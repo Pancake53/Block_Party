@@ -14,7 +14,7 @@ class Game_World(State):
         self.character = Character(0, 1, 240, 150)
 
     def update(self, delta_time, actions):
-        pass
+        self.character.update(delta_time, actions, self.tiles)
 
     def render(self, surface):
         surface.fill((self.BG_COLOUR))
