@@ -1,5 +1,6 @@
 import pygame, json, os
 from states.state import State
+from character import Character
 
 
 
@@ -10,6 +11,7 @@ class Game_World(State):
         self.BROWN = (245, 147, 49)
         self.tiles = []
         self.load_level("ship.json")
+        self.character = Character(0, 1, 240, 150)
 
     def update(self, delta_time, actions):
         pass
@@ -21,6 +23,8 @@ class Game_World(State):
                                self.game.GAME_H / 4)
         for tile in self.tiles:
             pygame.draw.rect(surface, self.BROWN, tile)
+
+        self.character.render(surface)
         
         
         
