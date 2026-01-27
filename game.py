@@ -9,7 +9,7 @@ class Game():
 
         self.FONT_SIZE = 20
         self.GAME_W, self.GAME_H = 480, 270
-        self.WINDOW_W, self.WINDOW_H = 480, 270
+        self.WINDOW_W, self.WINDOW_H = 960, 540
         self.game_canvas = pygame.Surface((self.GAME_W, self.GAME_H))
         self.window = pygame.display.set_mode((self.WINDOW_W, self.WINDOW_H))
 
@@ -97,6 +97,7 @@ class Game():
         # Pointers for assets
         self.assets_dir = os.path.join("assets")
         self.font_dir = os.path.join(self.assets_dir, "font")
+        self.level_dir = os.path.join("levels")
         # Assets themselves
         self.font = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_SIZE)
 

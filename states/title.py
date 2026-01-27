@@ -14,5 +14,5 @@ class Title(State):
     def render(self, surface):
         surface.fill((self.game.BLACK))
         self.game.draw_text(surface, "Mutiny Downmaster",
-                             self.game.WHITE, self.game.WINDOW_W / 2,
-                               self.game.WINDOW_H / 2)
+                             self.game.WHITE, self.game.GAME_W / 2,
+                               self.game.GAME_H / 2)
