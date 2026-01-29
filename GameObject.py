@@ -3,11 +3,11 @@ import pygame
 class GameObject():
     def __init__(self, x_pos, y_pos):
         self.origin = (x_pos, y_pos)
-        self.x_pos = x_pos
-        self.y_pos = y_pos
+        self.x_pos = float(x_pos)
+        self.y_pos = float(y_pos)
         self.x_speed = 0
         self.y_speed = 0.01
-        self.gravity = 3
+        self.gravity = 9.8
         self.air_resistance = 0.99
         self.selected = False
         self.rect = pygame.Rect(x_pos, y_pos, 16, 32)
@@ -45,7 +45,7 @@ class GameObject():
 
     def handle_actions(self, dt, actions, tiles):
         if actions["M1"]:
-            self.add_momentum(-500 * dt, -500 * dt)
+            self.add_momentum(-5000 * dt, -5000 * dt)
 
         if actions["action1"]:
             self.x_pos = self.origin[0]

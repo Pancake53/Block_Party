@@ -9,7 +9,7 @@ class Character(GameObject):
         self.colour = [(184, 43, 43), (95, 184, 43)][team_id]
         self.width = width
         self.y_stop = 0.1
-        self.x_stop = 0.01
+        self.x_stop = 0.1
         self.retention = 0.25 # * width
 
         self.rect = pygame.Rect(x_pos, y_pos, 12 * width, 25)
@@ -22,13 +22,14 @@ class Character(GameObject):
         return collisions
     
     def update_pos(self, dt, tiles): # only active if we have speed
+
         self.update_pos_y(dt, tiles)
         self.update_pos_x(dt, tiles)
 
     def update_pos_x(self, dt, tiles):
         # x movement
         self.x_pos += self.x_speed * dt # for calculations
-        self.rect.x = self.x_pos # update rect position for collision_test
+        self.rect.x = round(self.x_pos) # update rect position for collision_test
         collisions = self.collision_test(tiles)
 
         if not collisions:
@@ -42,16 +43,20 @@ class Character(GameObject):
             # DOING THIS BEFORE THE IF CHECK !!! BIG NO NO NO
             for tile in collisions:
                 if self.x_speed > 0:
+                    print("colliding w left wall")
                     self.rect.right = tile.left # colliderect => False
+                    self.x_pos = self.rect.x
                 elif self.x_speed < 0:
+                    print("colliding w right wall")
                     self.rect.left = tile.right # colliderect => False
+                    self.x_pos = self.rect.x
 
             self.x_speed = - self.x_speed * self.retention
 
     def update_pos_y(self, dt, tiles):
         # y movement
         self.y_pos += self.y_speed * dt # for calculations
-        self.rect.y = self.y_pos # update rect w calculated pos
+        self.rect.y = round(self.y_pos) # update rect w calculated pos
         collisions = self.collision_test(tiles)
 
         if not collisions:
@@ -60,10 +65,14 @@ class Character(GameObject):
             tile = collisions[0]
 
             if self.y_speed > self.y_stop: # top
+                print("colliding w top of tile")
                 self.rect.bottom = tile.top
+                self.y_pos = self.rect.y
                 self.y_speed = self.y_speed * -1 * self.retention
             elif -self.y_speed > self.y_stop: # bottom
+                print("colliding w bottom of tile")
                 self.rect.top = tile.bottom
+                self.y_pos = self.rect.y
                 self.y_speed = self.y_speed * -1 * self.retention / 2
             else:
                 self.y_speed = 0
