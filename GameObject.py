@@ -7,9 +7,12 @@ class GameObject():
         self.y_pos = float(y_pos)
         self.x_speed = 0
         self.y_speed = 0.01
-        self.gravity = 9.8
+        self.gravity = 100
         self.air_resistance = 0.99
         self.selected = False
+        self.mouse_pos_list = []
+        self.throw_multiplier = 1
+        self.max_velocity = 300
         self.rect = pygame.Rect(x_pos, y_pos, 16, 32)
 
     def render(self, surface):
@@ -39,15 +42,35 @@ class GameObject():
         # collision_test
         pass
 
-    def add_momentum(self, x_speed, y_speed):
-        self.x_speed = x_speed
-        self.y_speed = y_speed
+    def add_momentum(self, x_speed, y_speed): 
+        self.x_speed = max(-self.max_velocity,
+                        min(x_speed, self.max_velocity))
+        self.y_speed = max(-self.max_velocity,
+                        min(y_speed, self.max_velocity))
 
     def handle_actions(self, dt, actions, tiles):
-        if actions["M1"]:
-            self.add_momentum(-5000 * dt, -5000 * dt)
 
+        if actions["left"]:
+            self.add_momentum(-50, -50)
+        if actions["right"]:
+            self.add_momentum(50, -50)
         if actions["action1"]:
             self.x_pos = self.origin[0]
             self.y_pos = self.origin[1]
+            self.x_speed = 0
+            self.y_speed = 0.01
             self.update_pos(dt, tiles)
+
+        if actions["M1"]:
+            mouse_pos = pygame.mouse.get_pos()
+            while len(self.mouse_pos_list) > 2:
+                self.mouse_pos_list.pop()
+            self.mouse_pos_list.append(mouse_pos)
+
+        if (actions["M1"] == False) and (len(self.mouse_pos_list) >= 2):
+            print("time to throw!")
+            x_speed = (self.mouse_pos_list[0][0] -self.mouse_pos_list[-1][0]) * self.throw_multiplier
+            y_speed = (self.mouse_pos_list[0][1] -self.mouse_pos_list[-1][1]) * self.throw_multiplier
+            self.add_momentum(x_speed, y_speed)
+
+            self.mouse_pos_list = []

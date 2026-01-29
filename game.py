@@ -21,7 +21,7 @@ class Game():
 
         self.actions = {"left": False, "right": False, "up": False,
                         "down": False, "M1": False, "action1": False,
-                        "action2": False, "start": False}
+                        "action2": False, "space": False, "start": False}
         
 
         self.clock = pygame.time.Clock()
@@ -61,6 +61,8 @@ class Game():
                     self.actions["start"] = True
                 if event.key == pygame.K_2:
                     self.actions["action2"] = True
+                if event.key == pygame.K_SPACE:
+                    self.actions["space"] = True
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_a:
@@ -77,6 +79,8 @@ class Game():
                     self.actions["start"] = False
                 if event.key == pygame.K_2:
                     self.actions["action2"] = False
+                if event.key == pygame.K_SPACE:
+                    self.actions["space"] = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
