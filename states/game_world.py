@@ -11,7 +11,7 @@ class Game_World(State):
         self.BROWN = (245, 147, 49)
         self.tiles = []
         self.load_level("ship..tmj")
-        self.character = Character(0, 1, 240, 150)
+        self.character = Character(0, 1, 240, 170)
 
     def update(self, delta_time, actions):
         self.character.update(delta_time, actions, self.tiles)
@@ -20,7 +20,7 @@ class Game_World(State):
         surface.fill((self.BG_COLOUR))
         self.game.draw_text(surface, "Gameplay",
                              self.game.BLACK, self.game.GAME_W / 2,
-                               self.game.GAME_H / 6)
+                               self.game.GAME_H / 8)
         for tile in self.tiles:
             pygame.draw.rect(surface, self.BROWN, tile)
 

@@ -20,10 +20,12 @@ class Game():
         (204, 121, 167)] # Purple
 
         self.actions = {"left": False, "right": False, "up": False,
-                        "down": False, "mouse1": False, "action1": False,
+                        "down": False, "M1": False, "action1": False,
                         "action2": False, "start": False}
         
-        self.dt, self.prev_time = 0, 0
+
+        self.clock = pygame.time.Clock()
+        self.dt = self.clock.tick(60) / 1000
         self.state_stack = []
         self.load_assets()
         self.load_states()
@@ -76,6 +78,14 @@ class Game():
                 if event.key == pygame.K_2:
                     self.actions["action2"] = False
 
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    self.actions["M1"] = True
+
+            if event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    self.actions["M1"] = False
+
     def update(self):
         self.state_stack[-1].update(self.dt, self.actions)
 
@@ -87,9 +97,7 @@ class Game():
         pygame.display.flip()
 
     def get_dt(self):
-        now = time.time()
-        self.dt = now - self.prev_time
-        self.prev_time = now
+        self.dt = self.clock.tick(60) / 1000
 
     def draw_text(self, surface, text, colour, x, y):
         text_surface = self.font.render(text, True, colour)
