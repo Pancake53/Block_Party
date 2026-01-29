@@ -10,7 +10,7 @@ class Game_World(State):
         self.BG_COLOUR = (56, 175, 218)
         self.BROWN = (245, 147, 49)
         self.tiles = []
-        self.load_level("ship.json")
+        self.load_level("ship..tmj")
         self.character = Character(0, 1, 240, 150)
 
     def update(self, delta_time, actions):
@@ -20,7 +20,7 @@ class Game_World(State):
         surface.fill((self.BG_COLOUR))
         self.game.draw_text(surface, "Gameplay",
                              self.game.BLACK, self.game.GAME_W / 2,
-                               self.game.GAME_H / 4)
+                               self.game.GAME_H / 6)
         for tile in self.tiles:
             pygame.draw.rect(surface, self.BROWN, tile)
 
@@ -29,10 +29,14 @@ class Game_World(State):
         
         
     def load_level(self, level_name):
-        path = os.path.join(self.game.level_dir, level_name)
+        path = os.path.join(self.game.tilemap_dir, level_name)
 
         with open(path, "r", encoding="utf-8") as f:
             level_data = json.load(f)
 
-        for tile in level_data["tiles"]:
-            self.tiles.append(pygame.Rect(tile[0], tile[1], tile[2], tile[3]))
+        
+
+        for layer in level_data["layers"]:
+            if layer["type"] == "objectgroup":
+                for obj in layer["objects"]:
+                    self.tiles.append(pygame.Rect(obj["x"], obj["y"], obj["width"], obj["height"]))

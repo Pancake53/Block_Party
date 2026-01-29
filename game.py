@@ -14,6 +14,10 @@ class Game():
         self.window = pygame.display.set_mode((self.WINDOW_W, self.WINDOW_H))
 
         self.BLACK, self.WHITE = (0, 0, 0), (255, 255, 255)
+        self.team_colours = [(0, 114, 178), # Blue
+        (230, 159, 0), # Orange
+        (0, 158, 115), # Green
+        (204, 121, 167)] # Purple
 
         self.actions = {"left": False, "right": False, "up": False,
                         "down": False, "mouse1": False, "action1": False,
@@ -98,6 +102,7 @@ class Game():
         self.assets_dir = os.path.join("assets")
         self.font_dir = os.path.join(self.assets_dir, "font")
         self.level_dir = os.path.join("levels")
+        self.tilemap_dir = os.path.join("tilemap")
         # Assets themselves
         self.font = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_SIZE)
 
