@@ -9,11 +9,13 @@ class GameObject():
         self.y_speed = 0.01
         self.gravity = 100
         self.air_resistance = 0.99
-        self.selected = False
+        self.state = {"selected": False, "jump": False}
         self.mouse_pos_list = []
         self.throw_multiplier = 1
         self.max_velocity = 300
-        self.rect = pygame.Rect(x_pos, y_pos, 16, 32)
+
+        self.CHARACTER_SIZE = 12
+        self.rect = pygame.Rect(x_pos, y_pos, self.CHARACTER_SIZE, self.CHARACTER_SIZE * 2)
 
     def render(self, surface):
         pygame.draw.rect(surface, self.colour, self.rect)
@@ -22,7 +24,6 @@ class GameObject():
         
         if (self.x_speed != 0) or (self.y_speed != 0):
             self.update_pos(dt, tiles)
-        
         self.handle_actions(dt, actions, tiles)
 
 
@@ -59,9 +60,12 @@ class GameObject():
             self.y_pos = self.origin[1]
             self.x_speed = 0
             self.y_speed = 0.01
-            self.update_pos(dt, tiles)
 
-        if actions["M1"]:
+        if actions["M1"] and not self.state["jump"] and not self.state["throw"]:
+            mouse_pos = pygame.mouse.get_pos()
+
+
+        elif actions["M1"] and self.state["jump"]:
             mouse_pos = pygame.mouse.get_pos()
             while len(self.mouse_pos_list) > 2:
                 self.mouse_pos_list.pop()
@@ -74,3 +78,9 @@ class GameObject():
             self.add_momentum(x_speed, y_speed)
 
             self.mouse_pos_list = []
+            self.reset_state()
+
+
+    def reset_state(self):
+        for k in self.state:
+            self.state[k] = False

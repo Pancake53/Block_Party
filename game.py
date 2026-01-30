@@ -27,6 +27,7 @@ class Game():
         self.clock = pygame.time.Clock()
         self.dt = self.clock.tick(60) / 1000
         self.state_stack = []
+        self.assets = {}
         self.load_assets()
         self.load_states()
         
@@ -112,11 +113,13 @@ class Game():
     def load_assets(self):
         # Pointers for assets
         self.assets_dir = os.path.join("assets")
+        self.image_dir = os.path.join(self.assets_dir, "images")
         self.font_dir = os.path.join(self.assets_dir, "font")
         self.level_dir = os.path.join("levels")
         self.tilemap_dir = os.path.join("tilemap")
         # Assets themselves
         self.font = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_SIZE)
+        self.assets["bomb"] = pygame.image.load(os.path.join(self.image_dir, "bomb.png")).convert_alpha()
 
     def reset_keys(self):
         for action in self.actions:
