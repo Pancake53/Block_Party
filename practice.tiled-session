@@ -3,10 +3,18 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "tilemap/ship.tmx",
     "expandedProjectPaths": [
     ],
     "fileStates": {
+        "tilemap/ship.tmx": {
+            "scale": 0.8154166666666666,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 240.3679100664282,
+                "y": 135.51354113438938
+            }
+        }
     },
     "last.exportedFilePath": "C:/Users/nikol/OneDrive - O365 Turun yliopisto/Koulu/Tietotekniikka/Harjoitustyö/tilemap",
     "map.height": 18,
@@ -15,8 +23,11 @@
     "map.tileHeight": 15,
     "map.width": 15,
     "openFiles": [
+        "tilemap/ship.tmx"
     ],
     "project": "practice.tiled-project",
     "recentFiles": [
-    ]
+        "tilemap/ship.tmx"
+    ],
+    "resizeMap.removeObjects": false
 }

@@ -7,8 +7,8 @@ class Game():
         pygame.init()
         self.running, self.playing = True, False
 
-        self.FONT_SIZE = 20
-        self.GAME_W, self.GAME_H = 480, 270
+        self.FONT_SIZE = 40
+        self.GAME_W, self.GAME_H = 960, 540
         self.WINDOW_W, self.WINDOW_H = 960, 540
         self.game_canvas = pygame.Surface((self.GAME_W, self.GAME_H))
         self.window = pygame.display.set_mode((self.WINDOW_W, self.WINDOW_H))

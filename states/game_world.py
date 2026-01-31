@@ -11,7 +11,7 @@ class Game_World(State):
         self.BG_COLOUR = (56, 175, 218)
         self.BROWN = (245, 147, 49)
         self.tiles = []
-        self.load_level("ship..tmj")
+        self.load_level("ship.tmj")
         self.characters = [Character(self, 0, 1, 240, 170)]
         self.bombs = []
 

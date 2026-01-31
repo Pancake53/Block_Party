@@ -7,14 +7,14 @@ class GameObject():
         self.y_pos = float(y_pos)
         self.x_speed = 0
         self.y_speed = 0.01
-        self.gravity = 100
+        self.gravity = 200
         self.air_resistance = 0.99
         self.state = {"selected": False, "jump": False}
         self.mouse_pos_list = []
         self.throw_multiplier = 1
-        self.max_velocity = 300
+        self.max_velocity = 600
 
-        self.CHARACTER_SIZE = 12
+        self.CHARACTER_SIZE = 24
         self.rect = pygame.Rect(x_pos, y_pos, self.CHARACTER_SIZE, self.CHARACTER_SIZE * 2)
 
     def render(self, surface):
@@ -52,9 +52,9 @@ class GameObject():
     def handle_actions(self, dt, actions, tiles):
 
         if actions["left"]:
-            self.add_momentum(-50, -50)
+            self.add_momentum(-100, -100)
         if actions["right"]:
-            self.add_momentum(50, -50)
+            self.add_momentum(100, -100)
         if actions["action1"]:
             self.x_pos = self.origin[0]
             self.y_pos = self.origin[1]

@@ -22,7 +22,7 @@ class Character(GameObject):
     def render(self, surface):
         pygame.draw.rect(surface, self.colour, self.rect)
         if self.state["selected"]:
-            self.render_selections(self, surface)
+            self.render_selections(surface)
 
     def update(self, dt, actions, tiles):
         
@@ -113,10 +113,12 @@ class Character(GameObject):
             self.x_speed = 0
             self.y_speed = 0.01
 
-        if actions["M1"] and not self.state["jump"] and not self.state["throw"]:
+        if (actions["M1"]) and not (self.state["jump"] or self.state["throw"]):
+            print("select condition met")
             mouse_pos = pygame.mouse.get_pos()
             if self.rect.collidepoint(mouse_pos):
                 self.state["selected"] = not self.state["selected"]
+                print(f"state: {self.state}")
 
         # jump and release
         elif actions["M1"] and self.state["jump"]:
