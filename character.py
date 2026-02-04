@@ -113,21 +113,32 @@ class Character(GameObject):
             self.x_speed = 0
             self.y_speed = 0.01
 
-        if (actions["M1"]) and not (self.state["jump"] or self.state["throw"]):
-            print("select condition met")
-            mouse_pos = pygame.mouse.get_pos()
-            if self.rect.collidepoint(mouse_pos):
-                self.state["selected"] = not self.state["selected"]
-                print(f"state: {self.state}")
 
-        # jump and release
-        elif actions["M1"] and self.state["jump"]:
+        # Handle mouse clicks for selecting character
+        if (actions["mouse_click"]):
+            actions["mouse_click"] = False # prevent double clicking
+            print("Mouse Click")
+            if not (self.state["jump"] or self.state["throw"]):
+                # print("select condition met") 
+                mouse_pos = pygame.mouse.get_pos()
+                if self.rect.collidepoint(mouse_pos): # mouse on character
+                    # print("collision")
+                    self.state["selected"] = not self.state["selected"]
+                    # print(f"state: {self.state}")
+
+        # Jump
+        # Dragging
+        elif actions["mouse_pressed"] and self.state["selected"]: # and self.state["jump"]:
+            print("Mouse Pressed")
+
             mouse_pos = pygame.mouse.get_pos()
             while len(self.mouse_pos_list) > 2:
                 self.mouse_pos_list.pop()
             self.mouse_pos_list.append(mouse_pos)
+            # render line or arrow function
 
-        if (actions["M1"] == False) and (len(self.mouse_pos_list) >= 2):
+        # Releasing
+        elif (actions["mouse_pressed"] == False) and (len(self.mouse_pos_list) >= 2):
             print("time to throw!")
             x_speed = (self.mouse_pos_list[0][0] -self.mouse_pos_list[-1][0]) * self.throw_multiplier
             y_speed = (self.mouse_pos_list[0][1] -self.mouse_pos_list[-1][1]) * self.throw_multiplier

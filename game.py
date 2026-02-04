@@ -20,7 +20,7 @@ class Game():
         (204, 121, 167)] # Purple
 
         self.actions = {"left": False, "right": False, "up": False,
-                        "down": False, "M1": False, "action1": False,
+                        "down": False, "mouse_pressed": False, "mouse_click": False, "action1": False,
                         "action2": False, "space": False, "start": False}
         
 
@@ -41,6 +41,9 @@ class Game():
 
 
     def check_events(self):
+        # Reset variables
+        self.actions["mouse_click"] = False  
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running, self.playing = False, False
@@ -84,12 +87,23 @@ class Game():
                     self.actions["space"] = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    self.actions["M1"] = True
+                # print("mousebuttonDOWN")
+                self.actions["mouse_pressed"] = True
+                self.actions["mouse_click"] = True
+                # print(f"mouse_click: {self.actions["mouse_click"]}")
+
+            # else: # if we have no (down or up) mouse action then click = false 
+            #     self.actions["mouse_click"] = False    
+            #     print("NOT mousebuttondown")
+            #     print(f"mouse_click: {self.actions["mouse_click"]}")
 
             if event.type == pygame.MOUSEBUTTONUP:
-                if event.button == 1:
-                    self.actions["M1"] = False
+                # print("mousebuttonUP")
+                self.actions["mouse_pressed"] = False
+                
+        # print(f"mouse_click: {self.actions["mouse_click"]}")    
+        
+        
 
     def update(self):
         self.state_stack[-1].update(self.dt, self.actions)
