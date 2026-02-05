@@ -17,7 +17,9 @@ class Character(GameObject):
 
         self.rect = pygame.Rect(x_pos, y_pos, self.CHARACTER_SIZE * width, self.CHARACTER_SIZE * 2)
         # State management
-        self.state = {"selected": False, "choosing": False, "jump": False, "throw": False}
+        self.state = {"selected": False, "choosing": False, "jump": False, "drag": False, "throw": False}
+        self.state_CD = 30
+      
 
     def render(self, surface):
         pygame.draw.rect(surface, self.colour, self.rect)
@@ -112,30 +114,40 @@ class Character(GameObject):
             self.y_pos = self.origin[1]
             self.x_speed = 0
             self.y_speed = 0.01
+
+        print(f"char state: {self.state}")
         
         # mouse on character
         hovered = self.rect.collidepoint(actions["mouse_pos"])
 
         # Handle mouse clicks for selecting character
-        if hovered and (actions["mouse_click"]):
-            if not (self.state["jump"] or self.state["throw"]):
-                # print("select condition met") 
+        if hovered:
+            if actions["mouse_click"]:
+                if not (self.state["jump"] or self.state["throw"]):
+                    # print("select condition met") 
 
-                    # print("collision")
-                    self.state["selected"] = not self.state["selected"]
-                    # print(f"state: {self.state}")
+                        # print("collision")
+                        self.state["selected"] = not self.state["selected"]
+                        self.state["choosing"] = not self.state["choosing"]
+                        # print(f"state: {self.state}")
 
         # Jump
+        # require new click to enter drag state
+        if self.state["jump"] and not self.state["drag"]:
+            if actions["mouse_click"]:
+                self.mouse_pos_list = [actions["mouse_pos"]]
+                self.state["drag"] = True
+
         # Dragging
-        elif actions["mouse_pressed"] and self.state["jump"]:
-            print("Mouse Pressed")
-            while len(self.mouse_pos_list) > 2:
-                self.mouse_pos_list.pop()
-            self.mouse_pos_list.append(actions["mouse_pos"])
-            # render line or arrow function
+        elif self.state["drag"]:
+            if actions["mouse_pressed"]:
+                while len(self.mouse_pos_list) > 2:
+                    self.mouse_pos_list.pop()
+                self.mouse_pos_list.append(actions["mouse_pos"])
+                # render line or arrow function
 
         # Releasing
-        elif (actions["mouse_pressed"] == False) and (len(self.mouse_pos_list) >= 2):
+        if (not actions["mouse_pressed"]) and (len(self.mouse_pos_list) >= 2):
             print("time to throw!")
             x_speed = (self.mouse_pos_list[0][0] -self.mouse_pos_list[-1][0]) * self.throw_multiplier
             y_speed = (self.mouse_pos_list[0][1] -self.mouse_pos_list[-1][1]) * self.throw_multiplier

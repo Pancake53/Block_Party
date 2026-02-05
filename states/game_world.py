@@ -2,6 +2,7 @@ import pygame, json, os
 from states.state import State
 from character import Character
 from bomb import Bomb
+from button import Button
 
 
 
@@ -14,10 +15,13 @@ class Game_World(State):
         self.load_level("ship.tmj")
         self.characters = [Character(self, 0, 1, 240, 170)]
         self.bombs = []
+        self.button_choices = []
+        self.button = Button(100, 100, 30, 30)
 
     def update(self, delta_time, actions):
         for char in self.characters:
             char.update(delta_time, actions, self.tiles)
+        
 
     def render(self, surface):
         surface.fill((self.BG_COL))
@@ -29,8 +33,15 @@ class Game_World(State):
 
         for char in self.characters:
             char.render(surface)
+            if char.state["choosing"]:
+                if self.button.action_on_button(100, 100, surface, self.game.actions):
+                    char.state["jump"] = True
+                    char.state["choosing"] = False
+                
         for bomb in self.bombs:
             bomb.render(surface)
+
+        
         
         
         
@@ -45,8 +56,11 @@ class Game_World(State):
                 for obj in layer["objects"]:
                     self.tiles.append(pygame.Rect(obj["x"], obj["y"], obj["width"], obj["height"]))
 
+        
+
     def spawn_bomb(self, x_pos, y_pos):
         self.bombs.append(Bomb(x_pos, y_pos, self.game.assets["bomb"]))
 
     def render_selections(self, x, y):
-        pass
+        for count, button in enumerate(self.button_choices):
+            pass

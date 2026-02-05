@@ -10,9 +10,11 @@ class GameObject():
         self.gravity = 200
         self.air_resistance = 0.99
         self.state = {"selected": False, "jump": False}
+
         self.mouse_pos_list = []
         self.throw_multiplier = 2.5
         self.max_velocity = 300
+        self.min_jump = 10
 
         self.CHARACTER_SIZE = 24
         self.rect = pygame.Rect(x_pos, y_pos, self.CHARACTER_SIZE, self.CHARACTER_SIZE * 2)

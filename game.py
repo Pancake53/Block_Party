@@ -20,7 +20,7 @@ class Game():
         (204, 121, 167)] # Purple
 
         self.actions = {"left": False, "right": False, "up": False,
-                        "down": False, "mouse_pressed": False, "mouse_click": False, "action1": False,
+                        "down": False, "mouse_pressed": False, "mouse_click": False, "mouse_pos": (0, 0), "action1": False,
                         "action2": False, "space": False, "start": False}
         
 
@@ -42,7 +42,8 @@ class Game():
 
     def check_events(self):
         # Reset variables
-        self.actions["mouse_click"] = False  
+        self.actions["mouse_click"] = False
+        
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -107,6 +108,7 @@ class Game():
         
         self.actions["mouse_pos"] = pygame.mouse.get_pos()
         
+        
 
     def update(self):
         self.state_stack[-1].update(self.dt, self.actions)
@@ -138,9 +140,10 @@ class Game():
         self.font = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_SIZE)
         self.assets["bomb"] = pygame.image.load(os.path.join(self.image_dir, "bomb.png")).convert_alpha()
 
-    def reset_keys(self):
+    def reset_keys(self): # DELETE THIS
         for action in self.actions:
-            self.actions[action] = False
+            if action != "mouse_pos":
+                self.actions[action] = False
 
     def load_states(self):
         self.title_screen = Title(self)
