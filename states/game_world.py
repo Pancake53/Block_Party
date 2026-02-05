@@ -8,7 +8,7 @@ from bomb import Bomb
 class Game_World(State):
     def __init__(self, game):
         super().__init__(game)
-        self.BG_COLOUR = (56, 175, 218)
+        self.BG_COL = (56, 175, 218)
         self.BROWN = (245, 147, 49)
         self.tiles = []
         self.load_level("ship.tmj")
@@ -20,7 +20,7 @@ class Game_World(State):
             char.update(delta_time, actions, self.tiles)
 
     def render(self, surface):
-        surface.fill((self.BG_COLOUR))
+        surface.fill((self.BG_COL))
         self.game.draw_text(surface, "Gameplay",
                              self.game.BLACK, self.game.GAME_W / 2,
                                self.game.GAME_H / 8)
@@ -47,3 +47,6 @@ class Game_World(State):
 
     def spawn_bomb(self, x_pos, y_pos):
         self.bombs.append(Bomb(x_pos, y_pos, self.game.assets["bomb"]))
+
+    def render_selections(self, x, y):
+        pass

@@ -89,7 +89,6 @@ class Game():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # print("mousebuttonDOWN")
                 self.actions["mouse_pressed"] = True
-                self.actions["mouse_click"] = True
                 # print(f"mouse_click: {self.actions["mouse_click"]}")
 
             # else: # if we have no (down or up) mouse action then click = false 
@@ -101,8 +100,12 @@ class Game():
                 # print("mousebuttonUP")
                 self.actions["mouse_pressed"] = False
                 
-        # print(f"mouse_click: {self.actions["mouse_click"]}")    
+        # print(f"mouse_click: {self.actions["mouse_click"]}") 
+
+        if pygame.mouse.get_just_pressed()[0]:
+            self.actions["mouse_click"] = True   
         
+        self.actions["mouse_pos"] = pygame.mouse.get_pos()
         
 
     def update(self):

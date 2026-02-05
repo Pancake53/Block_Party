@@ -10,19 +10,19 @@ class Character(GameObject):
         self.width = width
 
         self.colour = [(184, 43, 43), (95, 184, 43)][team_id]
+        # Physics
         self.y_stop = 20
         self.x_stop = 1
         self.retention = 0.25 # * width
 
         self.rect = pygame.Rect(x_pos, y_pos, self.CHARACTER_SIZE * width, self.CHARACTER_SIZE * 2)
-
-        self.state = {"selected": False, "jump": False, "throw": False}
-        self.selections = ["jump", "throw", "surrender"]
+        # State management
+        self.state = {"selected": False, "choosing": False, "jump": False, "throw": False}
 
     def render(self, surface):
         pygame.draw.rect(surface, self.colour, self.rect)
-        if self.state["selected"]:
-            self.render_selections(surface)
+        if self.state["choosing"]:
+            self.game_world.render_selections(self.rect.x, self.rect.y)
 
     def update(self, dt, actions, tiles):
         
@@ -112,29 +112,26 @@ class Character(GameObject):
             self.y_pos = self.origin[1]
             self.x_speed = 0
             self.y_speed = 0.01
-
+        
+        # mouse on character
+        hovered = self.rect.collidepoint(actions["mouse_pos"])
 
         # Handle mouse clicks for selecting character
-        if (actions["mouse_click"]):
-            actions["mouse_click"] = False # prevent double clicking
-            print("Mouse Click")
+        if hovered and (actions["mouse_click"]):
             if not (self.state["jump"] or self.state["throw"]):
                 # print("select condition met") 
-                mouse_pos = pygame.mouse.get_pos()
-                if self.rect.collidepoint(mouse_pos): # mouse on character
+
                     # print("collision")
                     self.state["selected"] = not self.state["selected"]
                     # print(f"state: {self.state}")
 
         # Jump
         # Dragging
-        elif actions["mouse_pressed"] and self.state["selected"]: # and self.state["jump"]:
+        elif actions["mouse_pressed"] and self.state["jump"]:
             print("Mouse Pressed")
-
-            mouse_pos = pygame.mouse.get_pos()
             while len(self.mouse_pos_list) > 2:
                 self.mouse_pos_list.pop()
-            self.mouse_pos_list.append(mouse_pos)
+            self.mouse_pos_list.append(actions["mouse_pos"])
             # render line or arrow function
 
         # Releasing
@@ -152,5 +149,3 @@ class Character(GameObject):
             self.game_world.spawn_bomb(self.rect.x, self.rect.y)
 
 
-    def render_selections(self, surface):
-        pass
