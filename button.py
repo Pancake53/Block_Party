@@ -2,8 +2,27 @@ import pygame
 
 # Button that can have optionally image or text
 class Button():
+    '''Class for UI buttons
+    
+    returns True when clicked
+
+    handels rendering and actions on button
+    '''
     def __init__(self, x, y, width, height, button_colour=(255, 255, 255),
                   hover_colour=(139, 139, 139), image=None, text=None, font=None):
+        
+        '''
+        Docstring for __init__
+        
+
+         x & y: top left position of button
+         width & height: dimensions
+         button_colour: color as rgb
+         hover_colour: color on mouseover as rgb
+         image: image rendered on top of button
+         text: text rendered on top of button
+         font: potential special font
+        '''
         self.x = x 
         self.y = y
         self.width = width
@@ -26,8 +45,13 @@ class Button():
             self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         
 
-    def action_on_button(self, x, y, surface, actions):
+    def action_on_button(self, x, y, surface, actions) -> bool:
+        '''
+        Handels user actions, mouseover and click 
+        and calls draw_button
 
+        Return True when button is clicked
+        '''
         self.x = x
         self.y = y
         self.rect.x = self.x
@@ -52,6 +76,14 @@ class Button():
         return pressed
     
     def draw_button(self, col, surface):
+        '''
+        Draws button and image and text 
+        if they are entered as args into class
+        
+    
+        col: button col, default or hover
+        surface: surface for rendering
+        '''
         # draw rect
         pygame.draw.rect(surface, col, self.rect)
 
