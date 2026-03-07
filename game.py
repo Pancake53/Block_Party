@@ -14,10 +14,7 @@ class Game():
         self.window = pygame.display.set_mode((self.WINDOW_W, self.WINDOW_H))
 
         self.BLACK, self.WHITE = (0, 0, 0), (255, 255, 255)
-        self.team_colours = [(0, 114, 178), # Blue
-        (230, 159, 0), # Orange
-        (0, 158, 115), # Green
-        (204, 121, 167)] # Purple
+        
 
         self.actions = {"left": False, "right": False, "up": False,
                         "down": False, "mouse_pressed": False, "mouse_click": False, "mouse_pos": (0, 0), "action1": False,

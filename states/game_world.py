@@ -9,14 +9,30 @@ from button import Button
 class Game_World(State):
     def __init__(self, game):
         super().__init__(game)
-        self.BG_COL = (56, 175, 218)
-        self.BROWN = (245, 147, 49)
+        # Teal
+        self.BG_COL = (0, 153, 136) # (56, 175, 218) light blue
+        self.BROWN = (181, 67, 0)
         self.tiles = []
-        self.load_level("ship.tmj")
+        
+
+        self.team_colours = [
+        
+        (204, 121, 167), # Purple
+        (34, 136, 51), # Forest green
+        (204, 51, 17), # Vibrant red
+        (68, 119, 170), # Dark blue
+        (255, 242, 89), # Yellow
+        (0, 0, 0), # Black
+        (230, 159, 0), # Orange
+        (213, 94, 0) # Dark orange
+        ] 
+
         self.characters = [Character(self, 0, 1, 240, 170)]
         self.bombs = []
         self.button_choices = []
         self.button = Button(100, 100, 30, 30)
+
+        self.load_level("ship.tmj")
 
     def update(self, delta_time, actions):
         for char in self.characters:
@@ -24,12 +40,14 @@ class Game_World(State):
         
 
     def render(self, surface):
+
         surface.fill((self.BG_COL))
         self.game.draw_text(surface, "Gameplay",
                              self.game.BLACK, self.game.GAME_W / 2,
                                self.game.GAME_H / 8)
         for tile in self.tiles:
             pygame.draw.rect(surface, self.BROWN, tile)
+        
 
         for char in self.characters:
             char.render(surface)
@@ -56,7 +74,7 @@ class Game_World(State):
                 for obj in layer["objects"]:
                     self.tiles.append(pygame.Rect(obj["x"], obj["y"], obj["width"], obj["height"]))
 
-        
+
 
     def spawn_bomb(self, x_pos, y_pos):
         self.bombs.append(Bomb(x_pos, y_pos, self.game.assets["bomb"]))

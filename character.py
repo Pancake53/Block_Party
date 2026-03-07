@@ -1,43 +1,66 @@
 import pygame
-from GameObject import GameObject
+from gameObject import GameObject
 
 
 class Character(GameObject):
+    '''
+    In game character which players have many at the beginning of a round
+
+    Handels rendering, updating pos, collision testing,
+      action such as selecting, jumping, spawning in bomb
+    
+    '''
     def __init__(self, game_world, team_id, width, x_pos, y_pos):
+        '''Initialize attributes
+
+        game_world: level the character loads into
+        team_id: team number
+        characters width
+        x & y position
+        
+        '''
         super().__init__(x_pos, y_pos)
         self.team_id = team_id
         self.game_world = game_world
         self.width = width
-
-        self.colour = [(184, 43, 43), (95, 184, 43)][team_id]
+        # Character colour based on team id
+        self.colour = self.game_world.team_colours[team_id]
         # Physics
-        self.y_stop = 20
-        self.x_stop = 1
-        self.retention = 0.25 # * width
+        # y bounce, lower value -> more small bounces
+        self.y_stop = 20 
+        # x speed stopper, if x_speed < x_stop -> x_speed = 0
+        self.x_stop = 1 
+        # speed loss multiplier on collision
+        self.retention = 0.25 
 
         self.rect = pygame.Rect(x_pos, y_pos, self.CHARACTER_SIZE * width, self.CHARACTER_SIZE * 2)
         # State management
         self.state = {"selected": False, "choosing": False, "jump": False, "drag": False, "throw": False}
-        self.state_CD = 30
+        
       
 
     def render(self, surface):
+        '''
+        Render char on given surface
+        If char is choosing, then render options
+        '''
         pygame.draw.rect(surface, self.colour, self.rect)
         if self.state["choosing"]:
             self.game_world.render_selections(self.rect.x, self.rect.y)
 
     def update(self, dt, actions, tiles):
-        
+        '''
+        Updates char position, if char is moving
+        Handels inputs
+
+        dt: delta time for fps independance
+        actions: actions dictionary
+        tiles: game levels collision tiles
+        '''
         if (self.x_speed != 0) or (self.y_speed != 0):
             self.update_pos(dt, tiles)
-        self.handle_actions(dt, actions, tiles)
+        self.handle_actions(actions)
 
-    def collision_test(self, tiles):
-        collisions = []
-        for tile in tiles:
-            if self.rect.colliderect(tile): # returns a boolean
-                collisions.append(tile)
-        return collisions
     
     def update_pos(self, dt, tiles): # only active if we have speed
 
@@ -103,8 +126,9 @@ class Character(GameObject):
                 self.y_pos = self.rect.y
                 self.y_speed = 0
     
-    def handle_actions(self, dt, actions, tiles):
-
+    def handle_actions(self, actions):
+        '''handels actions for char
+          based on actions dictionary'''
         if actions["left"]:
             self.add_momentum(-50, -50)
         if actions["right"]:
@@ -115,7 +139,7 @@ class Character(GameObject):
             self.x_speed = 0
             self.y_speed = 0.01
 
-        print(f"char state: {self.state}")
+        # print(f"char state: {self.state}")
         
         # mouse on character
         hovered = self.rect.collidepoint(actions["mouse_pos"])

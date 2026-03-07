@@ -1,5 +1,5 @@
 import pygame
-from GameObject import GameObject
+from gameObject import GameObject
 
 class Bomb(GameObject):
     '''Player thrown object.
@@ -32,10 +32,10 @@ class Bomb(GameObject):
         '''
         Docstring for update
         
-        :param self: 
-        :param dt: delta time
-        :param actions: user inputs dictionary
-        :param tiles: game worlds collision tiles
+        self: 
+        dt: delta time
+        actions: user inputs dictionary
+        tiles: game worlds collision tiles
         '''
         
         if (self.x_speed != 0) or (self.y_speed != 0):
