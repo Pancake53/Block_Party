@@ -39,15 +39,27 @@ class GameObject():
         pygame.draw.rect(surface, self.colour, self.rect)
 
     def update(self, dt, actions, tiles):
-        # if in place no momentum no need to update position
+        '''
+        Updates obj position, if obj is moving
+        Handels inputs
+
+        dt: delta time 
+        actions: user inputs dictionary
+        tiles: game levels collision tiles
+        '''
         if (self.x_speed != 0) or (self.y_speed != 0):
             self.update_pos(dt, tiles)
         self.handle_actions(actions)
 
 
     def collision_test(self, tiles):
-        '''tests if gameObject has overlapping with collision tiles
-        then return list of overlapping tiles
+        '''
+        tests if gameObject has overlapping with collision tiles
+
+        tiles: game levels collision tiles
+
+        Returns:
+        collisions: list of overlapping tiles
         '''
         collisions = []
         for tile in tiles:
@@ -55,13 +67,52 @@ class GameObject():
                 collisions.append(tile)
         return collisions
     
-    def update_pos(self, dt, tiles):
-        # self.y_pos += self.y_speed\
-        # self.rect.y = self.y_pos
-        # collision_test
-        # self.x_pos += self.x_speed
-        # self.rect.x = self.x_pos
-        # collision_test
+    def update_pos(self, dt, tiles): # only active if we have speed
+        '''
+        Updates object position
+
+        dt: delta time 
+        tiles: game levels collision tiles
+        '''
+        self.update_pos_y(dt, tiles)
+        self.update_pos_x(dt, tiles)
+
+    def update_pos_y(self, dt, tiles):
+        # y movement
+        self.y_pos += self.y_speed * dt # for calculations
+        self.rect.y = round(self.y_pos) # update rect w calculated pos
+        collisions = self.collision_test(tiles)
+        # print(f"y: {round(self.y_speed,3)}")
+        if not collisions:
+            self.y_speed += self.gravity * dt
+        else: # collision on y axis
+            self.collision_y_axis(collisions)
+
+    def collision_y_axis(self, collisions):
+        pass
+
+    def update_pos_x(self, dt, tiles):
+        '''
+        update position x wise and react to collisions
+        
+        dt: delta time 
+        tiles: game levels collision tiles
+        '''
+        # x movement
+        self.x_pos += self.x_speed * dt # x_pos is used for calculations
+        self.rect.x = round(self.x_pos) # update rect position for collision_test
+        collisions = self.collision_test(tiles)
+
+        if not collisions: # no collision
+            if abs(self.x_speed) < self.x_stop: # low speed limit
+                self.x_speed = 0
+            # else:
+                # self.x_speed *= self.air_resistance
+        else: # collision on x axis
+            
+            self.collision_x_axis(collisions)
+
+    def collision_x_axis(self, collisions):
         pass
 
     def add_momentum(self, x_speed, y_speed): 

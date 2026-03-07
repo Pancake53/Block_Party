@@ -21,18 +21,16 @@ class Bomb(GameObject):
 
     def render(self, surface):
         '''
-        Docstring for render
+        Rendering bomb onto game canvas
         
-        :param self: 
-        :param surface: surface to render object on
+        surface: surface to render object on
         '''
         surface.blit(self.image, self.rect)
 
     def update(self, dt, actions, tiles):
         '''
-        Docstring for update
-        
-        self: 
+        Updating bombs position in game        
+
         dt: delta time
         actions: user inputs dictionary
         tiles: game worlds collision tiles

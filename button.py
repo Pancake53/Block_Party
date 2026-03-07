@@ -50,6 +50,10 @@ class Button():
         Handels user actions, mouseover and click 
         and calls draw_button
 
+        x & y coordinates
+        surface: surface to render object on
+        actions: user inputs dictionary
+
         Return True when button is clicked
         '''
         self.x = x
