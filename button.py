@@ -8,19 +8,21 @@ class Button():
 
     handels rendering and actions on button
     '''
-    def __init__(self, x, y, width, height, button_colour=(255, 255, 255),
-                  hover_colour=(139, 139, 139), image=None, text=None, font=None):
+    def __init__(self, x, y, button_colour=(255, 255, 255),
+                  hover_colour=(139, 139, 139), width=0, height=0, image=None):
         
         '''
         Docstring for __init__
         
 
          x & y: top left position of button
-         width & height: dimensions
+         
          button_colour: color as rgb
          hover_colour: color on mouseover as rgb
+
+         one of the following:
+         width & height: dimensions 
          image: image rendered on top of button
-         
         '''
         self.x = x 
         self.y = y
@@ -34,13 +36,16 @@ class Button():
         self.click_col = self.black
         self.image = image
         
-
+        if (not self.image) and (self.width == 0 or self.height == 0):
+            print("ERROR: Button has no image and no dimensions!")
 
         # make Rect object
         if self.image:
             self.rect = self.image.get_rect()
         else:    
             self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+
+        
         
 
     def action_on_button(self, x, y, surface, actions) -> bool:
