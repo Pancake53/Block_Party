@@ -28,12 +28,14 @@ class Game_World(State):
         ] 
 
         self.characters = []
-        self.bombs = []
+        self.bomb = Bomb(-36, -36, self.game.assets["bomb_img"])
         self.jump_button = Button(0, 0, image=self.game.assets['jump_img'])
         self.bomb_button = Button(0, 0, image=self.game.assets['bomb_img'])
         self.flag_button = Button(0, 0, image=self.game.assets['flag_img'])
 
         self.load_level(level_name)
+
+        self.game_state = {'turn': 1, 'selecting_cooldown': False, 'playing': True}
 
     def update(self, delta_time, actions):
         '''
@@ -45,12 +47,14 @@ class Game_World(State):
         '''
         for char in self.characters:
             char.update(delta_time, actions, self.tiles)
+
+        self.bomb.update(delta_time, actions, self.tiles)
         
 
     def render(self, surface):
         '''
         renders onto game canvas
-        background, text, tiles, characters and bombs
+        background, text, tiles, characters and bomb
         
         surface: surface to render on
         '''
@@ -65,39 +69,53 @@ class Game_World(State):
         
         self.render_characters(surface)
 
-                
-        for bomb in self.bombs:
-            bomb.render(surface)
+        self.bomb.render(surface)
 
     def render_characters(self, surface):
+        '''
+        renders characters and calls render_selections
+        
+        surface: surface to render on
+        '''
         for char in self.characters:
             char.render(surface)
             if char.state["choosing"]:
+                self.render_selections(char, surface)
                 
-                y = char.rect.y - self.jump_button.height - 10
-                x_jump = char.rect.x - self.jump_button.width - 12
 
-                if self.jump_button.action_on_button(x_jump, y, surface, self.game.actions):
-                    char.state["jump"] = True
-                    char.state["choosing"] = False
-
-                x_bomb = x_jump + self.jump_button.width + 6
+    def render_selections(self, char, surface):
+        '''
+        renders selections
+        handels state changes based on selection
         
-                if self.bomb_button.action_on_button(x_bomb, y, surface, self.game.actions):
-                    char.state["jump"] = True
-                    char.state["choosing"] = False
+        char: character that is choosing
+        surface: surface to render on
+        '''
+        y = char.rect.y - self.jump_button.height - 10
+        x_jump = char.rect.x - self.jump_button.width - 12
 
-                x_flag = x_bomb + self.jump_button.width + 6
-        
-                if self.flag_button.action_on_button(x_flag, y, surface, self.game.actions):
-                    char.state["jump"] = True
-                    char.state["choosing"] = False
+        if self.jump_button.action_on_button(x_jump, y, surface, self.game.actions):
+            char.state["jump"] = True
+            char.state["choosing"] = False
+
+        x_bomb = x_jump + self.jump_button.width + 6
+
+        if self.bomb_button.action_on_button(x_bomb, y, surface, self.game.actions):
+            char.state["throw"] = True
+            
+
+        x_flag = x_bomb + self.jump_button.width + 6
+
+        if self.flag_button.action_on_button(x_flag, y, surface, self.game.actions):
+            char.state["jump"] = True
+            char.state["choosing"] = False
         
     def load_level(self, level_name):
         '''
         loads level data and stores it in tiles list as Rects
         creates needed instances:
         - characters
+        - bomb
 
         level_name: filename with level data
         '''
@@ -114,13 +132,23 @@ class Game_World(State):
 
         # characters
         self.characters.append(Character(self, 0, 1, 240, 170))
+        
 
 
     def spawn_bomb(self, x_pos, y_pos):
         '''
-        creates an instance of Bomb and adds it to bombs list
+        create an illusion of creating bomb
+        handels bombs state, coordinates
 
         x & y: center coordinates of bomb
         '''
-        self.bombs.append(Bomb(x_pos, y_pos, self.game.assets["bomb_img"]))
+        # state
+        self.bomb.state["selected"] = True
+        self.bomb.state["jump"] = True
+        # rect x&y
+        self.bomb.rect.centerx = x_pos 
+        self.bomb.rect.centery = y_pos 
+        # for calculations
+        self.bomb.x_pos = self.bomb.rect.x 
+        self.bomb.y_pos = self.bomb.rect.y 
 

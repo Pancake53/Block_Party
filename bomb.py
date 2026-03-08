@@ -20,7 +20,9 @@ class Bomb(GameObject):
         self.image = image
         self.rect = image.get_rect()
         self.rect.center = (x_pos, y_pos)
-        self.state = {"selected": True, "jump": True, "throw": False}
+
+        # state dictionary
+        self.state = {"selected": False, "jump": False, "drag": False, "throw": False}
         
 
     def render(self, surface):
@@ -42,7 +44,24 @@ class Bomb(GameObject):
         
         if (self.x_speed != 0) or (self.y_speed != 0):
             self.update_pos(dt, tiles)
-        self.handle_actions(dt, actions, tiles)
+        self.handle_actions(actions)
+        print(self.state)
+
+    def update_pos_x(self, dt, tiles):
+        '''
+        update position x wise and react to collisions
+        
+        dt: delta time 
+        tiles: game levels collision tiles
+        '''
+        # x movement
+        self.x_pos += self.x_speed * dt # x_pos is used for calculations
+        self.rect.x = round(self.x_pos) # update rect position for collision_test
+        collisions = self.collision_test(tiles)
+
+        if collisions:
+            #collision on x axis
+            self.collision_x_axis(collisions)
 
     def collision_y_axis(self, collisions):
         '''
@@ -61,4 +80,7 @@ class Bomb(GameObject):
         self.explosion()
 
     def explosion(self):
-        pass
+        x_exp = self.rect.x
+        y_exp = self.rect.y
+
+        self.x_speed, self.y_speed = 0, 0

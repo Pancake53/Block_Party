@@ -28,6 +28,7 @@ class Character(GameObject):
         # Physics
         # y bounce, lower value -> more small bounces
         self.y_stop = 20 
+        self.y_speed = 0.1
         # x speed stopper, if x_speed < x_stop -> x_speed = 0
         self.x_stop = 1 
         # speed loss multiplier on collision
@@ -36,6 +37,10 @@ class Character(GameObject):
         self.rect = pygame.Rect(x_pos, y_pos, self.CHARACTER_SIZE * width, self.CHARACTER_SIZE * 2)
         # State management
         self.state = {"selected": False, "choosing": False, "jump": False, "drag": False, "throw": False}
+
+        # Health points
+        self.max_hp = 100
+        self.current_hp = 100
         
       
 
@@ -157,7 +162,12 @@ class Character(GameObject):
             self.reset_state()
 
         
-        if actions["space"]: # bomb placeholder
-            self.game_world.spawn_bomb(self.rect.x, self.rect.y)
+        if self.state["throw"]: # bomb placeholder
+            x_pos = self.rect.centerx
+            y_pos = self.rect.centery
+
+            
+            self.game_world.spawn_bomb(x_pos, y_pos)
+            self.reset_state()
 
 
