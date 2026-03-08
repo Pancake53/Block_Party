@@ -8,8 +8,10 @@ class GameObject():
     Important constants for game physics
     '''
     def __init__(self, x_pos, y_pos):
-        '''Initialize attributes
+        '''
+        Initialize attributes
         
+        x & y: coordinates on canvas
         '''
         # x & y
         self.origin = (x_pos, y_pos)
@@ -19,11 +21,11 @@ class GameObject():
         self.y_speed = 0.01
 
         # Game physics
-        self.gravity = 200
+        self.gravity = 250
         self.throw_multiplier = 2.5
         self.max_velocity = 300
         self.min_jump = 10
-        # self.air_resistance = 0.99 # not in use 
+        # self.air_resistance = 0.99 # not in use
 
         # state dictionary
         self.state = {"selected": False, "jump": False}
@@ -36,6 +38,11 @@ class GameObject():
         self.rect = pygame.Rect(x_pos, y_pos, self.CHARACTER_SIZE, self.CHARACTER_SIZE * 2)
 
     def render(self, surface):
+        '''
+        Render obj on given surface
+
+        surface: game canvas
+        '''
         pygame.draw.rect(surface, self.colour, self.rect)
 
     def update(self, dt, actions, tiles):
@@ -78,7 +85,12 @@ class GameObject():
         self.update_pos_x(dt, tiles)
 
     def update_pos_y(self, dt, tiles):
-        # y movement
+        '''
+        update position y wise and react to collisions
+        
+        dt: delta time 
+        tiles: game levels collision tiles
+        '''
         self.y_pos += self.y_speed * dt # for calculations
         self.rect.y = round(self.y_pos) # update rect w calculated pos
         collisions = self.collision_test(tiles)
@@ -89,6 +101,11 @@ class GameObject():
             self.collision_y_axis(collisions)
 
     def collision_y_axis(self, collisions):
+        '''
+        reaction to collision on y axis
+        
+        collisions: list of overlapping tiles
+        '''
         pass
 
     def update_pos_x(self, dt, tiles):
@@ -113,10 +130,19 @@ class GameObject():
             self.collision_x_axis(collisions)
 
     def collision_x_axis(self, collisions):
+        '''
+        reaction to collision on x axis
+        
+        collisions: list of overlapping tiles
+        '''
         pass
 
     def add_momentum(self, x_speed, y_speed): 
-        ''' give gameObject clamped x and y momentum
+        ''' 
+        give gameObject clamped x and y momentum
+
+        x_speed: given velocity on x axis
+        y_speed: given velocity on y axis
         '''
         # logic: speed can be positive or negative
         self.x_speed = max(-self.max_velocity, # caps max negative
@@ -125,8 +151,12 @@ class GameObject():
                         min(y_speed, self.max_velocity))
 
     def handle_actions(self, actions):
-        '''handels actions for gameObject
-          based on actions dictionary from Game'''
+        '''
+        handels actions for gameObject
+        based on actions dictionary from Game
+
+        actions: user inputs dictionary
+        '''
 
         if actions["left"]:
             self.add_momentum(-100, -100)

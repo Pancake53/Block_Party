@@ -20,8 +20,7 @@ class Button():
          button_colour: color as rgb
          hover_colour: color on mouseover as rgb
          image: image rendered on top of button
-         text: text rendered on top of button
-         font: potential special font
+         
         '''
         self.x = x 
         self.y = y
@@ -34,8 +33,7 @@ class Button():
         self.black = (0, 0, 0)
         self.click_col = self.black
         self.image = image
-        self.text = text
-        self.font = font
+        
 
 
         # make Rect object
@@ -103,6 +101,4 @@ class Button():
         
 
         if self.image:
-            pass
-        if self.text:
             pass

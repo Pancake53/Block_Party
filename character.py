@@ -43,6 +43,8 @@ class Character(GameObject):
         '''
         Render char on given surface
         If char is choosing, then render options
+
+        surface: game canvas
         '''
         pygame.draw.rect(surface, self.colour, self.rect)
         if self.state["choosing"]:
@@ -100,8 +102,10 @@ class Character(GameObject):
 
 
     def handle_actions(self, actions):
-        '''handels actions for char
-          based on actions dictionary'''
+        '''
+        handels actions for char
+        based on actions dictionary
+        '''
         if actions["left"]:
             self.add_momentum(-50, -50)
         if actions["right"]:

@@ -11,11 +11,15 @@ class Bomb(GameObject):
         image: image of bomb selected
     '''
     def __init__(self, x_pos, y_pos, image):
-        '''Initialize attributes, rectangle, state manager'''
+        '''Initialize attributes, rectangle, state manager
+        
+        x & y: bombs center coordinates
+        image: asset of the bomb_image
+        '''
         super().__init__(x_pos, y_pos)
         self.image = image
         self.rect = image.get_rect()
-        self.rect.x, self.rect.y = x_pos, y_pos
+        self.rect.center = (x_pos, y_pos)
         self.state = {"selected": True, "jump": True, "throw": False}
         
 
