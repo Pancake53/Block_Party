@@ -43,3 +43,22 @@ class Bomb(GameObject):
         if (self.x_speed != 0) or (self.y_speed != 0):
             self.update_pos(dt, tiles)
         self.handle_actions(dt, actions, tiles)
+
+    def collision_y_axis(self, collisions):
+        '''
+        reaction to collision on y axis
+        
+        collisions: list of overlapping tiles
+        '''
+        self.explosion()
+
+    def collision_x_axis(self, collisions):
+        '''
+        reaction to collision on x axis
+        
+        collisions: list of overlapping tiles
+        '''
+        self.explosion()
+
+    def explosion(self):
+        pass

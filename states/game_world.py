@@ -27,10 +27,11 @@ class Game_World(State):
         (213, 94, 0) # Dark orange
         ] 
 
-        self.characters = [Character(self, 0, 1, 240, 170)]
+        self.characters = []
         self.bombs = []
-        self.button_choices = []
-        self.button = Button(100, 100, 30, 30)
+        self.jump_button = Button(0, 0, image=self.game.assets['jump_img'])
+        self.bomb_button = Button(0, 0, image=self.game.assets['bomb_img'])
+        self.flag_button = Button(0, 0, image=self.game.assets['flag_img'])
 
         self.load_level(level_name)
 
@@ -62,27 +63,45 @@ class Game_World(State):
         for tile in self.tiles:
             pygame.draw.rect(surface, self.BROWN, tile)
         
+        self.render_characters(surface)
 
-        for char in self.characters:
-            char.render(surface)
-            if char.state["choosing"]:
-                if self.button.action_on_button(100, 100, surface, self.game.actions):
-                    char.state["jump"] = True
-                    char.state["choosing"] = False
                 
         for bomb in self.bombs:
             bomb.render(surface)
 
+    def render_characters(self, surface):
+        for char in self.characters:
+            char.render(surface)
+            if char.state["choosing"]:
+                
+                y = char.rect.y - self.jump_button.height - 10
+                x_jump = char.rect.x - self.jump_button.width - 12
+
+                if self.jump_button.action_on_button(x_jump, y, surface, self.game.actions):
+                    char.state["jump"] = True
+                    char.state["choosing"] = False
+
+                x_bomb = x_jump + self.jump_button.width + 6
         
+                if self.bomb_button.action_on_button(x_bomb, y, surface, self.game.actions):
+                    char.state["jump"] = True
+                    char.state["choosing"] = False
+
+                x_flag = x_bomb + self.jump_button.width + 6
         
-        
+                if self.flag_button.action_on_button(x_flag, y, surface, self.game.actions):
+                    char.state["jump"] = True
+                    char.state["choosing"] = False
         
     def load_level(self, level_name):
         '''
         loads level data and stores it in tiles list as Rects
+        creates needed instances:
+        - characters
 
         level_name: filename with level data
         '''
+        # level data
         path = os.path.join(self.game.tilemap_dir, level_name)
 
         with open(path, "r", encoding="utf-8") as f:
@@ -93,6 +112,8 @@ class Game_World(State):
                 for obj in layer["objects"]:
                     self.tiles.append(pygame.Rect(obj["x"], obj["y"], obj["width"], obj["height"]))
 
+        # characters
+        self.characters.append(Character(self, 0, 1, 240, 170))
 
 
     def spawn_bomb(self, x_pos, y_pos):
@@ -101,13 +122,5 @@ class Game_World(State):
 
         x & y: center coordinates of bomb
         '''
-        self.bombs.append(Bomb(x_pos, y_pos, self.game.assets["bomb"]))
+        self.bombs.append(Bomb(x_pos, y_pos, self.game.assets["bomb_img"]))
 
-    def render_selections(self, x_pos, y_pos):
-        '''
-        renders buttons for choosing action
-
-        x & y: coordinates of top left of selections
-        '''
-        for count, button in enumerate(self.button_choices):
-            pass

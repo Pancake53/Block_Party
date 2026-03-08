@@ -176,7 +176,9 @@ class Game():
         self.tilemap_dir = os.path.join("tilemap")
         # Assets themselves
         self.font = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_SIZE)
-        self.assets["bomb"] = pygame.image.load(os.path.join(self.image_dir, "bomb.png")).convert_alpha()
+        self.assets["bomb_img"] = pygame.image.load(os.path.join(self.image_dir, "bomb.png")).convert_alpha()
+        self.assets["jump_img"] = pygame.image.load(os.path.join(self.image_dir, "jump.png")).convert_alpha()
+        self.assets["flag_img"] = pygame.image.load(os.path.join(self.image_dir, "white_flag.png")).convert_alpha()
 
     def reset_keys(self):
         '''

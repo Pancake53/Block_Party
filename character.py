@@ -42,13 +42,12 @@ class Character(GameObject):
     def render(self, surface):
         '''
         Render char on given surface
-        If char is choosing, then render options
 
         surface: game canvas
         '''
         pygame.draw.rect(surface, self.colour, self.rect)
-        if self.state["choosing"]:
-            self.game_world.render_selections(self.rect.x, self.rect.y)
+        # if self.state["choosing"]:
+        #     self.game_world.render_selections(self.rect.x, self.rect.y)
 
 
 

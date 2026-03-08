@@ -17,8 +17,8 @@ class Button():
 
          x & y: top left position of button
          
-         button_colour: color as rgb
-         hover_colour: color on mouseover as rgb
+         button_colour: color as rgb (default white)
+         hover_colour: color on mouseover as rgb (default gray)
 
          one of the following:
          width & height: dimensions 
@@ -26,8 +26,7 @@ class Button():
         '''
         self.x = x 
         self.y = y
-        self.width = width
-        self.height = height
+
         self.button_col = button_colour
         self.hover_col = hover_colour
 
@@ -36,13 +35,18 @@ class Button():
         self.click_col = self.black
         self.image = image
         
+        # print an error if we are missing the image or width and height
         if (not self.image) and (self.width == 0 or self.height == 0):
             print("ERROR: Button has no image and no dimensions!")
 
         # make Rect object
         if self.image:
             self.rect = self.image.get_rect()
+            self.width = self.rect.width
+            self.height = self.rect.height
         else:    
+            self.width = width
+            self.height = height
             self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
         
@@ -84,26 +88,30 @@ class Button():
     
     def draw_button(self, col, surface):
         '''
-        Draws button and image and text 
-        if they are entered as args into class
-        
+        Draws button onto surface
     
-        col: button col, default or hover
+        col: button col, default, hover or click
         surface: surface for rendering
         '''
         # draw rect
-        pygame.draw.rect(surface, col, self.rect)
+
+        if self.image:
+            pygame.draw.rect(surface, col, self.rect)
+            surface.blit(self.image, self.rect)
+        else:
+            pygame.draw.rect(surface, col, self.rect)
 
         # Draw shading
         # top
-        pygame.draw.line(surface, self.white, (self.x, self.y), (self.x + self.width, self.y), 2)
+        pygame.draw.line(surface, self.white, (self.rect.x, self.rect.y),
+                          (self.rect.x + self.width, self.rect.y), 2)
         # left
-        pygame.draw.line(surface, self.white, (self.x, self.y), (self.x, self.y + self.height), 2)
+        pygame.draw.line(surface, self.white, (self.rect.x, self.rect.y),
+                          (self.rect.x, self.rect.y + self.height), 2)
         # right
-        pygame.draw.line(surface, self.black, (self.x + self.width, self.y), (self.x + self.width, self.y + self.height), 2)
+        pygame.draw.line(surface, self.black, (self.rect.x + self.width, self.rect.y),
+                          (self.rect.x + self.width, self.rect.y + self.height), 2)
         # bottom
-        pygame.draw.line(surface, self.black, (self.x, self.y + self.height), (self.x + self.width, self.y + self.height), 2)
+        pygame.draw.line(surface, self.black, (self.rect.x, self.rect.y + self.height),
+                          (self.rect.x + self.width, self.rect.y + self.height), 2)
         
-
-        if self.image:
-            pass
