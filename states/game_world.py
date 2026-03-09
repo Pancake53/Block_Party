@@ -58,6 +58,7 @@ class Game_World(State):
         for char in self.characters:
             char.state['locked'] = characters_locked
             char.update(delta_time, actions, self.tiles)
+            char.health_bar.update()
         
         self.bomb.update(delta_time, actions, self.tiles)
 
@@ -205,10 +206,10 @@ class Game_World(State):
             char.x_speed = direction[0] * force
             char.y_speed = direction[1] * force
 
-            if char.current_hp:
-                char.current_hp -= min(50, 
-                                       max(int(force * 1.8), 10))
-                print(f'char.current_hp: {char.current_hp}')
+            char.take_damage(force)
+            
+
+
 
 
     def check_for_character_lock(self):

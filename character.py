@@ -1,6 +1,6 @@
 import pygame
 from gameObject import GameObject
-
+from healthBar import HealthBar
 
 class Character(GameObject):
     '''
@@ -38,6 +38,7 @@ class Character(GameObject):
         # Health points
         self.max_hp = 100
         self.current_hp = 100
+        self.health_bar = HealthBar(self)
         
       
 
@@ -51,7 +52,28 @@ class Character(GameObject):
         # if self.state["choosing"]:
         #     self.game_world.render_selections(self.rect.x, self.rect.y)
 
+        self.health_bar.render(surface)
 
+    def update(self, dt, actions, tiles):
+        '''
+        Updates obj position, if obj is moving
+        Handels inputs
+
+        dt: delta time 
+        actions: user inputs dictionary
+        tiles: game levels collision tiles
+        '''
+        if (self.x_speed != 0) or (self.y_speed != 0):
+            self.state['moving'] = True
+            self.update_pos(dt, tiles)
+            
+        
+        else:
+            self.state['moving'] = False
+
+        # if not self.state['locked']:    
+        self.handle_actions(actions)
+        self.health_bar.update()
 
     def collision_x_axis(self, collisions):
         '''
@@ -172,4 +194,10 @@ class Character(GameObject):
         self.x_speed = 0
         self.y_speed = 0.01
 
+    def take_damage(self, damage):
+        self.current_hp -= min(50, 
+                                    max(int(damage * 1.8), 10))
+        if self.current_hp <= 0:
+            self.state['eliminated'] = True
 
+        self.health_bar.activate()
