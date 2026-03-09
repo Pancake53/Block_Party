@@ -4,6 +4,7 @@ from character import Character
 from bomb import Bomb
 from explosion import Explosion
 from button import Button
+from pygame.math import Vector2
 
 
 
@@ -168,8 +169,46 @@ class Game_World(State):
         self.bomb.y_pos = self.bomb.rect.y 
 
     def activate_explosion(self, x_pos, y_pos):
+        '''
+        activates bombs explosion animation
+        handels hit registration
+        
+        x & y: center coordinates of explosion
+        '''
         self.explosion.activate(x_pos, y_pos)
 
+        hit_characters = []
+        for char in self.characters:
+            if char.rect.colliderect(self.explosion):
+                hit_characters.append(char)
+
+        if hit_characters:
+            self.explosion_calculations(x_pos, y_pos, hit_characters)
+
+    def explosion_calculations(self, x_pos, y_pos, hit_characters):
+        '''
+        handels reacting to bomb explosion if it is near characters
+
+        x & y: center coordinates of explosion
+        hit_characters: list of hit characters
+        '''
+        explosion_pos = Vector2(x_pos, y_pos)
+
+        for char in hit_characters:
+            char_pos = Vector2(char.rect.centerx,
+                                char.rect.centery)
+            
+            direction = char_pos - explosion_pos
+            distance = max(direction.length(), 1)
+            force = char.force_mp / distance
+            print(f'force: {force}')
+            char.x_speed = direction[0] * force
+            char.y_speed = direction[1] * force
+
+            if char.current_hp:
+                char.current_hp -= min(50, 
+                                       max(int(force * 1.8), 10))
+                print(f'char.current_hp: {char.current_hp}')
 
 
     def check_for_character_lock(self):
