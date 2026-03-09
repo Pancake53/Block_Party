@@ -24,5 +24,6 @@ def test_add_momentum():
     x, y = 2, 2
     speed_vec = Vector2(x, y)
     total_speed = speed_vec.length()
-    
-    assert x + y == 4
+    calculated_length = (x**2 + y**2)**(1/2)
+
+    assert calculated_length == total_speed
