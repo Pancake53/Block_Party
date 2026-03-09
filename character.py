@@ -10,7 +10,7 @@ class Character(GameObject):
       action such as selecting, jumping, spawning in bomb
     
     '''
-    def __init__(self, game_world, team_id, width, x_pos, y_pos):
+    def __init__(self, team_id, x_pos, y_pos, game_world, width=1):
         '''Initialize attributes
 
         game_world: level the character loads into
@@ -19,9 +19,8 @@ class Character(GameObject):
         x & y position
         
         '''
-        super().__init__(x_pos, y_pos)
+        super().__init__(x_pos, y_pos, game_world)
         self.team_id = team_id
-        self.game_world = game_world
         self.width = width
         # Character colour based on team id
         self.colour = self.game_world.team_colours[team_id]
@@ -35,9 +34,7 @@ class Character(GameObject):
         self.retention = 0.25 
 
         self.rect = pygame.Rect(x_pos, y_pos, self.CHARACTER_SIZE * width, self.CHARACTER_SIZE * 2)
-        # State management
-        self.state = {"selected": False, "choosing": False, "jump": False, "drag": False, "throw": False}
-
+       
         # Health points
         self.max_hp = 100
         self.current_hp = 100
@@ -105,69 +102,74 @@ class Character(GameObject):
             self.y_speed = 0
 
 
-    def handle_actions(self, actions):
+    def clicking(self, actions):
         '''
-        handels actions for char
-        based on actions dictionary
+        handels hovered mouse clicks for Obj
         '''
-        if actions["left"]:
-            self.add_momentum(-50, -50)
-        if actions["right"]:
-            self.add_momentum(50, -50)
-        if actions["action1"]:
-            self.x_pos = self.origin[0]
-            self.y_pos = self.origin[1]
-            self.x_speed = 0
-            self.y_speed = 0.01
+        print(f'"CLICK!! : " {self.state}')
+        # Selecting
+        if not (self.state["jump"] or self.state["throw"]):
+        # print("select condition met") 
 
-        # print(f"char state: {self.state}")
-        
-        # mouse on character
-        hovered = self.rect.collidepoint(actions["mouse_pos"])
+            self.state["selected"] = not self.state["selected"]
+            self.state["choosing"] = not self.state["choosing"]
+            # print(f"state: {self.state}")
 
-        # Handle mouse clicks for selecting character
-        if hovered:
-            if actions["mouse_click"]:
-                if not (self.state["jump"] or self.state["throw"]):
-                    # print("select condition met") 
-
-                        # print("collision")
-                        self.state["selected"] = not self.state["selected"]
-                        self.state["choosing"] = not self.state["choosing"]
-                        # print(f"state: {self.state}")
-
-        # Jump
-        # require new click to enter drag state
+        # Jumping / entering into drag
+        # requere new click
         if self.state["jump"] and not self.state["drag"]:
             if actions["mouse_click"]:
                 self.mouse_pos_list = [actions["mouse_pos"]]
                 self.state["drag"] = True
 
-        # Dragging
-        elif self.state["drag"]:
+    def dragging(self, actions):
+        '''
+        handels what happens during the mousedrag
+
+        actions: user inputs dictionary
+        '''
+
+        if self.state["drag"]:
             if actions["mouse_pressed"]:
                 while len(self.mouse_pos_list) > 2:
                     self.mouse_pos_list.pop()
                 self.mouse_pos_list.append(actions["mouse_pos"])
                 # render line or arrow function
 
-        # Releasing
-        if (not actions["mouse_pressed"]) and (len(self.mouse_pos_list) >= 2):
-            print("time to throw!")
-            x_speed = (self.mouse_pos_list[0][0] -self.mouse_pos_list[-1][0]) * self.throw_multiplier
-            y_speed = (self.mouse_pos_list[0][1] -self.mouse_pos_list[-1][1]) * self.throw_multiplier
-            self.add_momentum(x_speed, y_speed)
+    def releasing(self):
+        '''
+        handels giving Obj velocity after mousedrag
+        '''
+        x_speed = (self.mouse_pos_list[0][0] -self.mouse_pos_list[-1][0]) * self.throw_multiplier
+        y_speed = (self.mouse_pos_list[0][1] -self.mouse_pos_list[-1][1]) * self.throw_multiplier
+        self.add_momentum(x_speed, y_speed)
 
-            self.mouse_pos_list = []
-            self.reset_state()
-
+        self.mouse_pos_list = []
+        self.reset_state()
         
-        if self.state["throw"]: # bomb placeholder
-            x_pos = self.rect.centerx
-            y_pos = self.rect.centery
-
+    def throw_bomb(self):
+        '''
+        spawns in bomb at the characters coordinates
+        resets characters state
+        '''
+        x_pos = self.rect.centerx
+        y_pos = self.rect.centery
             
-            self.game_world.spawn_bomb(x_pos, y_pos)
-            self.reset_state()
+        self.game_world.spawn_bomb(x_pos, y_pos)
+        self.reset_state()
+
+    def reset_pos(self):
+        '''
+        reset position
+        '''
+        # calculated values to origin
+        self.x_pos = self.origin[0]
+        self.y_pos = self.origin[1]
+        # move rect to calculated values
+        self.rect.x = self.x_pos
+        self.rect.y = self.y_pos
+        # remove velocity
+        self.x_speed = 0
+        self.y_speed = 0.01
 
 

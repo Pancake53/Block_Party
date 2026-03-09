@@ -7,7 +7,7 @@ class GameObject():
 
     Important constants for game physics
     '''
-    def __init__(self, x_pos, y_pos):
+    def __init__(self, x_pos, y_pos, game_world):
         '''
         Initialize attributes
         
@@ -20,6 +20,8 @@ class GameObject():
         self.x_speed = 0
         self.y_speed = 0
 
+        self.game_world = game_world
+
         # Game physics
         self.gravity = 250
         self.throw_multiplier = 2.5
@@ -28,7 +30,8 @@ class GameObject():
         # self.air_resistance = 0.99 # not in use
 
         # state dictionary
-        self.state = {"selected": False, "jump": False, "drag": False, "throw": False}
+        self.state = {"selected": False, "choosing": False, "jump": False, "drag": False,
+                       "throw": False, 'moving': False, "locked": False, "eliminated": False}
 
         # for jumping, throwing
         self.mouse_pos_list = []
@@ -56,7 +59,13 @@ class GameObject():
         '''
         if (self.x_speed != 0) or (self.y_speed != 0):
             self.update_pos(dt, tiles)
-        self.handle_actions(actions)
+            self.state['moving'] = True
+        
+        else:
+            self.state['moving'] = False
+
+        if not self.state['locked']:    
+            self.handle_actions(actions)
 
 
     def collision_test(self, tiles):
@@ -156,58 +165,101 @@ class GameObject():
         based on actions dictionary from Game
 
         actions: user inputs dictionary
+
         '''
+        # reset position (for testing)
+        if actions["action1"]:
+            self.reset_pos()
+            
 
-        # if actions["left"]:
-        #     self.add_momentum(-100, -100)
-        # if actions["right"]:
-        #     self.add_momentum(100, -100)
-        # if actions["action1"]:
-        #     # reset position
-        #     self.x_pos = self.origin[0]
-        #     self.y_pos = self.origin[1]
-        #     self.x_speed = 0
-        #     self.y_speed = 0.01
-
-        # mouse on character
+        # mouse on Obj
         hovered = self.rect.collidepoint(actions["mouse_pos"])
 
-        # Handle mouse clicks for selecting character
-        if hovered:
+        # Handle mouse clicks for selecting obj
+        if hovered and not self.state['locked']:
             if actions["mouse_click"]:
-                if not (self.state["jump"] or self.state["throw"]):
-                    # print("select condition met") 
+                self.clicking(actions)
 
-                        # print("collision")
-                        self.state["selected"] = not self.state["selected"]
-                        # print(f"state: {self.state}")
+        if self.state['selected']:
+            # Dragging
+            if self.state["drag"]:
+                self.dragging(actions)
 
-        # Jump
-        # require new click to enter drag state
+
+            # Releasing
+            if (not actions["mouse_pressed"]) and (len(self.mouse_pos_list) >= 2):
+                self.releasing(actions)
+
+            if self.state["throw"]: # bomb placeholder
+                self.throw_bomb(actions)
+
+    def clicking(self, actions):
+        '''
+        handels hovered mouse clicks for Obj
+        '''
+
+        # Selecting
+        if not (self.state["jump"] or self.state["throw"]):
+        # print("select condition met") 
+
+            # print("collision")
+            self.state["selected"] = not self.state["selected"]
+            # print(f"state: {self.state}")
+
+        # Jumping / entering into drag
+        # requere new click
         if self.state["jump"] and not self.state["drag"]:
             if actions["mouse_click"]:
                 self.mouse_pos_list = [actions["mouse_pos"]]
                 self.state["drag"] = True
 
-        # Dragging
-        elif self.state["drag"]:
+    def dragging(self, actions):
+        '''
+        handels what happens during the mousedrag
+
+        actions: user inputs dictionary
+        '''
+
+        if self.state["drag"]:
             if actions["mouse_pressed"]:
                 while len(self.mouse_pos_list) > 2:
                     self.mouse_pos_list.pop()
                 self.mouse_pos_list.append(actions["mouse_pos"])
                 # render line or arrow function
 
-        # Releasing
-        if (not actions["mouse_pressed"]) and (len(self.mouse_pos_list) >= 2):
-            print("time to throw!")
-            x_speed = (self.mouse_pos_list[0][0] -self.mouse_pos_list[-1][0]) * self.throw_multiplier
-            y_speed = (self.mouse_pos_list[0][1] -self.mouse_pos_list[-1][1]) * self.throw_multiplier
-            self.add_momentum(x_speed, y_speed)
+    def releasing(self):
+        '''
+        handels giving Obj velocity after mousedrag
 
-            self.mouse_pos_list = []
-            self.reset_state()
+        actions: user inputs dictionary
+        '''
+        x_speed = (self.mouse_pos_list[0][0] -self.mouse_pos_list[-1][0]) * self.throw_multiplier
+        y_speed = (self.mouse_pos_list[0][1] -self.mouse_pos_list[-1][1]) * self.throw_multiplier
+        self.add_momentum(x_speed, y_speed)
 
+        self.mouse_pos_list = []
+        self.reset_state()
+
+    def throw_bomb(self):
+        pass
+
+    def reset_pos(self):
+        '''
+        reset position
+        '''
+        # calculated values to origin
+        self.x_pos = self.origin[0]
+        self.y_pos = self.origin[1]
+        # move rect to calculated values
+        self.rect.x = self.x_pos
+        self.rect.y = self.y_pos
+        # remove velocity
+        self.x_speed = 0
+        self.y_speed = 0
 
     def reset_state(self):
+        '''
+        False all states in obj state dictionary
+        '''
         for k in self.state:
             self.state[k] = False

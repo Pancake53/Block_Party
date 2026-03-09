@@ -7,7 +7,7 @@ from button import Button
 
 
 class Game_World(State):
-    def __init__(self, game, level_name):
+    def __init__(self, game, level_name, player_count=2):
         super().__init__(game)
         # Teal
         self.BG_COL = (0, 153, 136) # (56, 175, 218) light blue
@@ -28,27 +28,37 @@ class Game_World(State):
         ] 
 
         self.characters = []
-        self.bomb = Bomb(-36, -36, self.game.assets["bomb_img"])
+        self.bomb = Bomb(-36, -36, self, self.game.assets["bomb_img"])
         self.jump_button = Button(0, 0, image=self.game.assets['jump_img'])
         self.bomb_button = Button(0, 0, image=self.game.assets['bomb_img'])
         self.flag_button = Button(0, 0, image=self.game.assets['flag_img'])
 
+        self.player_count = player_count
         self.load_level(level_name)
+        
 
-        self.game_state = {'turn': 1, 'selecting_cooldown': False, 'playing': True}
+        self.game_state = {'turn': 0, 'selecting_locked': False, 'playing': True}
 
     def update(self, delta_time, actions):
         '''
         update state
         call game objects update functions
+        locks selecting if objects are moving
 
         delta_time: dt
         actions: user inputs dictionary
         '''
+        
+        locked = self.check_for_selection_lock()
+        self.game_state['selecting_locked'] = locked
+      
         for char in self.characters:
+            char.state['locked'] = locked
             char.update(delta_time, actions, self.tiles)
-
+        
         self.bomb.update(delta_time, actions, self.tiles)
+
+        # print(self.game_state)
         
 
     def render(self, surface):
@@ -82,7 +92,6 @@ class Game_World(State):
             if char.state["choosing"]:
                 self.render_selections(char, surface)
                 
-
     def render_selections(self, char, surface):
         '''
         renders selections
@@ -131,9 +140,7 @@ class Game_World(State):
                     self.tiles.append(pygame.Rect(obj["x"], obj["y"], obj["width"], obj["height"]))
 
         # characters
-        self.characters.append(Character(self, 0, 1, 240, 170))
-        
-
+        self.characters.append(Character(0, 240, 170, self))
 
     def spawn_bomb(self, x_pos, y_pos):
         '''
@@ -152,3 +159,22 @@ class Game_World(State):
         self.bomb.x_pos = self.bomb.rect.x 
         self.bomb.y_pos = self.bomb.rect.y 
 
+    def check_for_selection_lock(self):
+        '''
+        checks for ongoing events
+        - movement
+        - bomb selected
+
+        return:
+        boolean
+        - True if there is an ongoing event
+        - False if no actions
+        '''
+        for char in self.characters:
+            if char.state['moving']:
+                return True
+
+        if self.bomb.state['selected'] or self.bomb.state['moving']:
+            return True
+        
+        return False

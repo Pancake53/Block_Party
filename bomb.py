@@ -10,19 +10,22 @@ class Bomb(GameObject):
         x, y: top left position x and y
         image: image of bomb selected
     '''
-    def __init__(self, x_pos, y_pos, image):
+    def __init__(self, x_pos, y_pos, game_world, image):
         '''Initialize attributes, rectangle, state manager
         
         x & y: bombs center coordinates
         image: asset of the bomb_image
         '''
-        super().__init__(x_pos, y_pos)
+        super().__init__(x_pos, y_pos, game_world)
         self.image = image
         self.rect = image.get_rect()
         self.rect.center = (x_pos, y_pos)
 
         # state dictionary
-        self.state = {"selected": False, "jump": False, "drag": False, "throw": False}
+        self.state = {"selected": False, "choosing": False, "jump": False, "drag": False,
+                       "throw": False, 'moving': False, "locked": False, "eliminated": False}
+
+
         
 
     def render(self, surface):
@@ -45,7 +48,7 @@ class Bomb(GameObject):
         if (self.x_speed != 0) or (self.y_speed != 0):
             self.update_pos(dt, tiles)
         self.handle_actions(actions)
-        print(self.state)
+
 
     def update_pos_x(self, dt, tiles):
         '''
@@ -79,8 +82,35 @@ class Bomb(GameObject):
         '''
         self.explosion()
 
+
+
     def explosion(self):
         x_exp = self.rect.x
         y_exp = self.rect.y
 
-        self.x_speed, self.y_speed = 0, 0
+        self.reset_pos()
+
+
+    def clicking(self, actions):
+        '''
+        handels hovered mouse clicks for Obj
+
+        doesn't change choosing state
+
+        actions: user inputs dictionary
+        '''
+
+        # Selecting
+        if not (self.state["jump"] or self.state["throw"]):
+        # print("select condition met") 
+
+            # print("collision")
+            self.state["selected"] = not self.state["selected"]
+            # print(f"state: {self.state}")
+
+        # Jumping / entering into drag
+        # requere new click
+        if self.state["jump"] and not self.state["drag"]:
+            if actions["mouse_click"]:
+                self.mouse_pos_list = [actions["mouse_pos"]]
+                self.state["drag"] = True
