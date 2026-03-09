@@ -179,6 +179,7 @@ class Game():
         self.assets["bomb_img"] = pygame.image.load(os.path.join(self.image_dir, "bomb.png")).convert_alpha()
         self.assets["jump_img"] = pygame.image.load(os.path.join(self.image_dir, "jump.png")).convert_alpha()
         self.assets["flag_img"] = pygame.image.load(os.path.join(self.image_dir, "white_flag.png")).convert_alpha()
+        self.assets["explosion_img"] = pygame.image.load(os.path.join(self.image_dir, "explosion.png")).convert_alpha()
 
     def reset_keys(self):
         '''

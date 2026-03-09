@@ -34,20 +34,10 @@ class Bomb(GameObject):
         
         surface: surface to render object on
         '''
-        surface.blit(self.image, self.rect)
-
-    def update(self, dt, actions, tiles):
-        '''
-        Updating bombs position in game        
-
-        dt: delta time
-        actions: user inputs dictionary
-        tiles: game worlds collision tiles
-        '''
         
-        if (self.x_speed != 0) or (self.y_speed != 0):
-            self.update_pos(dt, tiles)
-        self.handle_actions(actions)
+
+        if self.state['selected'] or self.state['moving']:
+            surface.blit(self.image, self.rect) 
 
 
     def update_pos_x(self, dt, tiles):
@@ -85,9 +75,11 @@ class Bomb(GameObject):
 
 
     def explosion(self):
-        x_exp = self.rect.x
-        y_exp = self.rect.y
+        x_pos = self.rect.centerx
+        y_pos = self.rect.centery
+        self.game_world.activate_explosion(x_pos, y_pos)
 
+        self.reset_state()
         self.reset_pos()
 
 
@@ -95,18 +87,11 @@ class Bomb(GameObject):
         '''
         handels hovered mouse clicks for Obj
 
-        doesn't change choosing state
+        for bomb no selecting,
+        only switching to drag state
 
         actions: user inputs dictionary
         '''
-
-        # Selecting
-        if not (self.state["jump"] or self.state["throw"]):
-        # print("select condition met") 
-
-            # print("collision")
-            self.state["selected"] = not self.state["selected"]
-            # print(f"state: {self.state}")
 
         # Jumping / entering into drag
         # requere new click
@@ -114,3 +99,14 @@ class Bomb(GameObject):
             if actions["mouse_click"]:
                 self.mouse_pos_list = [actions["mouse_pos"]]
                 self.state["drag"] = True
+
+    def releasing(self):
+        '''
+        handels giving Obj velocity after mousedrag
+        '''
+        x_speed = (self.mouse_pos_list[0][0] -self.mouse_pos_list[-1][0]) * self.throw_multiplier
+        y_speed = (self.mouse_pos_list[0][1] -self.mouse_pos_list[-1][1]) * self.throw_multiplier
+        self.add_momentum(x_speed, y_speed)
+
+        self.mouse_pos_list = []
+        self.state['locked'] = True

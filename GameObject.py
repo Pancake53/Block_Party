@@ -58,14 +58,15 @@ class GameObject():
         tiles: game levels collision tiles
         '''
         if (self.x_speed != 0) or (self.y_speed != 0):
-            self.update_pos(dt, tiles)
             self.state['moving'] = True
+            self.update_pos(dt, tiles)
+            
         
         else:
             self.state['moving'] = False
 
-        if not self.state['locked']:    
-            self.handle_actions(actions)
+        # if not self.state['locked']:    
+        self.handle_actions(actions)
 
 
     def collision_test(self, tiles):
@@ -170,28 +171,30 @@ class GameObject():
         # reset position (for testing)
         if actions["action1"]:
             self.reset_pos()
-            
-
-        # mouse on Obj
-        hovered = self.rect.collidepoint(actions["mouse_pos"])
+            self.reset_state()
 
         # Handle mouse clicks for selecting obj
-        if hovered and not self.state['locked']:
-            if actions["mouse_click"]:
-                self.clicking(actions)
+        if not self.state['locked']:
 
-        if self.state['selected']:
-            # Dragging
-            if self.state["drag"]:
-                self.dragging(actions)
+            # mouse on Obj
+            hovered = self.rect.collidepoint(actions["mouse_pos"])
+
+            if hovered:
+                if actions["mouse_click"]:
+                    self.clicking(actions)
+
+            if self.state['selected']:
+                # Dragging
+                if self.state["drag"]:
+                    self.dragging(actions)
 
 
-            # Releasing
-            if (not actions["mouse_pressed"]) and (len(self.mouse_pos_list) >= 2):
-                self.releasing(actions)
+                # Releasing
+                if (not actions["mouse_pressed"]) and (len(self.mouse_pos_list) >= 2):
+                    self.releasing()
 
-            if self.state["throw"]: # bomb placeholder
-                self.throw_bomb(actions)
+                if self.state["throw"]: # bomb placeholder
+                    self.throw_bomb()
 
     def clicking(self, actions):
         '''
@@ -261,5 +264,5 @@ class GameObject():
         '''
         False all states in obj state dictionary
         '''
-        for k in self.state:
-            self.state[k] = False
+        for state in self.state:
+            self.state[state] = False

@@ -2,6 +2,7 @@ import pygame, json, os
 from states.state import State
 from character import Character
 from bomb import Bomb
+from explosion import Explosion
 from button import Button
 
 
@@ -29,11 +30,12 @@ class Game_World(State):
 
         self.characters = []
         self.bomb = Bomb(-36, -36, self, self.game.assets["bomb_img"])
+        self.explosion = Explosion(self.game.assets['explosion_img'])
         self.jump_button = Button(0, 0, image=self.game.assets['jump_img'])
         self.bomb_button = Button(0, 0, image=self.game.assets['bomb_img'])
         self.flag_button = Button(0, 0, image=self.game.assets['flag_img'])
 
-        self.player_count = player_count
+        self.player_ids = [i for i in range(player_count)]
         self.load_level(level_name)
         
 
@@ -49,14 +51,16 @@ class Game_World(State):
         actions: user inputs dictionary
         '''
         
-        locked = self.check_for_selection_lock()
-        self.game_state['selecting_locked'] = locked
-      
+        
+        characters_locked = self.check_for_character_lock()
+    
         for char in self.characters:
-            char.state['locked'] = locked
+            char.state['locked'] = characters_locked
             char.update(delta_time, actions, self.tiles)
         
         self.bomb.update(delta_time, actions, self.tiles)
+
+        self.explosion.update()
 
         # print(self.game_state)
         
@@ -74,12 +78,16 @@ class Game_World(State):
                              self.game.BLACK, self.game.GAME_W / 2,
                                self.game.GAME_H / 8)
         
+        # collision tiles
         for tile in self.tiles:
             pygame.draw.rect(surface, self.BROWN, tile)
-        
-        self.render_characters(surface)
 
+        # characters
+        self.render_characters(surface)
+        # bomb
         self.bomb.render(surface)
+        # explosion
+        self.explosion.render(surface)
 
     def render_characters(self, surface):
         '''
@@ -159,7 +167,12 @@ class Game_World(State):
         self.bomb.x_pos = self.bomb.rect.x 
         self.bomb.y_pos = self.bomb.rect.y 
 
-    def check_for_selection_lock(self):
+    def activate_explosion(self, x_pos, y_pos):
+        self.explosion.activate(x_pos, y_pos)
+
+
+
+    def check_for_character_lock(self):
         '''
         checks for ongoing events
         - movement
@@ -174,7 +187,7 @@ class Game_World(State):
             if char.state['moving']:
                 return True
 
-        if self.bomb.state['selected'] or self.bomb.state['moving']:
+        if self.bomb.state['selected']:
             return True
         
         return False
