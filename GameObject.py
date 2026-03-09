@@ -1,4 +1,5 @@
 import pygame
+from pygame.math import Vector2
 
 class GameObject():
     '''Interactive movable object in game world
@@ -154,11 +155,23 @@ class GameObject():
         x_speed: given velocity on x axis
         y_speed: given velocity on y axis
         '''
-        # logic: speed can be positive or negative
-        self.x_speed = max(-self.max_velocity, # caps max negative
-                        min(x_speed, self.max_velocity)) # caps max positive
-        self.y_speed = max(-self.max_velocity,
-                        min(y_speed, self.max_velocity))
+        # # logic: speed can be positive or negative
+        # self.x_speed = max(-self.max_velocity, # caps max negative
+        #                 min(x_speed, self.max_velocity)) # caps max positive
+        # self.y_speed = max(-self.max_velocity,
+        #                 min(y_speed, self.max_velocity))
+
+        speed_vec = Vector2(x_speed, y_speed)
+        total_speed = speed_vec.length()
+
+        if total_speed > self.max_velocity:
+            normalized = speed_vec.normalize()
+            speed_vec = self.max_velocity * normalized
+
+        self.x_speed = speed_vec[0]
+        self.y_speed = speed_vec[1]
+
+
 
     def handle_actions(self, actions):
         '''
