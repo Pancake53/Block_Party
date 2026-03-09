@@ -1,4 +1,4 @@
-import os, pygame, time
+import os, pygame
 
 from states.title import Title
 

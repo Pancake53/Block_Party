@@ -186,6 +186,7 @@ class GameObject():
         if actions["action1"]:
             self.reset_pos()
             self.reset_state()
+            
 
         # Handle mouse clicks for selecting obj
         if not self.state['locked']:
@@ -280,3 +281,4 @@ class GameObject():
         '''
         for state in self.state:
             self.state[state] = False
+

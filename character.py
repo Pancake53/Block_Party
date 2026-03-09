@@ -67,9 +67,9 @@ class Character(GameObject):
             self.state['moving'] = True
             self.update_pos(dt, tiles)
             
-        
         else:
             self.state['moving'] = False
+
 
         # if not self.state['locked']:    
         self.handle_actions(actions)
@@ -193,8 +193,15 @@ class Character(GameObject):
         # remove velocity
         self.x_speed = 0
         self.y_speed = 0.01
+        # max hp
+        self.current_hp = self.max_hp
 
     def take_damage(self, damage):
+        '''
+        react to taking damage
+
+        damage: force of bomb
+        '''
         self.current_hp -= min(50, 
                                     max(int(damage * 1.8), 10))
         if self.current_hp <= 0:
