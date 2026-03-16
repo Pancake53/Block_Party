@@ -40,7 +40,7 @@ class GameObject():
   
         # rect
         self.CHARACTER_SIZE = 24
-        self.rect = pygame.Rect(x_pos, y_pos, self.CHARACTER_SIZE, self.CHARACTER_SIZE * 2)
+        
 
     def render(self, surface):
         '''
@@ -60,9 +60,15 @@ class GameObject():
         tiles: game levels collision tiles
         '''
         if (self.x_speed != 0) or (self.y_speed != 0):
+            # check if out of bounds on x axis
+            if (self.x_pos < - self.CHARACTER_SIZE) or (self.x_pos > self.game_world.game.GAME_W):
+                self.state['eliminated'] = True
+            # check if out of bounds on y axis
+            if self.y_pos > self.game_world.game.GAME_H:
+                self.state['eliminated'] = True
+
             self.state['moving'] = True
             self.update_pos(dt, tiles)
-            
         
         else:
             self.state['moving'] = False

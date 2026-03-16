@@ -21,12 +21,6 @@ class Bomb(GameObject):
         self.rect = image.get_rect()
         self.rect.center = (x_pos, y_pos)
 
-        # state dictionary
-        self.state = {"selected": False, "choosing": False, "jump": False, "drag": False,
-                       "throw": False, 'moving': False, "locked": False, "eliminated": False}
-
-
-        
 
     def render(self, surface):
         '''
@@ -34,7 +28,6 @@ class Bomb(GameObject):
         
         surface: surface to render object on
         '''
-        
 
         if self.state['selected'] or self.state['moving']:
             surface.blit(self.image, self.rect) 
