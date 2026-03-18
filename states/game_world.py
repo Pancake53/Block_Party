@@ -47,7 +47,7 @@ class Game_World(State):
         '''
         update state
         call game objects update functions
-        locks selecting if objects are moving
+        locks selecting if objects are moving 
 
         delta_time: dt
         actions: user inputs dictionary
