@@ -260,6 +260,8 @@ class GameObject():
 
         self.mouse_pos_list = []
         self.reset_state()
+        self.game_world.state['turn'] += 1
+        print(f'Game World State: {self.game_world.state}')
 
     def throw_bomb(self):
         pass

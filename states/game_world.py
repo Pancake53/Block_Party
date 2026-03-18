@@ -36,11 +36,12 @@ class Game_World(State):
         self.bomb_button = Button(0, 0, image=self.game.assets['bomb_img'])
         self.flag_button = Button(0, 0, image=self.game.assets['flag_img'])
 
+        self.player_count = player_count
         self.player_ids = [i for i in range(player_count)]
         self.load_level(level_name)
         
 
-        self.game_state = {'turn': 0, 'selecting_locked': False, 'playing': True}
+        self.state = {'turn': 0, 'selecting_locked': False, 'playing': True}
 
     def update(self, delta_time, actions):
         '''
@@ -54,9 +55,13 @@ class Game_World(State):
         
         
         characters_locked = self.check_for_character_lock()
-    
+        print(characters_locked)
         for char in self.characters:
+            # Universal lock if char or bomb is moving
+            #  or if bomb is being thrown
             char.state['locked'] = characters_locked
+            if not characters_locked:
+                char.state['locked'] = self.turn_based_lock(char)
             char.update(delta_time, actions, self.tiles)
             char.health_bar.update()
         
@@ -147,11 +152,24 @@ class Game_World(State):
         for layer in level_data["layers"]:
             if layer["type"] == "objectgroup":
                 for obj in layer["objects"]:
-                    self.tiles.append(pygame.Rect(obj["x"], obj["y"], obj["width"], obj["height"]))
 
-        # characters
-        self.characters.append(Character(0, 240, 170, self))
-        self.characters.append(Character(1, 720, 170, self))
+                    # tiles
+                    if obj['type'] == "collision_tile":
+                        self.tiles.append(
+                            pygame.Rect(obj["x"], obj["y"],
+                                obj["width"], obj["height"])
+                        )
+                        
+                    # playable characters
+                    if obj['type'] == "character":
+                        self.characters.append(
+                            # create character instances
+                            Character(int(obj["name"]), # id
+                                      obj["x"], # x position
+                                      obj['y'], # y position
+                                      self)
+                        )
+
 
     def spawn_bomb(self, x_pos, y_pos):
         '''
@@ -239,3 +257,12 @@ class Game_World(State):
             return True
         
         return False
+    
+    def turn_based_lock(self, character):
+        '''
+        locks characters based on games turn state
+        return True if it is not teams turn
+
+        character: character which is being inspected
+        '''
+        return self.state['turn'] % self.player_count != character.team_id

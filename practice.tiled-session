@@ -19,7 +19,7 @@
     "last.exportedFilePath": "C:/Users/nikol/OneDrive - O365 Turun yliopisto/Koulu/Tietotekniikka/Harjoitustyö/tilemap",
     "map.height": 18,
     "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
-    "map.lastUsedFormat": "tmx",
+    "map.lastUsedFormat": "json",
     "map.tileHeight": 15,
     "map.width": 15,
     "openFiles": [

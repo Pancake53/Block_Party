@@ -48,11 +48,12 @@ class Character(GameObject):
 
         surface: game canvas
         '''
-        pygame.draw.rect(surface, self.colour, self.rect)
-        # if self.state["choosing"]:
-        #     self.game_world.render_selections(self.rect.x, self.rect.y)
+        if not self.state['eliminated']:
+            pygame.draw.rect(surface, self.colour, self.rect)
+            # if self.state["choosing"]:
+            #     self.game_world.render_selections(self.rect.x, self.rect.y)
 
-        self.health_bar.render(surface)
+            self.health_bar.render(surface)
 
     def update(self, dt, actions, tiles):
         '''
@@ -67,12 +68,13 @@ class Character(GameObject):
             if (self.x_speed != 0) or (self.y_speed != 0):
                 # check if out of bounds on x axis
                 if (self.x_pos < - self.CHARACTER_SIZE) or (self.x_pos > self.game_world.game.GAME_W):
-                    self.state['eliminated'] = True
+                    self.eliminated()
                 # check if out of bounds on y axis
-                if self.y_pos > self.game_world.game.GAME_H:
-                    self.state['eliminated'] = True
-                self.state['moving'] = True
-                self.update_pos(dt, tiles)
+                elif self.y_pos > self.game_world.game.GAME_H:
+                    self.eliminated()
+                else:
+                    self.state['moving'] = True
+                    self.update_pos(dt, tiles)
                 
             else:
                 self.state['moving'] = False
@@ -136,7 +138,7 @@ class Character(GameObject):
         '''
         handels hovered mouse clicks for Obj
         '''
-        print(f'"CLICK!! : " {self.state}')
+        #print(f'"CLICK!! : " {self.state}')
         # Selecting
         if not (self.state["jump"] or self.state["throw"]):
         # print("select condition met") 
@@ -165,17 +167,6 @@ class Character(GameObject):
                     self.mouse_pos_list.pop()
                 self.mouse_pos_list.append(actions["mouse_pos"])
                 # render line or arrow function
-
-    def releasing(self):
-        '''
-        handels giving Obj velocity after mousedrag
-        '''
-        x_speed = (self.mouse_pos_list[0][0] -self.mouse_pos_list[-1][0]) * self.throw_multiplier
-        y_speed = (self.mouse_pos_list[0][1] -self.mouse_pos_list[-1][1]) * self.throw_multiplier
-        self.add_momentum(x_speed, y_speed)
-
-        self.mouse_pos_list = []
-        self.reset_state()
         
     def throw_bomb(self):
         '''
@@ -205,6 +196,7 @@ class Character(GameObject):
         self.current_hp = self.max_hp
 
     def take_damage(self, damage):
+
         '''
         react to taking damage
 
@@ -213,6 +205,12 @@ class Character(GameObject):
         self.current_hp -= min(50, 
                                     max(int(damage * 1.8), 10))
         if self.current_hp <= 0:
-            self.state['eliminated'] = True
+            self.eliminated()
 
         self.health_bar.activate()
+
+    def eliminated(self):
+        self.state['eliminated'] = True
+        self.x_speed = 0
+        self.y_speed = 0
+        self.state['moving'] = False

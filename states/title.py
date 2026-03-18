@@ -19,7 +19,7 @@ class Title(State):
         actions: user inputs dictionary
         '''
         if actions["start"]:
-            new_state = Game_World(self.game, "ship.tmj")
+            new_state = Game_World(self.game, "ship_w_characters.tmj")
             new_state.enter_state()
         self.game.reset_keys()
 
