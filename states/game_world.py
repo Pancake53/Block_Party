@@ -63,7 +63,7 @@ class Game_World(State):
         self.bomb.update(delta_time, actions, self.tiles)
 
         self.explosion.update()
-
+        self.handle_actions(actions)
         # print(self.game_state)
         
 
@@ -151,6 +151,7 @@ class Game_World(State):
 
         # characters
         self.characters.append(Character(0, 240, 170, self))
+        self.characters.append(Character(1, 720, 170, self))
 
     def spawn_bomb(self, x_pos, y_pos):
         '''
@@ -208,9 +209,16 @@ class Game_World(State):
 
             char.take_damage(force)
             
+    def handle_actions(self, actions):
 
+         # reset position (for testing)
+        if actions["action1"]:
+            self.reset_level()
 
-
+    def reset_level(self):
+        for char in self.characters:
+                char.reset_pos()
+                char.reset_state()
 
     def check_for_character_lock(self):
         '''

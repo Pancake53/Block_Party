@@ -188,10 +188,7 @@ class GameObject():
         actions: user inputs dictionary
 
         '''
-        # reset position (for testing)
-        if actions["action1"]:
-            self.reset_pos()
-            self.reset_state()
+       
             
 
         # Handle mouse clicks for selecting obj

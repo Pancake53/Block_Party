@@ -63,24 +63,25 @@ class Character(GameObject):
         actions: user inputs dictionary
         tiles: game levels collision tiles
         '''
-        if (self.x_speed != 0) or (self.y_speed != 0):
-            # check if out of bounds on x axis
-            if (self.x_pos < - self.CHARACTER_SIZE) or (self.x_pos > self.game_world.game.GAME_W):
-                self.state['eliminated'] = True
-            # check if out of bounds on y axis
-            if self.y_pos > self.game_world.game.GAME_H:
-                self.state['eliminated'] = True
-            self.state['moving'] = True
-            self.update_pos(dt, tiles)
+        if not self.state['eliminated']:
+            if (self.x_speed != 0) or (self.y_speed != 0):
+                # check if out of bounds on x axis
+                if (self.x_pos < - self.CHARACTER_SIZE) or (self.x_pos > self.game_world.game.GAME_W):
+                    self.state['eliminated'] = True
+                # check if out of bounds on y axis
+                if self.y_pos > self.game_world.game.GAME_H:
+                    self.state['eliminated'] = True
+                self.state['moving'] = True
+                self.update_pos(dt, tiles)
+                
+            else:
+                self.state['moving'] = False
+
             
-        else:
-            self.state['moving'] = False
 
-        
-
-        # if not self.state['locked']:    
-        self.handle_actions(actions)
-        self.health_bar.update()
+            # if not self.state['locked']:    
+            self.handle_actions(actions)
+            self.health_bar.update()
 
     def collision_x_axis(self, collisions):
         '''
