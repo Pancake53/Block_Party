@@ -1,10 +1,11 @@
-import pygame, json, os
+import pygame, json, os, random
 from states.state import State
 from character import Character
 from bomb import Bomb
 from explosion import Explosion
 from button import Button
 from pygame.math import Vector2
+
 
 
 
@@ -30,6 +31,24 @@ class Game_World(State):
         ] 
 
         self.characters = []
+        self.characters_not_eliminated = []
+        self.winner_id = 0
+        self.victory_messages = ['has won\nthe pissing contest', 
+                            '\nate all the crayons', 
+                            'wiped the\nfloor with his toes', 
+                            'crushed\nall opposition', 
+                            'left\nno survivors', 
+                            'dominated\nopposing force',
+                            'claimed\ntotal victory',
+                            '\nended it in style', 
+                            'proved\nunstoppable',
+                            'brought\nthe paintrain',
+                            'sealed\ntheir enemies fate',
+                            '\nreigned supreme',
+                            'delivered\nthe final blow(job)',
+                            '\nis the lash',
+                            'is\n very special']
+
         self.bomb = Bomb(-36, -36, self, self.game.assets["bomb_img"])
         self.explosion = Explosion(self.game.assets['explosion_img'])
         self.jump_button = Button(0, 0, image=self.game.assets['jump_img'])
@@ -41,7 +60,7 @@ class Game_World(State):
         self.load_level(level_name)
         
 
-        self.state = {'turn': 0, 'selecting_locked': False, 'playing': True}
+        self.state = {'turn': 0, 'selecting_locked': False, 'game_over': False}
 
     def update(self, delta_time, actions):
         '''
@@ -52,7 +71,6 @@ class Game_World(State):
         delta_time: dt
         actions: user inputs dictionary
         '''
-        
         
         characters_locked = self.check_for_character_lock()
         
@@ -95,6 +113,9 @@ class Game_World(State):
         self.bomb.render(surface)
         # explosion
         self.explosion.render(surface)
+
+        if self.state['game_over']:
+            self.winning(surface)
 
     def render_characters(self, surface):
         '''
@@ -165,6 +186,11 @@ class Game_World(State):
                         
                     # playable characters
                     if obj['type'] == "character":
+                        # for testing COMMENT OUT LATER
+                        for char in self.characters: 
+                            if char.team_id == 0: 
+                                return
+                            
                         self.characters.append(
                             # create character instances
                             Character(int(obj["name"]), # id
@@ -237,6 +263,7 @@ class Game_World(State):
             self.reset_level()
 
     def reset_level(self):
+        # reset characters to their original position and states
         for char in self.characters:
                 char.reset_pos()
                 char.reset_state()
@@ -259,6 +286,9 @@ class Game_World(State):
         if self.bomb.state['selected']:
             return True
         
+        if self.state['game_over']:
+            return True
+        
         return False
     
     def turn_based_lock(self, character):
@@ -269,3 +299,33 @@ class Game_World(State):
         character: character which is being inspected
         '''
         return self.state['turn'] % self.player_count != character.team_id
+    
+    def check_for_win(self):
+        '''
+        checks remaining characters are all from one team
+
+        only runs on character elimination
+        '''
+        self.characters_not_eliminated = [char for char in self.characters if not char.state['eliminated']]
+        print('checking win conditions')
+        # check for winning conditions
+        if len(self.characters_not_eliminated) > 0: # eliminated list is not empty
+            # all characters team id is the same as first ones 
+            if all(char.team_id == self.characters_not_eliminated[0].team_id 
+                    for char in self.characters_not_eliminated):
+                self.state['game_over'] = True
+                self.winner_id = self.characters_not_eliminated[0].team_id + 1
+                # select at random one of the victory messages
+                self.displayed_message = self.victory_messages[random.randint(0, len(self.victory_messages) - 1)]
+                
+        else:
+            print('DRAW')
+
+
+    def winning(self, surface):
+        '''
+        difines what happens when someone wins        
+        '''
+
+        text = f'Player {self.winner_id} {self.displayed_message}'
+        self.game.draw_text(surface, text, self.game.BLACK, self.game.GAME_W / 2, self.game.GAME_H / 2)

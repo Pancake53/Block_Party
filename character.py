@@ -233,6 +233,7 @@ class Character(GameObject):
         self.x_speed = 0
         self.y_speed = 0
         self.state['moving'] = False
+        self.game_world.check_for_win()
 
     def out_of_bounds(self):
         self.eliminated()
