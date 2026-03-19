@@ -65,25 +65,31 @@ class Character(GameObject):
         tiles: game levels collision tiles
         '''
         if not self.state['eliminated']:
+            # only update if character is moving and on the screen
             if (self.x_speed != 0) or (self.y_speed != 0):
                 # check if out of bounds on x axis
                 if (self.x_pos < - self.CHARACTER_SIZE) or (self.x_pos > self.game_world.game.GAME_W):
-                    self.eliminated()
+                    self.out_of_bounds()
                 # check if out of bounds on y axis
                 elif self.y_pos > self.game_world.game.GAME_H:
-                    self.eliminated()
+                    self.out_of_bounds()
                 else:
+                    # moving and not out of bounds
                     self.state['moving'] = True
                     self.update_pos(dt, tiles)
                 
             else:
                 self.state['moving'] = False
 
-            
 
-            # if not self.state['locked']:    
-            self.handle_actions(actions)
+            if not self.state['locked']:    
+                self.handle_actions(actions)
+
             self.health_bar.update()
+
+        # bug fixing
+        # if self.state['choosing']:
+        #     print(f'char state: {self.state}')
 
     def collision_x_axis(self, collisions):
         '''
@@ -138,13 +144,26 @@ class Character(GameObject):
         '''
         handels hovered mouse clicks for Obj
         '''
-        #print(f'"CLICK!! : " {self.state}')
+        print(f'"CLICK!! : " {self.state}')
         # Selecting
         if not (self.state["jump"] or self.state["throw"]):
         # print("select condition met") 
+            
+            # store current state
+            selected_state = self.state["selected"]
+            choosing_state = self.state["choosing"]
 
-            self.state["selected"] = not self.state["selected"]
-            self.state["choosing"] = not self.state["choosing"]
+            # reset every characters selected state
+            for char in self.game_world.characters:
+                char.state["selected"] = False
+                char.state["choosing"] = False
+                char.state["jump"] = False
+
+            # reverse current state
+            self.state["selected"] = not selected_state
+            self.state["choosing"] = not choosing_state
+
+            
             # print(f"state: {self.state}")
 
         # Jumping / entering into drag
@@ -214,3 +233,6 @@ class Character(GameObject):
         self.x_speed = 0
         self.y_speed = 0
         self.state['moving'] = False
+
+    def out_of_bounds(self):
+        self.eliminated()

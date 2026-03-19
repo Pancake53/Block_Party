@@ -55,7 +55,7 @@ class Game_World(State):
         
         
         characters_locked = self.check_for_character_lock()
-        print(characters_locked)
+        
         for char in self.characters:
             # Universal lock if char or bomb is moving
             #  or if bomb is being thrown
@@ -119,8 +119,11 @@ class Game_World(State):
         x_jump = char.rect.x - self.jump_button.width - 12
 
         if self.jump_button.action_on_button(x_jump, y, surface, self.game.actions):
+            # jump button pressed
+            # set state to jump and choosing to false
             char.state["jump"] = True
             char.state["choosing"] = False
+            
 
         x_bomb = x_jump + self.jump_button.width + 6
 

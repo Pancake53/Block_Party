@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "tilemap/ship.tmx",
+    "activeFile": "tilemap/ship_w_characters.tmj",
     "expandedProjectPaths": [
     ],
     "fileStates": {
@@ -12,6 +12,14 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 550.6387327542158,
+                "y": 323.76085845682167
+            }
+        },
+        "tilemap/ship_w_characters.tmj": {
+            "scale": 0.8154166666666666,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 594.7879407256004,
                 "y": 323.76085845682167
             }
         }
@@ -23,10 +31,11 @@
     "map.tileHeight": 15,
     "map.width": 15,
     "openFiles": [
-        "tilemap/ship.tmx"
+        "tilemap/ship_w_characters.tmj"
     ],
     "project": "practice.tiled-project",
     "recentFiles": [
+        "tilemap/ship_w_characters.tmj",
         "tilemap/ship.tmx"
     ],
     "resizeMap.removeObjects": false

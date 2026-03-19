@@ -59,22 +59,26 @@ class GameObject():
         actions: user inputs dictionary
         tiles: game levels collision tiles
         '''
-        if (self.x_speed != 0) or (self.y_speed != 0):
-            # check if out of bounds on x axis
-            if (self.x_pos < - self.CHARACTER_SIZE) or (self.x_pos > self.game_world.game.GAME_W):
-                self.state['eliminated'] = True
-            # check if out of bounds on y axis
-            if self.y_pos > self.game_world.game.GAME_H:
-                self.state['eliminated'] = True
+        if not self.state['eliminated']:
+            # only update if obj is moving and on the screen
+            if (self.x_speed != 0) or (self.y_speed != 0):
+                # check if out of bounds on x axis
+                if (self.x_pos < - self.CHARACTER_SIZE) or (self.x_pos > self.game_world.game.GAME_W):
+                    self.out_of_bounds()
+                # check if out of bounds on y axis
+                elif self.y_pos > self.game_world.game.GAME_H:
+                    self.out_of_bound()
+                else:
+                    # moving and not out of bounds
+                    self.state['moving'] = True
+                    self.update_pos(dt, tiles)
+                
+            else:
+                self.state['moving'] = False
 
-            self.state['moving'] = True
-            self.update_pos(dt, tiles)
-        
-        else:
-            self.state['moving'] = False
 
-        # if not self.state['locked']:    
-        self.handle_actions(actions)
+            if not self.state['locked']:    
+                self.handle_actions(actions)
 
 
     def collision_test(self, tiles):
@@ -192,27 +196,27 @@ class GameObject():
             
 
         # Handle mouse clicks for selecting obj
-        if not self.state['locked']:
+        
 
-            # mouse on Obj
-            hovered = self.rect.collidepoint(actions["mouse_pos"])
+        # mouse on Obj
+        hovered = self.rect.collidepoint(actions["mouse_pos"])
 
-            if hovered:
-                if actions["mouse_click"]:
-                    self.clicking(actions)
+        if hovered:
+            if actions["mouse_click"]:
+                self.clicking(actions)
 
-            if self.state['selected']:
-                # Dragging
-                if self.state["drag"]:
-                    self.dragging(actions)
+        if self.state['selected']:
+            # Dragging
+            if self.state["drag"]:
+                self.dragging(actions)
 
 
-                # Releasing
-                if (not actions["mouse_pressed"]) and (len(self.mouse_pos_list) >= 2):
-                    self.releasing()
+            # Releasing
+            if (not actions["mouse_pressed"]) and (len(self.mouse_pos_list) >= 2):
+                self.releasing()
 
-                if self.state["throw"]: # bomb placeholder
-                    self.throw_bomb()
+            if self.state["throw"]: # bomb placeholder
+                self.throw_bomb()
 
     def clicking(self, actions):
         '''
@@ -287,3 +291,5 @@ class GameObject():
         for state in self.state:
             self.state[state] = False
 
+    def out_of_bounds(self):
+        pass

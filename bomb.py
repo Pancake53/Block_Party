@@ -65,7 +65,9 @@ class Bomb(GameObject):
         '''
         self.explosion()
 
-
+    def out_of_bounds(self):
+        self.reset_state()
+        self.reset_pos()
 
     def explosion(self):
         x_pos = self.rect.centerx
