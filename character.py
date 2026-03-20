@@ -233,7 +233,10 @@ class Character(GameObject):
         self.x_speed = 0
         self.y_speed = 0
         self.state['moving'] = False
-        self.game_world.check_for_win()
+
+        # checks if all players characters are eliminated
+        self.game_world.check_for_player_eliminated(self.team_id)
+        
 
     def out_of_bounds(self):
         self.eliminated()
