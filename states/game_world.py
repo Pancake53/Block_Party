@@ -172,7 +172,7 @@ class Game_World(State):
         level_name: filename with level data
         '''
         # level data
-        path = os.path.join(self.game.tilemap_dir, level_name)
+        path = os.path.join(self.game.level_dir, level_name)
 
         with open(path, "r", encoding="utf-8") as f:
             level_data = json.load(f)

@@ -1,5 +1,5 @@
 from states.state import State
-from states.game_world import Game_World
+from states.level_menu import Level_Menu
 
 class Title(State):
     '''
@@ -19,7 +19,7 @@ class Title(State):
         actions: user inputs dictionary
         '''
         if actions["start"]:
-            new_state = Game_World(self.game, "ship_w_characters.tmj")
+            new_state = Level_Menu(self.game)
             new_state.enter_state()
         self.game.reset_keys()
 

@@ -173,7 +173,7 @@ class Game():
         self.image_dir = os.path.join(self.assets_dir, "images")
         self.font_dir = os.path.join(self.assets_dir, "font")
         self.level_dir = os.path.join("levels")
-        self.tilemap_dir = os.path.join("tilemap")
+        # self.tilemap_dir = os.path.join("tilemap") NOT IN USE
         # Assets themselves
         self.font = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_SIZE)
         self.assets["bomb_img"] = pygame.image.load(os.path.join(self.image_dir, "bomb.png")).convert_alpha()
