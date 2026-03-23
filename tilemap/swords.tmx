@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="18" tilewidth="32" tileheight="30" infinite="0" nextlayerid="3" nextobjectid="140">
+ <editorsettings>
+  <export target="../levels/swords.tmj" format="json"/>
+ </editorsettings>
+ <layer id="1" name="Tile Layer 1" width="30" height="18">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="2" name="collisionTiles">
+  <object id="29" name="2" type="character" x="310.867" y="425.644" width="24" height="48"/>
+  <object id="36" name="4" type="character" x="784.985" y="326.214" width="24" height="48"/>
+  <object id="37" name="3" type="character" x="672.713" y="334.462" width="24" height="48"/>
+  <object id="67" type="collision_tile" x="416" y="120" width="97" height="30"/>
+  <object id="76" type="collision_tile" x="448" y="390" width="32" height="90"/>
+  <object id="81" type="collision_tile" x="192" y="180" width="32" height="300">
+   <properties>
+    <property name="colour" type="color" value=""/>
+   </properties>
+  </object>
+  <object id="88" type="collision_tile" x="128" y="390" width="160" height="30"/>
+  <object id="89" type="collision_tile" x="544" y="270" width="32" height="30"/>
+  <object id="93" type="collision_tile" x="896" y="270" width="64" height="28"/>
+  <object id="98" name="1" type="character" x="40.838" y="397.808" width="24" height="48"/>
+  <object id="99" type="collision_tile" x="864" y="450" width="97" height="30"/>
+  <object id="100" type="collision_tile" x="384" y="150" width="160" height="30"/>
+  <object id="115" type="collision_tile" x="736" y="180" width="32" height="300">
+   <properties>
+    <property name="colour" type="color" value=""/>
+   </properties>
+  </object>
+  <object id="116" type="collision_tile" x="672" y="390" width="160" height="30"/>
+  <object id="118" type="collision_tile" x="0" y="270" width="64" height="28"/>
+  <object id="119" type="collision_tile" x="480" y="390" width="30" height="60"/>
+  <object id="120" type="collision_tile" x="416" y="390" width="32" height="60"/>
+  <object id="122" type="collision_tile" x="480" y="450" width="16" height="15"/>
+  <object id="126" type="collision_tile" x="384" y="240" width="32" height="90"/>
+  <object id="127" type="collision_tile" x="512" y="240" width="32" height="90"/>
+  <object id="128" type="collision_tile" x="352" y="270" width="32" height="30"/>
+  <object id="129" type="collision_tile" x="0" y="450" width="97" height="30"/>
+  <object id="131" type="collision_tile" x="288" y="480" width="64" height="28"/>
+  <object id="132" type="collision_tile" x="0" y="90" width="96" height="28"/>
+  <object id="133" type="collision_tile" x="864" y="90" width="96" height="28"/>
+  <object id="135" type="collision_tile" x="576" y="480" width="64" height="28"/>
+  <object id="136" type="collision_tile" x="432" y="450" width="16" height="16"/>
+  <object id="137" type="collision_tile" x="456" y="479.333" width="16" height="16"/>
+  <object id="138" type="collision_tile" x="744" y="167.667" width="16" height="16"/>
+  <object id="139" type="collision_tile" x="200.333" y="167" width="16" height="16"/>
+ </objectgroup>
+</map>

@@ -3,8 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "tilemap/ship.tmx",
+    "activeFile": "tilemap/tree of life.tmx",
     "expandedProjectPaths": [
+        "tilemap",
+        ".",
+        "levels"
     ],
     "fileStates": {
         "levels/ship.tmj": {
@@ -16,11 +19,14 @@
             }
         },
         "levels/shipwreck.tmj": {
-            "scale": 0.8154166666666666,
+            "expandedObjectLayers": [
+                2
+            ],
+            "scale": 0.75,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 550.6387327542157,
-                "y": 323.76085845682167
+                "x": 479.9999999999999,
+                "y": 268.66666666666663
             }
         },
         "tilemap/ship.tmx": {
@@ -39,6 +45,14 @@
                 "y": 269.8007153806848
             }
         },
+        "tilemap/shipwreck - Copy.tmx": {
+            "scale": 1.0432407407407407,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 480.23431259430197,
+                "y": 269.8322534836247
+            }
+        },
         "tilemap/shipwreck.tmx": {
             "expandedObjectLayers": [
                 2
@@ -49,20 +63,51 @@
                 "x": 456.20848237097607,
                 "y": 343.995912110373
             }
+        },
+        "tilemap/smily.tmx": {
+            "scale": 1,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 480,
+                "y": 269.5
+            }
+        },
+        "tilemap/swords.tmx": {
+            "scale": 1,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 423,
+                "y": 293.5
+            }
+        },
+        "tilemap/tree of life.tmx": {
+            "scale": 1,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 480,
+                "y": 269.5
+            }
         }
     },
-    "last.exportedFilePath": "C:/Users/nikol/OneDrive - O365 Turun yliopisto/Koulu/Tietotekniikka/Harjoitustyö/tilemap",
+    "last.exportedFilePath": "C:/Users/nikol/OneDrive - O365 Turun yliopisto/Koulu/Tietotekniikka/Harjoitustyö/levels",
     "map.height": 18,
     "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
-    "map.lastUsedFormat": "json",
+    "map.lastUsedFormat": "tmx",
     "map.tileHeight": 15,
     "map.width": 15,
     "openFiles": [
-        "tilemap/ship_w_characters.tmj",
-        "tilemap/ship.tmx"
+        "levels/shipwreck.tmj",
+        "levels/ship.tmj",
+        "tilemap/smily.tmx",
+        "tilemap/tree of life.tmx"
     ],
     "project": "practice.tiled-project",
+    "property.type": "color",
     "recentFiles": [
+        "levels/shipwreck.tmj",
+        "levels/ship.tmj",
+        "tilemap/smily.tmx",
+        "tilemap/tree of life.tmx",
         "tilemap/ship_w_characters.tmj",
         "tilemap/ship.tmx"
     ],

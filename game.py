@@ -23,8 +23,11 @@ class Game():
         
         # actions dictionary for user input
         self.actions = {"left": False, "right": False, "up": False,
-                        "down": False, "mouse_pressed": False, "mouse_click": False, "mouse_pos": (0, 0), "action1": False,
-                        "action2": False, "space": False, "start": False}
+                        "down": False, "mouse_pressed": False, 
+                        "mouse_click": False, "mouse_pos": (0, 0), 
+                        "action1": False, "action2": False,
+                        "space": False, "start": False, 
+                        'esc': False}
         
 
         # set clock and tickrate
@@ -66,7 +69,7 @@ class Game():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.running, self.playing = False, False
+                    self.actions['esc'] = True
                 if event.key == pygame.K_a:
                     self.actions["left"] = True
                 if event.key == pygame.K_d:
@@ -85,6 +88,8 @@ class Game():
                     self.actions["space"] = True
 
             if event.type == pygame.KEYUP:
+                if event.key == pygame.K_ESCAPE:
+                    self.actions['esc'] = False
                 if event.key == pygame.K_a:
                     self.actions["left"] = False
                 if event.key == pygame.K_d:

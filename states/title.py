@@ -21,7 +21,11 @@ class Title(State):
         if actions["start"]:
             new_state = Level_Menu(self.game)
             new_state.enter_state()
-        self.game.reset_keys()
+            self.game.reset_keys()
+
+        if actions["esc"]:
+            self.game.playing = False
+            self.game.running = False
 
     def render(self, surface):
         '''

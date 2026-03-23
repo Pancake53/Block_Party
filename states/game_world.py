@@ -10,7 +10,7 @@ from pygame.math import Vector2
 
 
 class Game_World(State):
-    def __init__(self, game, level_name, player_count=3):
+    def __init__(self, game, level_name, player_count=4):
         super().__init__(game)
         # Teal
         self.BG_COL = (0, 153, 136) # (56, 175, 218) light blue
@@ -42,7 +42,7 @@ class Game_World(State):
         self.victory_messages = ['has won\nthe pissing contest', 
                             '\nate all the crayons', 
                             'wiped the\nfloor with his toes', 
-                            'eats\n their nails', 
+                            'eats\ntheir nails', 
                             'is\nthe biggest nerd', 
                             'is\ngoofy as heck',
                             'claimed\nvictory royale',
@@ -302,6 +302,10 @@ class Game_World(State):
          # reset position (for testing)
         if actions["action1"]:
             self.reset_level()
+        
+        if actions["esc"]:
+            self.exit_state()
+            self.game.reset_keys()
 
     def reset_level(self):
         # reset characters to their original position and states

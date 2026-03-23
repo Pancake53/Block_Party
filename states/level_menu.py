@@ -14,6 +14,7 @@ class Level_Menu(State):
 
         self.BROWN = (181, 67, 0)
         self.BG_COL = (0, 153, 136)
+        self
 
         self.current_level = 0
         self.levels = []
@@ -35,9 +36,9 @@ class Level_Menu(State):
         delta_time: dt
         actions: user inputs dictionary
         '''
-        if actions["start"]:
-            new_state = Game_World(self.game, self.filenames[self.current_level])
-            new_state.enter_state()
+
+        self.handle_actions(actions)
+        
         self.game.reset_keys()
 
         if self.left_clicked:
@@ -55,6 +56,14 @@ class Level_Menu(State):
             else:
                 self.current_level += 1
 
+    def handle_actions(self, actions):
+        if actions["start"]:
+            new_state = Game_World(self.game, self.filenames[self.current_level])
+            new_state.enter_state()
+
+        if actions["esc"]:
+            self.exit_state()
+
     def render(self, surface):
         '''
         renders background and levels to choose from
@@ -67,9 +76,9 @@ class Level_Menu(State):
                                self.game.GAME_H / 8)
         
         pygame.draw.rect(surface, self.BG_COL, self.level_bg)
-        draw_shading_for_rect(self.game.WHITE, self.level_bg, surface, shading_W=4)
         
         self.render_selected_level(surface)
+        draw_shading_for_rect(self.game.WHITE, self.level_bg, surface, shading_W=4)
 
         self.render_buttons(surface)
         

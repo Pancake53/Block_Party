@@ -26,7 +26,7 @@ class GameObject():
         # Game physics
         self.gravity = 250
         self.throw_multiplier = 2.5
-        self.max_velocity = 300
+        self.max_velocity = 330
         self.min_jump = 10
         self.force_mp = 250
         # self.air_resistance = 0.99 # not in use
