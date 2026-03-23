@@ -31,16 +31,21 @@ class Game_World(State):
         (204, 51, 17) # Vibrant red
         ] 
 
-        self.characters = []
-        self.characters_not_eliminated = []
-        self.winner_id = 0
+        self.player_count = player_count
+        self.players_alive = [i for i in range(player_count)]
+
+        # stores player character data as team_id: [characters]
+        self.teams = {i: [] for i in range(self.player_count)}
+        self.teams_not_eliminated = {}
+
+        self.winner_id = None
         self.victory_messages = ['has won\nthe pissing contest', 
                             '\nate all the crayons', 
                             'wiped the\nfloor with his toes', 
-                            'crushed\nall opposition', 
-                            'left\nno survivors', 
-                            'dominated\nopposing force',
-                            'claimed\ntotal victory',
+                            'eats\n their nails', 
+                            'is\nthe biggest nerd', 
+                            'is\ngoofy as heck',
+                            'claimed\nvictory royale',
                             '\nended it in style', 
                             'proved\nunstoppable',
                             'brought\nthe paintrain',
@@ -48,19 +53,18 @@ class Game_World(State):
                             '\nreigned supreme',
                             'delivered\nthe final blow(job)',
                             '\nis the lash',
-                            'is\n very special']
+                            'is\nvery special']
 
+        # Init needed classes
         self.bomb = Bomb(-36, -36, self, self.game.assets["bomb_img"])
         self.explosion = Explosion(self.game.assets['explosion_img'])
         self.jump_button = Button(0, 0, image=self.game.assets['jump_img'])
         self.bomb_button = Button(0, 0, image=self.game.assets['bomb_img'])
         self.flag_button = Button(0, 0, image=self.game.assets['flag_img'])
 
-        self.player_count = player_count
-        self.players_alive = [i for i in range(player_count)]
         self.load_level(level_name)
-        
 
+        # Game State
         self.state = {'turn': 0, 'selecting_locked': False, 'game_over': False}
 
     def update(self, delta_time, actions):
@@ -73,17 +77,8 @@ class Game_World(State):
         actions: user inputs dictionary
         '''
         
-        characters_locked = self.check_for_character_lock()
-        
-        for char in self.characters:
-            # Universal lock if char or bomb is moving
-            #  or if bomb is being thrown
-            char.state['locked'] = characters_locked
-            if not characters_locked:
-                char.state['locked'] = self.turn_based_lock(char)
-            char.update(delta_time, actions, self.tiles)
-            char.health_bar.update()
-        
+        self.update_characters(delta_time, actions)
+            
         self.bomb.update(delta_time, actions, self.tiles)
 
         self.explosion.update()
@@ -91,8 +86,27 @@ class Game_World(State):
         # print(self.game_state)
 
         if self.state['game_over']:
-            self.update_winning()
+            self.update_winning()    
+
+    def update_characters(self, delta_time, actions):
+        '''
+        calls characters update function
+        locks character selection logic
+
+        delta_time: dt
+        actions: user inputs dictionary
+        '''
+        characters_locked = self.check_for_character_lock()
         
+        for id, team in self.teams_not_eliminated.items():
+            for char in team:
+                # Universal lock if char or bomb is moving
+                #  or if bomb is being thrown
+                char.state['locked'] = characters_locked
+                if not characters_locked:
+                    char.state['locked'] = self.turn_based_lock(char)
+                char.update(delta_time, actions, self.tiles)
+                char.health_bar.update()
 
     def render(self, surface):
         '''
@@ -127,11 +141,12 @@ class Game_World(State):
         
         surface: surface to render on
         '''
-        for char in self.characters:
-            char.render(surface)
-            if char.state["choosing"]:
-                self.render_selections(char, surface)
-                
+        for id, team in self.teams_not_eliminated.items():
+            for char in team:
+                char.render(surface)
+                if char.state["choosing"]:
+                    self.render_selections(char, surface)
+                    
     def render_selections(self, char, surface):
         '''
         renders selections
@@ -153,14 +168,15 @@ class Game_World(State):
         x_bomb = x_jump + self.jump_button.width + 6
 
         if self.bomb_button.action_on_button(x_bomb, y, surface, self.game.actions):
+            char.state["choosing"] = False
             char.state["throw"] = True
             
 
         x_flag = x_bomb + self.jump_button.width + 6
 
         if self.flag_button.action_on_button(x_flag, y, surface, self.game.actions):
-            char.state["jump"] = True
             char.state["choosing"] = False
+            self.surrender(char.team_id)
         
     def load_level(self, level_name):
         '''
@@ -192,6 +208,9 @@ class Game_World(State):
                     if obj['type'] == "character":
                         self.load_character(obj)
 
+        self.teams_not_eliminated = self.teams.copy()
+        # print(f'Level Loaded \nLevel Data:\n{self.teams}')
+
     def load_character(self, obj):
         '''
         loads character object into the level
@@ -205,12 +224,11 @@ class Game_World(State):
         
         one_char_per_player = False
         # TESTING SECTION COMMENT OUT LATER
-        for char in self.characters: 
-            if char.team_id == player_id: 
-                one_char_per_player = True
+        # if self.teams[player_id]: 
+        #     one_char_per_player = True
 
         if not one_char_per_player:
-            self.characters.append(
+            self.teams[player_id].append(
                 # create character instances
                 Character(player_id, # id
                         obj["x"], # x position
@@ -245,9 +263,10 @@ class Game_World(State):
         self.explosion.activate(x_pos, y_pos)
 
         hit_characters = []
-        for char in self.characters:
-            if char.rect.colliderect(self.explosion):
-                hit_characters.append(char)
+        for id, team in self.teams_not_eliminated.items():
+            for char in team:
+                if char.rect.colliderect(self.explosion):
+                    hit_characters.append(char)
 
         if hit_characters:
             self.explosion_calculations(x_pos, y_pos, hit_characters)
@@ -268,11 +287,13 @@ class Game_World(State):
             direction = char_pos - explosion_pos
             distance = max(direction.length(), 1)
             force = char.force_mp / distance
-            print(f'force: {force}')
-            char.x_speed = direction[0] * force
-            char.y_speed = direction[1] * force
 
             char.take_damage(force)
+            # if still alive after taking damage
+            if not char.state['eliminated']:
+            
+                char.x_speed = direction[0] * force
+                char.y_speed = direction[1] * force     
             
     def handle_actions(self, actions):
 
@@ -282,13 +303,16 @@ class Game_World(State):
 
     def reset_level(self):
         # reset characters to their original position and states
-        for char in self.characters:
+        for id, team in self.teams.items():
+            for char in team:
                 char.reset_pos()
                 char.reset_state()
 
         self.state['turn'] = 0
         self.state['game_over'] = False
         self.players_alive = [i for i in range(self.player_count)]
+
+        self.teams_not_eliminated = self.teams.copy()
 
     def check_for_character_lock(self):
         '''
@@ -301,9 +325,10 @@ class Game_World(State):
         - True if there is an ongoing event
         - False if no actions
         '''
-        for char in self.characters:
-            if char.state['moving']:
-                return True
+        for id, team in self.teams_not_eliminated.items():
+            for char in team:
+                if char.state['moving']:
+                    return True
 
         if self.bomb.state['selected']:
             return True
@@ -329,22 +354,29 @@ class Game_World(State):
 
         return turn != character.team_id
             
-    def check_for_player_eliminated(self, player_id):
+    def check_for_player_eliminated(self, char_eliminated):
         '''
         checks if one players all characters are eliminated
 
-        player_id: player id
+        char_eliminated: character that was eliminated
 
         if player eliminated then change turn logic and check for win
         '''
         print("checking for player elimination")
-        # update list of characters that are not eliminated
-        self.characters_not_eliminated = [char for char in self.characters if not char.state['eliminated']]
-        # eliminated characters team
-        teams_chars_alive = [char for char in self.characters_not_eliminated if char.team_id == player_id]
 
-        # if list not empty quit check
+        # eliminated characters team
+        player_id = char_eliminated.team_id
+
+        teams_chars_alive = False
+
+        for char in self.teams_not_eliminated[player_id]:
+            if not char.state['eliminated']:
+                teams_chars_alive = True
+
+        # if list not empty, update characters_not_eliminated and quit check
         if teams_chars_alive:
+            # update teams & chars that are not eliminated
+            self.teams_not_eliminated[player_id].remove(char_eliminated)
             return
         
         # list empty, player eliminated
@@ -361,26 +393,27 @@ class Game_World(State):
         
         print('checking win conditions')
         # check for winning conditions
-        if len(self.characters_not_eliminated) > 0: # eliminated list is not empty
-            # all characters team id is the same as first ones 
-            if all(char.team_id == self.characters_not_eliminated[0].team_id 
-                    for char in self.characters_not_eliminated):
+        match len(self.players_alive): # eliminated list is not empty
+            # len of teams alive is one, only one team left
+            case 1:
                 self.state['game_over'] = True
-                self.winner_id = self.characters_not_eliminated[0].team_id + 1
+                self.winner_id = self.players_alive[0] + 1
                 # select at random one of the victory messages
                 self.displayed_message = self.victory_messages[random.randint(0, len(self.victory_messages) - 1)]
                 
-        else:
-            print('DRAW') # logically impossible
+            case 0:
+                self.state['game_over'] = True
+                print('DRAW') # logically impossible
 
     def update_winning(self):
         '''
         characters jumping from joy after winning
         '''
-        for char in self.characters_not_eliminated:
-            # if not moving then jump
-            if not char.state['moving']:
-                char.y_speed -= random.randint(50, 150)
+        for id, team in self.teams_not_eliminated.items():
+            for char in team:
+                # if not moving then jump
+                if not char.state['moving']:
+                    char.y_speed -= random.randint(50, 150)
 
     def render_winning(self, surface):
         '''
@@ -390,5 +423,19 @@ class Game_World(State):
         text = f'Player {self.winner_id} {self.displayed_message}'
         self.game.draw_text(surface, text, self.game.BLACK, self.game.GAME_W / 2, self.game.GAME_H / 2)
 
+    def surrender(self, player_id):
+        '''
+        handels logic for surrendering
 
-        
+        player_id: id of player who pressed the surrender button
+        '''
+        # change character states
+        for char in self.teams[player_id]:
+            char.state['eliminated'] = True
+            char.x_speed = 0
+            char.y_speed = 0
+            char.state['moving'] = False
+        # remove from alive
+        self.players_alive.remove(player_id)
+        # check for win
+        self.check_for_win()

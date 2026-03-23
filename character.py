@@ -154,7 +154,7 @@ class Character(GameObject):
             choosing_state = self.state["choosing"]
 
             # reset every characters selected state
-            for char in self.game_world.characters:
+            for char in self.game_world.teams_not_eliminated[self.team_id]:
                 char.state["selected"] = False
                 char.state["choosing"] = False
                 char.state["jump"] = False
@@ -235,7 +235,7 @@ class Character(GameObject):
         self.state['moving'] = False
 
         # checks if all players characters are eliminated
-        self.game_world.check_for_player_eliminated(self.team_id)
+        self.game_world.check_for_player_eliminated(self)
         
 
     def out_of_bounds(self):

@@ -54,7 +54,6 @@ class Level_Menu(State):
             else:
                 pygame.draw.rect(surface, self.BROWN, tile)
             
-
     def load_levels(self):
         '''
         loads levels tile data for level selection
