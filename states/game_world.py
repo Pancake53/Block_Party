@@ -221,7 +221,9 @@ class Game_World(State):
         '''
         # team id of character
         player_id = int(obj["name"]) - 1
-        
+        if player_id not in self.players_alive:
+            return
+
         one_char_per_player = False
         # TESTING SECTION COMMENT OUT LATER
         # if self.teams[player_id]: 

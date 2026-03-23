@@ -7,6 +7,14 @@
     "expandedProjectPaths": [
     ],
     "fileStates": {
+        "levels/ship.tmj": {
+            "scale": 1.0432407407407407,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 480.23431259430197,
+                "y": 269.8322534836247
+            }
+        },
         "levels/shipwreck.tmj": {
             "scale": 0.8154166666666666,
             "selectedLayer": 1,
@@ -30,12 +38,23 @@
                 "x": 479.50945324476237,
                 "y": 269.8007153806848
             }
+        },
+        "tilemap/shipwreck.tmx": {
+            "expandedObjectLayers": [
+                2
+            ],
+            "scale": 0.8154166666666666,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 456.20848237097607,
+                "y": 343.995912110373
+            }
         }
     },
     "last.exportedFilePath": "C:/Users/nikol/OneDrive - O365 Turun yliopisto/Koulu/Tietotekniikka/Harjoitustyö/tilemap",
     "map.height": 18,
     "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
-    "map.lastUsedFormat": "tmx",
+    "map.lastUsedFormat": "json",
     "map.tileHeight": 15,
     "map.width": 15,
     "openFiles": [

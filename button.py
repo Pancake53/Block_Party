@@ -1,4 +1,5 @@
 import pygame
+from helpers import draw_shading_for_rect
 
 # Button that can have optionally image or text
 class Button():
@@ -30,9 +31,9 @@ class Button():
         self.button_col = button_colour
         self.hover_col = hover_colour
 
-        self.white = (255, 255, 255)
-        self.black = (0, 0, 0)
-        self.click_col = self.black
+        self.WHITE = (255, 255, 255)
+        self.BLACK = (0, 0, 0)
+        self.click_col = self.BLACK
         self.image = image
         
         # print an error if we are missing the image or width and height
@@ -101,17 +102,6 @@ class Button():
         else:
             pygame.draw.rect(surface, col, self.rect)
 
-        # Draw shading
-        # top
-        pygame.draw.line(surface, self.white, (self.rect.x, self.rect.y),
-                          (self.rect.x + self.width, self.rect.y), 2)
-        # left
-        pygame.draw.line(surface, self.white, (self.rect.x, self.rect.y),
-                          (self.rect.x, self.rect.y + self.height), 2)
-        # right
-        pygame.draw.line(surface, self.black, (self.rect.x + self.width, self.rect.y),
-                          (self.rect.x + self.width, self.rect.y + self.height), 2)
-        # bottom
-        pygame.draw.line(surface, self.black, (self.rect.x, self.rect.y + self.height),
-                          (self.rect.x + self.width, self.rect.y + self.height), 2)
+        draw_shading_for_rect(self.WHITE, self.rect,
+                               surface, right_color = self.BLACK)    
         

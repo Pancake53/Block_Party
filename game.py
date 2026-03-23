@@ -180,6 +180,8 @@ class Game():
         self.assets["jump_img"] = pygame.image.load(os.path.join(self.image_dir, "jump.png")).convert_alpha()
         self.assets["flag_img"] = pygame.image.load(os.path.join(self.image_dir, "white_flag.png")).convert_alpha()
         self.assets["explosion_img"] = pygame.image.load(os.path.join(self.image_dir, "explosion.png")).convert_alpha()
+        self.assets["arrowleft_img"] = pygame.image.load(os.path.join(self.image_dir, "arrowleft.png")).convert_alpha()
+        self.assets["arrowright_img"] = pygame.image.load(os.path.join(self.image_dir, "arrowright.png")).convert_alpha()
 
     def reset_keys(self):
         '''
@@ -195,5 +197,4 @@ class Game():
         '''
         self.title_screen = Title(self)
         self.state_stack.append(self.title_screen)
-
 
