@@ -142,40 +142,81 @@ class Game_World(State):
         
         surface: surface to render on
         '''
+        choosing_char = None
         for id, team in self.teams_not_eliminated.items():
             for char in team:
                 char.render(surface)
                 if char.state["choosing"]:
-                    self.render_selections(char, surface)
+                    choosing_char = char
+        if choosing_char:
+            self.render_selections(choosing_char, surface)            
                     
     def render_selections(self, char, surface):
         '''
         renders selections
         handels state changes based on selection
+        if char is near edges then alter the selection position
         
         char: character that is choosing
         surface: surface to render on
         '''
-        y = char.rect.y - self.jump_button.height - 10
-        x_jump = char.rect.x - self.jump_button.width - 12
+        padding = 6
+        button_W = self.jump_button.width
+        button_H = self.jump_button.height
+        # char is next to left edge, render right
+        if char.x_pos < button_W + padding * 4:
+            # y
+            y_jump = char.rect.centery - button_H - padding * 4
+            y_bomb = y_jump + button_H + padding
+            y_flag = y_bomb + button_H + padding
+            # x
+            x = char.rect.x + char.WIDTH + padding * 2
+            x_jump = x_bomb = x_flag = x
 
-        if self.jump_button.action_on_button(x_jump, y, surface, self.game.actions):
+        # char next to right edge, render left
+        elif char.x_pos > self.game.GAME_W - (button_W + padding * 4):
+            # y
+            y_jump = char.rect.centery - button_H - padding * 4
+            y_bomb = y_jump + button_H + padding
+            y_flag = y_bomb + button_H + padding
+            # x
+            x = char.rect.x - button_W - padding * 2
+            x_jump = x_bomb = x_flag = x
+
+
+        # char next to top, render below
+        elif char.y_pos < button_H * 2:
+            # y
+            y = char.rect.y + char.rect.height + padding * 2
+            y_jump = y_bomb = y_flag = y
+            # x
+            x_jump = char.rect.x - button_W - padding * 2
+            x_bomb = x_jump + button_W + padding
+            x_flag = x_bomb + button_W + padding
+
+        # render above, normal behavior
+        else:
+            # y
+            y = char.rect.y - button_H - padding * 2
+            y_jump = y_bomb = y_flag = y
+            # x
+            x_jump = char.rect.x - button_W - padding * 2
+            x_bomb = x_jump + button_W + padding
+            x_flag = x_bomb + button_W + padding
+
+        if self.jump_button.action_on_button(x_jump, y_jump, surface, self.game.actions):
             # jump button pressed
             # set state to jump and choosing to false
             char.state["jump"] = True
             char.state["choosing"] = False
             
 
-        x_bomb = x_jump + self.jump_button.width + 6
-
-        if self.bomb_button.action_on_button(x_bomb, y, surface, self.game.actions):
+        if self.bomb_button.action_on_button(x_bomb, y_bomb, surface, self.game.actions):
             char.state["choosing"] = False
             char.state["throw"] = True
             
 
-        x_flag = x_bomb + self.jump_button.width + 6
-
-        if self.flag_button.action_on_button(x_flag, y, surface, self.game.actions):
+        if self.flag_button.action_on_button(x_flag, y_flag, surface, self.game.actions):
             char.state["choosing"] = False
             self.surrender(char.team_id)
         

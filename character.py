@@ -32,8 +32,14 @@ class Character(GameObject):
         self.x_stop = 1 
         # speed loss multiplier on collision
         self.retention = 0.25 
+        # how many pixels can in map to be considered 
+        # to not be out of bounds
+        # Buffer for levels with wrapping left/right
+        self.out_of_bounds_buffer = 5
 
-        self.rect = pygame.Rect(x_pos, y_pos, self.CHARACTER_SIZE * width, self.CHARACTER_SIZE * 2)
+        self.WIDTH = self.CHARACTER_SIZE * width
+        self.HEIGHT = self.CHARACTER_SIZE * 2
+        self.rect = pygame.Rect(x_pos, y_pos, self.WIDTH, self.HEIGHT)
        
         # Health points
         self.max_hp = 100
@@ -67,7 +73,8 @@ class Character(GameObject):
             # only update if character is moving and on the screen
             if (self.x_speed != 0) or (self.y_speed != 0):
                 # check if out of bounds on x axis
-                if (self.x_pos < - self.CHARACTER_SIZE) or (self.x_pos > self.game_world.game.GAME_W):
+                if (self.x_pos < - self.WIDTH + self.out_of_bounds_buffer or 
+                    self.x_pos > self.game_world.game.GAME_W - self.out_of_bounds_buffer):
                     self.out_of_bounds()
                 # check if out of bounds on y axis
                 elif self.y_pos > self.game_world.game.GAME_H:
@@ -249,16 +256,16 @@ class Character(GameObject):
         '''
         wrap around logic
         '''
-        buffer = 5
+        
         if self.y_pos <= self.game_world.game.GAME_H:
             # out of map on sides
             # moving left -> move to right side
             if self.x_speed < 0:
-                self.x_pos = self.game_world.game.GAME_W - buffer
+                self.x_pos = self.game_world.game.GAME_W - self.out_of_bounds_buffer
 
             # moving right -> move to left side
             if self.x_speed > 0:
-                self.x_pos = - self.CHARACTER_SIZE + buffer
+                self.x_pos = - self.CHARACTER_SIZE + self.out_of_bounds_buffer
         # fell through the floor
         else:
             self.eliminated()
