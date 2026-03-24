@@ -39,8 +39,7 @@ class Character(GameObject):
         self.max_hp = 100
         self.current_hp = 100
         self.health_bar = HealthBar(self)
-        
-      
+       
 
     def render(self, surface):
         '''
@@ -110,7 +109,6 @@ class Character(GameObject):
         self.x_speed = - self.x_speed * self.retention
         self.y_speed *= self.retention # also reduce y speed, MAY NEED TWEAKING
 
-
     def collision_y_axis(self, collisions):
         '''
         reaction to collision on y axis
@@ -138,7 +136,6 @@ class Character(GameObject):
             self.rect.bottom = tile.top
             self.y_pos = self.rect.y
             self.y_speed = 0
-
 
     def clicking(self, actions):
         '''
@@ -236,7 +233,32 @@ class Character(GameObject):
 
         # checks if all players characters are eliminated
         self.game_world.check_for_player_eliminated(self)
-        
 
     def out_of_bounds(self):
-        self.eliminated()
+        '''
+        handels logic for going outside of map
+        '''
+        # levels that wrap around on sides
+        if self.game_world.wrap_around:
+            self.wrap_around()
+        # normal levels
+        else:
+            self.eliminated()
+
+    def wrap_around(self):
+        '''
+        wrap around logic
+        '''
+        buffer = 5
+        if self.y_pos <= self.game_world.game.GAME_H:
+            # out of map on sides
+            # moving left -> move to right side
+            if self.x_speed < 0:
+                self.x_pos = self.game_world.game.GAME_W - buffer
+
+            # moving right -> move to left side
+            if self.x_speed > 0:
+                self.x_pos = - self.CHARACTER_SIZE + buffer
+        # fell through the floor
+        else:
+            self.eliminated()

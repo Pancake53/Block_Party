@@ -66,8 +66,31 @@ class Bomb(GameObject):
         self.explosion()
 
     def out_of_bounds(self):
-        self.reset_state()
-        self.reset_pos()
+        # levels that wrap around on sides
+        if self.game_world.wrap_around:
+            self.wrap_around()
+        else:
+            self.reset_state()
+            self.reset_pos()
+
+    def wrap_around(self):
+        '''
+        wrap around logic
+        '''
+        buffer = 5
+        if self.y_pos <= self.game_world.game.GAME_H:
+            # out of map on sides
+            # moving left -> move to right side
+            if self.x_speed < 0:
+                self.x_pos = self.game_world.game.GAME_W - buffer
+
+            # moving right -> move to left side
+            if self.x_speed > 0:
+                self.x_pos = - self.CHARACTER_SIZE + buffer
+        # fell through the floor
+        else:
+            self.reset_state()
+            self.reset_pos()
 
     def explosion(self):
         x_pos = self.rect.centerx

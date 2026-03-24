@@ -62,6 +62,7 @@ class Game_World(State):
         self.bomb_button = Button(0, 0, image=self.game.assets['bomb_img'])
         self.flag_button = Button(0, 0, image=self.game.assets['flag_img'])
 
+        self.wrap_around = None
         self.load_level(level_name)
 
         # Game State
@@ -209,6 +210,9 @@ class Game_World(State):
                         self.load_character(obj)
 
         self.teams_not_eliminated = self.teams.copy()
+
+        if level_name.split('.')[0] in ['tree of life', 'swords']:
+            self.wrap_around = True
         # print(f'Level Loaded \nLevel Data:\n{self.teams}')
 
     def load_character(self, obj):
