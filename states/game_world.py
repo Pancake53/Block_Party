@@ -290,15 +290,29 @@ class Game_World(State):
 
         x & y: center coordinates of bomb
         '''
+        print(f'Spawning bomb')
         # state
         self.bomb.state["selected"] = True
         self.bomb.state["jump"] = True
         # rect x&y
         self.bomb.rect.centerx = x_pos 
         self.bomb.rect.centery = y_pos 
+
         # for calculations
         self.bomb.x_pos = self.bomb.rect.x 
         self.bomb.y_pos = self.bomb.rect.y 
+
+        # check if bomb has spawned already colliding with a wall
+        collisions = self.bomb.collision_test(self.tiles)
+        if collisions:
+            print(f"Bomb collides w wall on spawn, fixing, collisions: {collisions}")
+            self.bomb.fix_spawn(collisions)
+            
+        # bomb spawned normally
+        
+            
+
+
 
     def activate_explosion(self, x_pos, y_pos):
         '''

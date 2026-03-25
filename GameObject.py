@@ -40,6 +40,11 @@ class GameObject():
   
         # rect
         self.CHARACTER_SIZE = 24
+
+        # how many pixels can in map to be considered 
+        # to not be out of bounds
+        # Buffer for levels with wrapping left/right
+        self.out_of_bounds_buffer = 5
         
 
     def render(self, surface):

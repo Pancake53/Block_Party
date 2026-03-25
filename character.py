@@ -32,10 +32,7 @@ class Character(GameObject):
         self.x_stop = 1 
         # speed loss multiplier on collision
         self.retention = 0.25 
-        # how many pixels can in map to be considered 
-        # to not be out of bounds
-        # Buffer for levels with wrapping left/right
-        self.out_of_bounds_buffer = 5
+        
 
         self.WIDTH = self.CHARACTER_SIZE * width
         self.HEIGHT = self.CHARACTER_SIZE * 2
@@ -73,12 +70,15 @@ class Character(GameObject):
             # only update if character is moving and on the screen
             if (self.x_speed != 0) or (self.y_speed != 0):
                 # check if out of bounds on x axis
-                if (self.x_pos < - self.WIDTH + self.out_of_bounds_buffer or 
-                    self.x_pos > self.game_world.game.GAME_W - self.out_of_bounds_buffer):
-                    self.out_of_bounds()
+                # out on left side
+                if self.x_pos < - self.WIDTH + self.out_of_bounds_buffer:
+                    self.out_of_bounds('left')
+                # out on right side
+                elif self.x_pos > self.game_world.game.GAME_W - self.out_of_bounds_buffer:
+                    self.out_of_bounds('right')
                 # check if out of bounds on y axis
                 elif self.y_pos > self.game_world.game.GAME_H:
-                    self.out_of_bounds()
+                    self.out_of_bounds('bottom')
                 else:
                     # moving and not out of bounds
                     self.state['moving'] = True
@@ -241,31 +241,30 @@ class Character(GameObject):
         # checks if all players characters are eliminated
         self.game_world.check_for_player_eliminated(self)
 
-    def out_of_bounds(self):
+    def out_of_bounds(self, side):
         '''
         handels logic for going outside of map
         '''
         # levels that wrap around on sides
         if self.game_world.wrap_around:
-            self.wrap_around()
+            self.wrap_around(side)
         # normal levels
         else:
             self.eliminated()
 
-    def wrap_around(self):
+    def wrap_around(self, side):
         '''
         wrap around logic
-        '''
-        
-        if self.y_pos <= self.game_world.game.GAME_H:
-            # out of map on sides
-            # moving left -> move to right side
-            if self.x_speed < 0:
-                self.x_pos = self.game_world.game.GAME_W - self.out_of_bounds_buffer
 
+        side: of map
+        '''
+        match side:
+            # moving left -> move to right side of the screen
+            case 'left':
+                self.x_pos = self.game_world.game.GAME_W - self.out_of_bounds_buffer
             # moving right -> move to left side
-            if self.x_speed > 0:
+            case 'right':
                 self.x_pos = - self.CHARACTER_SIZE + self.out_of_bounds_buffer
-        # fell through the floor
-        else:
-            self.eliminated()
+            # fell through the floor
+            case 'bottom':
+                self.eliminated()

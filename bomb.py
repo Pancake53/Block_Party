@@ -13,14 +13,46 @@ class Bomb(GameObject):
     def __init__(self, x_pos, y_pos, game_world, image):
         '''Initialize attributes, rectangle, state manager
         
-        x & y: bombs center coordinates
+        x & y: bombs coordinates
         image: asset of the bomb_image
         '''
         super().__init__(x_pos, y_pos, game_world)
         self.image = image
         self.rect = image.get_rect()
-        self.rect.center = (x_pos, y_pos)
+        self.WIDTH = self.rect.width
+        self.HEIGHT = self.rect.height
 
+    def update(self, dt, actions, tiles):
+        '''
+        Updates obj position, if obj is moving
+        Handels inputs
+
+        dt: delta time 
+        actions: user inputs dictionary
+        tiles: game levels collision tiles
+        '''
+        if self.state['locked']:
+            # only update if bomb is flying
+            
+            # check if out of bounds on x axis
+            if self.x_pos < - self.WIDTH / 2:
+                self.out_of_bounds("left")
+            elif self.x_pos > self.game_world.game.GAME_W - self.WIDTH / 2:
+                self.out_of_bounds("right")
+            # check if out of bounds on y axis
+            elif self.y_pos > self.game_world.game.GAME_H:
+                self.out_of_bounds("bottom")
+            else:
+                # moving and not out of bounds
+                self.state['moving'] = True
+                self.update_pos(dt, tiles)
+                
+            
+
+
+        if not self.state['locked']:    
+            self.handle_actions(actions)
+    
 
     def render(self, surface):
         '''
@@ -29,7 +61,7 @@ class Bomb(GameObject):
         surface: surface to render object on
         '''
 
-        if self.state['selected'] or self.state['moving']:
+        if self.state['selected']:
             surface.blit(self.image, self.rect) 
 
 
@@ -65,32 +97,33 @@ class Bomb(GameObject):
         '''
         self.explosion()
 
-    def out_of_bounds(self):
+    def out_of_bounds(self, side):
         # levels that wrap around on sides
         if self.game_world.wrap_around:
-            self.wrap_around()
+            self.wrap_around(side)
         else:
             self.reset_state()
             self.reset_pos()
 
-    def wrap_around(self):
+    def wrap_around(self, side):
         '''
         wrap around logic
         '''
-        buffer = 5
-        if self.y_pos <= self.game_world.game.GAME_H:
-            # out of map on sides
-            # moving left -> move to right side
-            if self.x_speed < 0:
-                self.x_pos = self.game_world.game.GAME_W - buffer
+        match side:
+            # moving left -> move to right side of screen
+            case "left":
+                self.x_pos = self.game_world.game.GAME_W - self.WIDTH / 2
+            # moving right -> move to left side side of screen
+            case "right":
+                self.x_pos = - self.WIDTH / 2
+            # fell off the map
+            case "bottom":
+                self.reset_state()
+                self.reset_pos()
 
-            # moving right -> move to left side
-            if self.x_speed > 0:
-                self.x_pos = - self.CHARACTER_SIZE + buffer
-        # fell through the floor
-        else:
-            self.reset_state()
-            self.reset_pos()
+            case _:
+                pass    
+                
 
     def explosion(self):
         x_pos = self.rect.centerx
@@ -129,4 +162,47 @@ class Bomb(GameObject):
         self.mouse_pos_list = []
         self.state['locked'] = True
         self.game_world.state['turn'] += 1
-        print(f'Game World State: {self.game_world.state}')
+        # print(f'Game World State: {self.game_world.state}')
+
+    def fix_spawn(self, tiles): # TODO
+        '''
+        handels moving bombs spawn when it spawns
+        too close to a wall
+
+        tiles: Rect, collision tiles that collide with da bomb
+        '''
+        # only left and right side of bomb can not be colliding with a wall
+        # so only need to look at x coordinates
+        
+
+        for tile in tiles:
+
+            bomb_L = self.x_pos
+            bomb_R = bomb_L + self.WIDTH
+
+            tile_L = tile.x
+            tile_R = tile_L + tile.width
+
+            # right side of tile / left side of bomb
+            if (self.rect.centerx > tile.centerx and
+                tile_R > bomb_L):
+                print("left side of bomb colliding")
+                # update calculations
+                self.x_pos += tile_R - bomb_L
+                # update actual position
+                self.rect.x = self.x_pos
+                continue
+
+            # left side of tile / right side of bomb
+            if (self.rect.centerx < tile.centerx and
+                tile_L < bomb_R):
+                print("right side of bomb colliding")
+                # update calculations
+                self.x_pos -= bomb_R - tile_L 
+                # update actual position
+                self.rect.x = self.x_pos
+
+
+    
+                
+            
