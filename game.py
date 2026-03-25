@@ -18,8 +18,21 @@ class Game():
         self.window = pygame.display.set_mode((self.WINDOW_W, self.WINDOW_H))
 
         # default
+        self.BG_COL = (0, 153, 136)
         self.BLACK, self.WHITE = (0, 0, 0), (255, 255, 255)
         self.FONT_SIZE = 40
+
+        self.team_colours = [
+        
+            (204, 121, 167), # Purple
+            (34, 136, 51), # Forest green
+            (68, 119, 170), # Dark blue
+            (255, 242, 89), # Yellow
+            (0, 0, 0), # Black
+            (230, 159, 0), # Orange
+            (213, 94, 0), # Dark orange
+            (204, 51, 17) # Vibrant red
+        ] 
         
         # actions dictionary for user input
         self.actions = {"left": False, "right": False, "up": False,

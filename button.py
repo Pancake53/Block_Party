@@ -31,6 +31,9 @@ class Button():
         self.button_col = button_colour
         self.hover_col = hover_colour
 
+        self.width = width
+        self.height = height
+
         self.WHITE = (255, 255, 255)
         self.BLACK = (0, 0, 0)
         self.click_col = self.BLACK
@@ -46,8 +49,6 @@ class Button():
             self.width = self.rect.width
             self.height = self.rect.height
         else:    
-            self.width = width
-            self.height = height
             self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
         

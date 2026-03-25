@@ -10,7 +10,7 @@ class Character(GameObject):
       action such as selecting, jumping, spawning in bomb
     
     '''
-    def __init__(self, team_id, x_pos, y_pos, game_world, width=1):
+    def __init__(self, team_id, x_pos, y_pos, game_world, colour_id = 0, width=1):
         '''Initialize attributes
 
         game_world: level the character loads into
@@ -23,7 +23,7 @@ class Character(GameObject):
         self.team_id = team_id
         self.width = width
         # Character colour based on team id
-        self.colour = self.game_world.team_colours[team_id]
+        self.colour = self.game_world.game.team_colours[team_id]
         # Physics
         # y bounce, lower value -> more small bounces
         self.y_stop = 20 
@@ -148,7 +148,7 @@ class Character(GameObject):
         '''
         handels hovered mouse clicks for Obj
         '''
-        print(f'"CLICK!! : " {self.state}')
+        # print(f'"CLICK!! : " {self.state}')
         # Selecting
         if not (self.state["jump"] or self.state["throw"]):
         # print("select condition met") 

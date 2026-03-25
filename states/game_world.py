@@ -18,19 +18,6 @@ class Game_World(State):
         self.tiles = []
         
 
-        self.team_colours = [
-        
-        (204, 121, 167), # Purple
-        (34, 136, 51), # Forest green
-        
-        (68, 119, 170), # Dark blue
-        (255, 242, 89), # Yellow
-        (0, 0, 0), # Black
-        (230, 159, 0), # Orange
-        (213, 94, 0), # Dark orange
-        (204, 51, 17) # Vibrant red
-        ] 
-
         self.player_count = player_count
         self.players_alive = [i for i in range(player_count)]
 
@@ -290,7 +277,7 @@ class Game_World(State):
 
         x & y: center coordinates of bomb
         '''
-        print(f'Spawning bomb')
+        # print(f'Spawning bomb')
         # state
         self.bomb.state["selected"] = True
         self.bomb.state["jump"] = True
@@ -305,9 +292,9 @@ class Game_World(State):
         # check if bomb has spawned already colliding with a wall
         collisions = self.bomb.collision_test(self.tiles)
         if collisions:
-            print(f"Bomb collides w wall on spawn, fixing, collisions: {collisions}")
+            # print(f"Bomb collides w wall on spawn, fixing, collisions: {collisions}")
             self.bomb.fix_spawn(collisions)
-            
+
         # bomb spawned normally
         
             

@@ -186,7 +186,7 @@ class Bomb(GameObject):
             # right side of tile / left side of bomb
             if (self.rect.centerx > tile.centerx and
                 tile_R > bomb_L):
-                print("left side of bomb colliding")
+                # print("left side of bomb colliding")
                 # update calculations
                 self.x_pos += tile_R - bomb_L
                 # update actual position
@@ -196,7 +196,7 @@ class Bomb(GameObject):
             # left side of tile / right side of bomb
             if (self.rect.centerx < tile.centerx and
                 tile_L < bomb_R):
-                print("right side of bomb colliding")
+                # print("right side of bomb colliding")
                 # update calculations
                 self.x_pos -= bomb_R - tile_L 
                 # update actual position

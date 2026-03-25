@@ -7,14 +7,14 @@ from helpers import draw_shading_for_rect
 
 class Level_Menu(State):
     '''
-    title screen
+    level menu for choosing level
     '''
-    def __init__(self, game):
+    def __init__(self, game, player_count=2):
         super().__init__(game)
 
+        self.player_count = player_count
+
         self.BROWN = (181, 67, 0)
-        self.BG_COL = (0, 153, 136)
-        self
 
         self.current_level = 0
         self.levels = []
@@ -58,7 +58,9 @@ class Level_Menu(State):
 
     def handle_actions(self, actions):
         if actions["start"]:
-            new_state = Game_World(self.game, self.filenames[self.current_level])
+            new_state = Game_World(self.game,
+                                    self.filenames[self.current_level],
+                                      player_count=self.player_count)
             new_state.enter_state()
 
         if actions["esc"]:
@@ -75,7 +77,7 @@ class Level_Menu(State):
                              self.game.WHITE, self.game.GAME_W / 2,
                                self.game.GAME_H / 8)
         
-        pygame.draw.rect(surface, self.BG_COL, self.level_bg)
+        pygame.draw.rect(surface, self.game.BG_COL, self.level_bg)
         
         self.render_selected_level(surface)
         draw_shading_for_rect(self.game.WHITE, self.level_bg, surface, shading_W=4)

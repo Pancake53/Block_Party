@@ -29,9 +29,11 @@ class State():
         if len(self.game.state_stack) > 1:
             self.prev_state = self.game.state_stack[-1]
         self.game.state_stack.append(self)
+        self.game.reset_keys()
 
     def exit_state(self):
         '''
         removes top state
         '''
         self.game.state_stack.pop()
+        self.game.reset_keys()
