@@ -9,7 +9,6 @@ class Player_Menu(State):
     '''
     level menu for player amount
     '''
-
     def __init__(self, game):
         super().__init__(game)
 
