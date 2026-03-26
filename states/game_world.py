@@ -84,15 +84,20 @@ class Game_World(State):
         delta_time: dt
         actions: user inputs dictionary
         '''
+        # Universal lock if char or bomb is moving
+        #  or if bomb is being thrown
         characters_locked = self.check_for_character_lock()
-        
+        # update self.turn
+        self.turn_based_lock()
+
         for id, team in self.teams_not_eliminated.items():
+            turn_lock = (id != self.turn) # for each team
             for char in team:
-                # Universal lock if char or bomb is moving
-                #  or if bomb is being thrown
-                char.state['locked'] = characters_locked
-                if not characters_locked:
-                    char.state['locked'] = self.turn_based_lock(char)
+                if characters_locked:
+                    char.state['locked'] = characters_locked
+                else: 
+                    char.state['locked'] = turn_lock
+                        
                 char.update(delta_time, actions, self.tiles)
                 char.health_bar.update()
 
@@ -296,10 +301,6 @@ class Game_World(State):
             self.bomb.fix_spawn(collisions)
 
         # bomb spawned normally
-        
-            
-
-
 
     def activate_explosion(self, x_pos, y_pos):
         '''
@@ -390,21 +391,35 @@ class Game_World(State):
         
         return False
     
-    def turn_based_lock(self, character):
+    def turn_based_lock(self):
         '''
         locks characters based on games turn state
-        return True if it is not teams turn
 
         character: character which is being inspected
         '''
-        turn = self.state['turn'] % self.player_count
+        
+        # reverse order on second round
+        if (self.state['turn'] < self.player_count * 2 and 
+            self.state['turn'] >= self.player_count):
+            # select from the end of player count, so last player first then second to last
+            self.turn = self.player_count - self.state['turn'] % self.player_count
+            # eliminated players turn
+            while self.turn not in self.players_alive:
+                # change turn will we get a valid turn
+                self.state['turn'] += 1
+                self.turn = self.player_count - self.state['turn'] % self.player_count
+
+            return
+        
+        # normal order
+        self.turn = self.state['turn'] % self.player_count
         # eliminated players turn
-        while turn not in self.players_alive:
+        while self.turn not in self.players_alive:
             # change turn will we get a valid turn
             self.state['turn'] += 1
-            turn = self.state['turn'] % self.player_count
+            self.turn = self.state['turn'] % self.player_count
 
-        return turn != character.team_id
+        return 
             
     def check_for_player_eliminated(self, char_eliminated):
         '''

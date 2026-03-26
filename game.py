@@ -13,7 +13,7 @@ class Game():
 
         # window and game canvas
         self.GAME_W, self.GAME_H = 960, 540
-        self.WINDOW_W, self.WINDOW_H = 1920, 1080
+        self.WINDOW_W, self.WINDOW_H = 960, 540
         self.SCREEN_H, self.SCREEN_W = 0, 0 # updates on fullscreen toggle
 
         self.game_canvas = pygame.Surface((self.GAME_W, self.GAME_H))
