@@ -43,17 +43,14 @@ class Game_World(State):
                             'is\nvery special']
 
         # Init needed classes
-        self.bomb = Bomb(-36, -36, self, self.game.assets["bomb_img"])
-        self.explosion = Explosion(self.game.assets['explosion_img'])
-        self.jump_button = Button(0, 0, image=self.game.assets['jump_img'])
-        self.bomb_button = Button(0, 0, image=self.game.assets['bomb_img'])
-        self.flag_button = Button(0, 0, image=self.game.assets['flag_img'])
+        self.load_entities()
 
         self.wrap_around = None
         self.load_level(level_name)
 
         # Game State
         self.state = {'turn': 0, 'selecting_locked': False, 'game_over': False}
+        self.turn = 0
 
     def update(self, delta_time, actions):
         '''
@@ -118,12 +115,16 @@ class Game_World(State):
         for tile in self.tiles:
             pygame.draw.rect(surface, self.BROWN, tile)
 
+        self.render_turn(surface)
+
         # characters
         self.render_characters(surface)
         # bomb
         self.bomb.render(surface)
         # explosion
         self.explosion.render(surface)
+
+        
 
         if self.state['game_over']:
             self.render_winning(surface)
@@ -211,7 +212,29 @@ class Game_World(State):
         if self.flag_button.action_on_button(x_flag, y_flag, surface, self.game.actions):
             char.state["choosing"] = False
             self.surrender(char.team_id)
+
+    def render_turn(self, surface):
+        '''
+        render whose turn it is
+        '''
+        colour = self.game.team_colours[self.turn]
+        pygame.draw.rect(surface, colour, self.turn_rect)
+        self.game.draw_text(surface,
+                "turn", self.game.BLACK, 55, self.game.GAME_H - 32, "Medium")
         
+
+    def load_entities(self):
+        '''
+        loads classes and pygame obj at the init of level
+        '''
+        self.bomb = Bomb(-36, -36, self, self.game.assets["bomb_img"])
+        self.explosion = Explosion(self.game.assets['explosion_img'])
+        self.jump_button = Button(0, 0, image=self.game.assets['jump_img'])
+        self.bomb_button = Button(0, 0, image=self.game.assets['bomb_img'])
+        self.flag_button = Button(0, 0, image=self.game.assets['flag_img'])    
+
+        self.turn_rect = pygame.Rect(15, self.game.GAME_H - 45, 80, 30)
+
     def load_level(self, level_name):
         '''
         loads level data and stores it in tiles list as Rects
@@ -274,6 +297,7 @@ class Game_World(State):
                         obj['y'], # y position
                         self)
             )
+
 
     def spawn_bomb(self, x_pos, y_pos):
         '''

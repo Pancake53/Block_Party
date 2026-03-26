@@ -27,7 +27,9 @@ class Game():
         # default
         self.BG_COL = (0, 153, 136)
         self.BLACK, self.WHITE = (0, 0, 0), (255, 255, 255)
-        self.FONT_SIZE = 40
+        self.FONT_TITLE = 40
+        self.FONT_MEDIUM = 15
+        self.FONT_SMALL = 8
 
         self.team_colours = [
         
@@ -184,7 +186,7 @@ class Game():
         '''
         self.dt = self.clock.tick(60) / 1000
 
-    def draw_text(self, surface, text, colour, x, y):
+    def draw_text(self, surface, text, colour, x, y, size="Title"):
         '''
         helper function for drawing text
 
@@ -192,8 +194,22 @@ class Game():
         text: written message
         colour: colour of text
         x & y: center coordinates of text rect
+        size: Title, Medium or Small
         '''
-        text_surface = self.font.render(text, True, colour)
+        match size:
+            case "Title":
+                text_surface = self.font_title.render(text,
+                                                True, colour)
+            case "Medium":
+                text_surface = self.font_medium.render(text,
+                                                True, colour)
+            case "Small":
+                text_surface = self.font_small.render(text,
+                                                True, colour)
+            case _:
+                text_surface = self.font_medium.render(text,
+                                                True, colour)
+                print(f"Draw text input error, size: {size} is not in Title, Medium, Small")
         text_rect = text_surface.get_rect()
         text_rect.center = (x, y)
         surface.blit(text_surface, text_rect)
@@ -209,7 +225,9 @@ class Game():
         self.level_dir = os.path.join("levels")
         # self.tilemap_dir = os.path.join("tilemap") NOT IN USE
         # Assets themselves
-        self.font = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_SIZE)
+        self.font_title = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_TITLE)
+        self.font_medium = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_MEDIUM)
+        self.font_small = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_SMALL)
         self.assets["bomb_img"] = pygame.image.load(os.path.join(self.image_dir, "bomb.png")).convert_alpha()
         self.assets["jump_img"] = pygame.image.load(os.path.join(self.image_dir, "jump.png")).convert_alpha()
         self.assets["flag_img"] = pygame.image.load(os.path.join(self.image_dir, "white_flag.png")).convert_alpha()
