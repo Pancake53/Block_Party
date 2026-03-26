@@ -1,4 +1,4 @@
-import pygame, json, os
+import pygame
 
 from states.state import State
 from states.level_menu import Level_Menu

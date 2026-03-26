@@ -164,7 +164,7 @@ class Bomb(GameObject):
         self.game_world.state['turn'] += 1
         # print(f'Game World State: {self.game_world.state}')
 
-    def fix_spawn(self, tiles): # TODO
+    def fix_spawn(self, tiles): 
         '''
         handels moving bombs spawn when it spawns
         too close to a wall

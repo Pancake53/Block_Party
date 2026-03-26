@@ -13,9 +13,16 @@ class Game():
 
         # window and game canvas
         self.GAME_W, self.GAME_H = 960, 540
-        self.WINDOW_W, self.WINDOW_H = 960, 540
+        self.WINDOW_W, self.WINDOW_H = 1920, 1080
+        self.SCREEN_H, self.SCREEN_W = 0, 0 # updates on fullscreen toggle
+
         self.game_canvas = pygame.Surface((self.GAME_W, self.GAME_H))
         self.window = pygame.display.set_mode((self.WINDOW_W, self.WINDOW_H))
+        self.is_fullscreen = False
+
+        # scaling
+        self.scale_multiplier_x = self.GAME_W / self.WINDOW_W
+        self.scale_multiplier_y = self.GAME_H / self.WINDOW_H
 
         # default
         self.BG_COL = (0, 153, 136)
@@ -99,6 +106,9 @@ class Game():
                     self.actions["action2"] = True
                 if event.key == pygame.K_SPACE:
                     self.actions["space"] = True
+                # Fullscreen
+                if event.key == pygame.K_f:
+                    self.toggle_fullscreen()
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_ESCAPE:
@@ -140,8 +150,9 @@ class Game():
             # for clicking only interaction
             self.actions["mouse_click"] = True   
         
-        self.actions["mouse_pos"] = pygame.mouse.get_pos()
-        
+        unscaled_mouse_pos = pygame.mouse.get_pos()
+        self.actions["mouse_pos"] = [unscaled_mouse_pos[0] * self.scale_multiplier_x,
+                                      unscaled_mouse_pos[1] * self.scale_multiplier_y]
         
 
     def update(self):
@@ -157,7 +168,12 @@ class Game():
         draws the canvas on users screen
         '''
         self.state_stack[-1].render(self.game_canvas)
-        self.window.blit(pygame.transform.scale(self.game_canvas,
+        if self.is_fullscreen:
+            self.window.blit(pygame.transform.scale(self.game_canvas,
+                                                 (self.SCREEN_W, self.SCREEN_H)),
+                                                   (0, 0))
+        else:
+            self.window.blit(pygame.transform.scale(self.game_canvas,
                                                  (self.WINDOW_W, self.WINDOW_H)),
                                                    (0, 0))
         pygame.display.flip()
@@ -216,3 +232,23 @@ class Game():
         self.title_screen = Title(self)
         self.state_stack.append(self.title_screen)
 
+    def toggle_fullscreen(self):
+        '''
+        need I explain this
+        updates fullscreen values
+        '''
+        self.is_fullscreen = not self.is_fullscreen
+
+        if self.is_fullscreen:
+            self.window = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+            self.SCREEN_H = self.window.get_height()   
+            self.SCREEN_W = self.window.get_width()
+            # scaling for new H and W
+            self.scale_multiplier_x = self.GAME_W / self.SCREEN_W
+            self.scale_multiplier_y = self.GAME_H / self.SCREEN_H
+
+        else:
+            self.window = pygame.display.set_mode((self.WINDOW_W, self.WINDOW_H))
+            # scaling for new H and W
+            self.scale_multiplier_x = self.GAME_W / self.WINDOW_W
+            self.scale_multiplier_y = self.GAME_H / self.WINDOW_H
