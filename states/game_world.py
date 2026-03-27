@@ -50,7 +50,11 @@ class Game_World(State):
 
         # Game State
         self.state = {'turn': 0, 'selecting_locked': False, 'game_over': False}
-        self.turn = 0
+        self.current_turn = 0
+        self.round = int(self.state['turn'] 
+                                    / self.player_count) + 1
+
+    # update functions
 
     def update(self, delta_time, actions):
         '''
@@ -85,10 +89,9 @@ class Game_World(State):
         #  or if bomb is being thrown
         characters_locked = self.check_for_character_lock()
         # update self.turn
-        self.turn_based_lock()
 
         for id, team in self.teams_not_eliminated.items():
-            turn_lock = (id != self.turn) # for each team
+            turn_lock = (id != self.current_turn) # for each team
             for char in team:
                 if characters_locked:
                     char.state['locked'] = characters_locked
@@ -97,6 +100,8 @@ class Game_World(State):
                         
                 char.update(delta_time, actions, self.tiles)
                 char.health_bar.update()
+
+    # render functions
 
     def render(self, surface):
         '''
@@ -216,12 +221,14 @@ class Game_World(State):
     def render_turn(self, surface):
         '''
         render whose turn it is
+        bottom left of screen
         '''
-        colour = self.game.team_colours[self.turn]
+        colour = self.game.team_colours[self.current_turn]
         pygame.draw.rect(surface, colour, self.turn_rect)
         self.game.draw_text(surface,
                 "turn", self.game.BLACK, 55, self.game.GAME_H - 32, "Medium")
-        
+
+    # load functions
 
     def load_entities(self):
         '''
@@ -298,6 +305,7 @@ class Game_World(State):
                         self)
             )
 
+    # bomb / explosion
 
     def spawn_bomb(self, x_pos, y_pos):
         '''
@@ -367,7 +375,9 @@ class Game_World(State):
             
                 char.x_speed = direction[0] * force
                 char.y_speed = direction[1] * force     
-            
+
+    # actions
+
     def handle_actions(self, actions):
 
          # reset position (for testing)
@@ -386,10 +396,13 @@ class Game_World(State):
                 char.reset_state()
 
         self.state['turn'] = 0
+        self.round = 0
         self.state['game_over'] = False
         self.players_alive = [i for i in range(self.player_count)]
 
         self.teams_not_eliminated = self.teams.copy()
+
+    # locks & turn
 
     def check_for_character_lock(self):
         '''
@@ -421,30 +434,41 @@ class Game_World(State):
 
         character: character which is being inspected
         '''
-        
+        self.current_turn = self.state['turn'] % self.player_count
         # reverse order on second round
-        if (self.state['turn'] < self.player_count * 2 and 
-            self.state['turn'] >= self.player_count):
+        if self.round == 2:
             # select from the end of player count, so last player first then second to last
-            self.turn = self.player_count - self.state['turn'] % self.player_count
+            self.current_turn = self.player_count - self.current_turn - 1
             # eliminated players turn
-            while self.turn not in self.players_alive:
+            while self.current_turn not in self.players_alive:
                 # change turn will we get a valid turn
-                self.state['turn'] += 1
-                self.turn = self.player_count - self.state['turn'] % self.player_count
+                self.next_turn()
+                self.current_turn = self.player_count - self.state['turn'] % self.player_count
 
             return
         
         # normal order
-        self.turn = self.state['turn'] % self.player_count
+        
         # eliminated players turn
-        while self.turn not in self.players_alive:
+        while self.current_turn not in self.players_alive:
             # change turn will we get a valid turn
             self.state['turn'] += 1
-            self.turn = self.state['turn'] % self.player_count
+            self.current_turn = self.state['turn'] % self.player_count
 
         return 
             
+    def next_turn(self):
+        '''
+        update turn and round after an action
+        '''
+        self.state['turn'] += 1
+        self.round = int(self.state['turn'] 
+                                    / self.player_count) + 1
+        
+        self.turn_based_lock()
+
+    # checks
+
     def check_for_player_eliminated(self, char_eliminated):
         '''
         checks if one players all characters are eliminated
@@ -496,6 +520,8 @@ class Game_World(State):
                 self.state['game_over'] = True
                 print('DRAW') # logically impossible
 
+    # winning
+
     def update_winning(self):
         '''
         characters jumping from joy after winning
@@ -530,3 +556,4 @@ class Game_World(State):
         self.players_alive.remove(player_id)
         # check for win
         self.check_for_win()
+        self.next_turn()

@@ -161,7 +161,8 @@ class Bomb(GameObject):
 
         self.mouse_pos_list = []
         self.state['locked'] = True
-        self.game_world.state['turn'] += 1
+        # print(f'Round: {self.game_world.round}, Turn id: {self.game_world.current_turn}, Turns {self.game_world.state['turn']}')
+        self.game_world.next_turn()
         # print(f'Game World State: {self.game_world.state}')
 
     def fix_spawn(self, tiles): 

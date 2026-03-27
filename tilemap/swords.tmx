@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="18" tilewidth="32" tileheight="30" infinite="0" nextlayerid="3" nextobjectid="140">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="18" tilewidth="32" tileheight="30" infinite="0" nextlayerid="3" nextobjectid="149">
  <editorsettings>
   <export target="../levels/swords.tmj" format="json"/>
  </editorsettings>
@@ -27,8 +27,8 @@
  </layer>
  <objectgroup id="2" name="collisionTiles">
   <object id="29" name="2" type="character" x="310.867" y="425.644" width="24" height="48"/>
-  <object id="36" name="4" type="character" x="784.985" y="326.214" width="24" height="48"/>
-  <object id="37" name="3" type="character" x="672.713" y="334.462" width="24" height="48"/>
+  <object id="36" name="4" type="character" x="148.985" y="331.547" width="24" height="48"/>
+  <object id="37" name="3" type="character" x="691.38" y="326.462" width="24" height="48"/>
   <object id="67" type="collision_tile" x="416" y="120" width="97" height="30"/>
   <object id="76" type="collision_tile" x="448" y="390" width="32" height="90"/>
   <object id="81" type="collision_tile" x="192" y="180" width="32" height="300">
@@ -64,5 +64,13 @@
   <object id="137" type="collision_tile" x="456" y="479.333" width="16" height="16"/>
   <object id="138" type="collision_tile" x="744" y="167.667" width="16" height="16"/>
   <object id="139" type="collision_tile" x="200.333" y="167" width="16" height="16"/>
+  <object id="140" name="1" type="character" x="392" y="188" width="24" height="48"/>
+  <object id="141" name="2" type="character" x="514.667" y="185.333" width="24" height="48"/>
+  <object id="142" name="2" type="character" x="921.333" y="28" width="24" height="48"/>
+  <object id="143" name="1" type="character" x="917.333" y="218.667" width="24" height="48"/>
+  <object id="144" name="4" type="character" x="597.333" y="414.667" width="24" height="48"/>
+  <object id="145" name="4" type="character" x="44" y="32" width="24" height="48"/>
+  <object id="146" name="3" type="character" x="18.6667" y="198.667" width="24" height="48"/>
+  <object id="147" name="3" type="character" x="461.333" y="57.3333" width="24" height="48"/>
  </objectgroup>
 </map>
