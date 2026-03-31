@@ -74,10 +74,11 @@ class GameObject():
             # only update if obj is moving and on the screen
             if (self.x_speed != 0) or (self.y_speed != 0):
                 # check if out of bounds on x axis
-                if (self.x_screen < - self.CHARACTER_SIZE) or (self.x_screen > self.game_world.game.GAME_W):
+                if (self.x_level < - self.CHARACTER_SIZE or
+                    self.x_level > self.game_world.game.GAME_W):
                     self.out_of_bounds()
                 # check if out of bounds on y axis
-                elif self.y_screen > self.game_world.game.GAME_H:
+                elif self.y_level > self.game_world.game.GAME_H:
                     self.out_of_bound()
                 else:
                     # moving and not out of bounds

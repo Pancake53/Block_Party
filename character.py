@@ -71,13 +71,13 @@ class Character(GameObject):
             if (self.x_speed != 0) or (self.y_speed != 0):
                 # check if out of bounds on x axis
                 # out on left side
-                if self.x_pos < - self.WIDTH + self.out_of_bounds_buffer:
+                if self.x_level < - self.WIDTH + self.out_of_bounds_buffer:
                     self.out_of_bounds('left')
                 # out on right side
-                elif self.x_pos > self.game_world.game.GAME_W - self.out_of_bounds_buffer:
+                elif self.x_level > self.game_world.game.GAME_W - self.out_of_bounds_buffer:
                     self.out_of_bounds('right')
                 # check if out of bounds on y axis
-                elif self.y_pos > self.game_world.game.GAME_H:
+                elif self.y_level > self.game_world.game.GAME_H:
                     self.out_of_bounds('bottom')
                 else:
                     # moving and not out of bounds
@@ -107,11 +107,11 @@ class Character(GameObject):
             if self.x_speed > 0:
                 # print("colliding w left wall")
                 self.rect.right = tile.left # colliderect => False
-                self.x_pos = self.rect.x
+                self.x_screen = self.rect.x
             elif self.x_speed < 0:
                 # print("colliding w right wall")
                 self.rect.left = tile.right # colliderect => False
-                self.x_pos = self.rect.x
+                self.x_screen = self.rect.x
 
         self.x_speed = - self.x_speed * self.retention
         self.y_speed *= self.retention # also reduce y speed, MAY NEED TWEAKING
@@ -129,19 +129,19 @@ class Character(GameObject):
             # top
             # print(f"colliding w top of tile, y: {round(self.y_speed,3)}, x: {round(self.x_speed,3)}")
             self.rect.bottom = tile.top
-            self.y_pos = self.rect.y
+            self.y_screen = self.rect.y
             self.y_speed = self.y_speed * -1 * self.retention
         elif -self.y_speed > 0: 
             # bottom
             # print("colliding w bottom of tile")
             self.rect.top = tile.bottom
-            self.y_pos = self.rect.y
+            self.y_screen = self.rect.y
             self.y_speed = self.y_speed * -1 * self.retention / 2
         else:
             # top little momentum so momentum to 0
             # print("y_speed 0")
             self.rect.bottom = tile.top
-            self.y_pos = self.rect.y
+            self.y_screen = self.rect.y
             self.y_speed = 0
 
     def clicking(self, actions):
@@ -207,11 +207,11 @@ class Character(GameObject):
         reset position
         '''
         # calculated values to origin
-        self.x_pos = self.origin[0]
-        self.y_pos = self.origin[1]
+        self.x_screen = self.origin[0]
+        self.y_screen = self.origin[1]
         # move rect to calculated values
-        self.rect.x = self.x_pos
-        self.rect.y = self.y_pos
+        self.rect.x = self.x_screen
+        self.rect.y = self.y_screen
         # remove velocity
         self.x_speed = 0
         self.y_speed = 0.01
@@ -261,10 +261,14 @@ class Character(GameObject):
         match side:
             # moving left -> move to right side of the screen
             case 'left':
-                self.x_pos = self.game_world.game.GAME_W - self.out_of_bounds_buffer
+                self.x_level = self.game_world.game.GAME_W - self.out_of_bounds_buffer
+                self.x_screen = self.x_level + self.game_world.camera.total_offset_x
+                self.rect.x = self.x_screen
             # moving right -> move to left side
             case 'right':
-                self.x_pos = - self.CHARACTER_SIZE + self.out_of_bounds_buffer
+                self.x_level = - self.CHARACTER_SIZE + self.out_of_bounds_buffer
+                self.x_screen = self.x_level + self.game_world.camera.total_offset_x
+                self.rect.x = self.x_screen
             # fell through the floor
             case 'bottom':
                 self.eliminated()

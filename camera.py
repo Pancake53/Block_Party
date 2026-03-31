@@ -36,10 +36,10 @@ class Camera():
         # move movables if new offset was applied
         if offset:
             # collision tiles
-            for tile in self.tiles:
+            for tile in self.game_world.tiles:
                 tile.update(x_offset, y_offset)
             # characters
-            for team in self.teams_not_eliminated.values():
+            for team in self.game_world.teams_not_eliminated.values():
                 for char in team:
                     char.on_camera_move(x_offset, y_offset)
 
