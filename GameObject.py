@@ -16,8 +16,14 @@ class GameObject():
         '''
         # x & y
         self.origin = (x_pos, y_pos)
-        self.x_pos = float(x_pos)
-        self.y_pos = float(y_pos)
+        # position on screen 
+        # takes offset into account
+        self.x_screen = float(x_pos)
+        self.y_screen = float(y_pos)
+        # position in the entire level
+        # useful in out_of_bounds
+        self.x_level = self.x_screen
+        self.y_level = self.y_screen
         self.x_speed = 0
         self.y_speed = 0
 
@@ -68,10 +74,10 @@ class GameObject():
             # only update if obj is moving and on the screen
             if (self.x_speed != 0) or (self.y_speed != 0):
                 # check if out of bounds on x axis
-                if (self.x_pos < - self.CHARACTER_SIZE) or (self.x_pos > self.game_world.game.GAME_W):
+                if (self.x_screen < - self.CHARACTER_SIZE) or (self.x_screen > self.game_world.game.GAME_W):
                     self.out_of_bounds()
                 # check if out of bounds on y axis
-                elif self.y_pos > self.game_world.game.GAME_H:
+                elif self.y_screen > self.game_world.game.GAME_H:
                     self.out_of_bound()
                 else:
                     # moving and not out of bounds
@@ -97,8 +103,8 @@ class GameObject():
         '''
         collisions = []
         for tile in tiles:
-            if self.rect.colliderect(tile):
-                collisions.append(tile)
+            if self.rect.colliderect(tile.rect):
+                collisions.append(tile.rect)
         return collisions
     
     def update_pos(self, dt, tiles): # only active if we have speed
@@ -118,8 +124,8 @@ class GameObject():
         dt: delta time 
         tiles: game levels collision tiles
         '''
-        self.y_pos += self.y_speed * dt # for calculations
-        self.rect.y = round(self.y_pos) # update rect w calculated pos
+        self.y_screen += self.y_speed * dt # for calculations
+        self.rect.y = round(self.y_screen) # update rect w calculated pos
         collisions = self.collision_test(tiles)
         # print(f"y: {round(self.y_speed,3)}")
         if not collisions:
@@ -143,8 +149,8 @@ class GameObject():
         tiles: game levels collision tiles
         '''
         # x movement
-        self.x_pos += self.x_speed * dt # x_pos is used for calculations
-        self.rect.x = round(self.x_pos) # update rect position for collision_test
+        self.x_screen += self.x_speed * dt # x_pos is used for calculations
+        self.rect.x = round(self.x_screen) # update rect position for collision_test
         collisions = self.collision_test(tiles)
 
         if not collisions: # no collision
@@ -280,11 +286,11 @@ class GameObject():
         reset position
         '''
         # calculated values to origin
-        self.x_pos = self.origin[0]
-        self.y_pos = self.origin[1]
+        self.x_screen = self.origin[0]
+        self.y_screen = self.origin[1]
         # move rect to calculated values
-        self.rect.x = self.x_pos
-        self.rect.y = self.y_pos
+        self.rect.x = self.x_screen
+        self.rect.y = self.y_screen
         # remove velocity
         self.x_speed = 0
         self.y_speed = 0
@@ -299,3 +305,12 @@ class GameObject():
     def out_of_bounds(self):
         pass
 
+    def on_camera_move(self, x_offset, y_offset):
+        '''
+        update char screen position based on camera movement
+
+        x_offset: offset x axis
+        y_offset: offset y axis 
+        '''
+
+        pass

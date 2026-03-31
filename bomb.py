@@ -40,7 +40,7 @@ class Bomb(GameObject):
             elif self.x_pos > self.game_world.game.GAME_W - self.WIDTH / 2:
                 self.out_of_bounds("right")
             # check if out of bounds on y axis
-            elif self.y_pos > self.game_world.game.GAME_H:
+            elif self.y_screen > self.game_world.game.GAME_H:
                 self.out_of_bounds("bottom")
             else:
                 # moving and not out of bounds

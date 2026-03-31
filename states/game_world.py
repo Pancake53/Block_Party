@@ -1,10 +1,15 @@
 import pygame, json, os, random
+from pygame.math import Vector2
+
 from states.state import State
 from character import Character
 from bomb import Bomb
 from explosion import Explosion
 from button import Button
-from pygame.math import Vector2
+from tile import Tile
+from camera import Camera
+
+
 
 
 
@@ -12,9 +17,9 @@ from pygame.math import Vector2
 class Game_World(State):
     def __init__(self, game, level_name, player_count=4):
         super().__init__(game)
-        # Teal
+        
         self.BG_COL = (0, 153, 136) # (56, 175, 218) light blue
-        self.BROWN = (181, 67, 0)
+        self.TILE_COL = (181, 67, 0)
         self.tiles = []
         
 
@@ -53,6 +58,8 @@ class Game_World(State):
         self.current_turn = 0
         self.round = int(self.state['turn'] 
                                     / self.player_count) + 1
+        
+
 
     # update functions
 
@@ -65,7 +72,9 @@ class Game_World(State):
         delta_time: dt
         actions: user inputs dictionary
         '''
-        
+        # update view based on mouse movement around level edges
+        self.camera.update(delta_time, actions)
+
         self.update_characters(delta_time, actions)
             
         self.bomb.update(delta_time, actions, self.tiles)
@@ -73,6 +82,7 @@ class Game_World(State):
         self.explosion.update()
         self.handle_actions(actions)
         # print(self.game_state)
+        
 
         if self.state['game_over']:
             self.update_winning()    
@@ -118,7 +128,7 @@ class Game_World(State):
         
         # collision tiles
         for tile in self.tiles:
-            pygame.draw.rect(surface, self.BROWN, tile)
+            tile.render(surface)
 
         self.render_turn(surface)
 
@@ -241,6 +251,7 @@ class Game_World(State):
         self.flag_button = Button(0, 0, image=self.game.assets['flag_img'])    
 
         self.turn_rect = pygame.Rect(15, self.game.GAME_H - 45, 80, 30)
+        self.camera = Camera(self)
 
     def load_level(self, level_name):
         '''
@@ -264,8 +275,8 @@ class Game_World(State):
                     # tiles
                     if obj['type'] == "collision_tile":
                         self.tiles.append(
-                            pygame.Rect(obj["x"], obj["y"],
-                                obj["width"], obj["height"])
+                            Tile(obj["x"], obj["y"],
+                                obj["width"], obj["height"], self.TILE_COL)
                         )
                         
                     # playable characters
@@ -324,7 +335,7 @@ class Game_World(State):
 
         # for calculations
         self.bomb.x_pos = self.bomb.rect.x 
-        self.bomb.y_pos = self.bomb.rect.y 
+        self.bomb.y_screen = self.bomb.rect.y 
 
         # check if bomb has spawned already colliding with a wall
         collisions = self.bomb.collision_test(self.tiles)
@@ -395,12 +406,17 @@ class Game_World(State):
                 char.reset_pos()
                 char.reset_state()
 
+        # game state
         self.state['turn'] = 0
         self.round = 0
         self.state['game_over'] = False
         self.players_alive = [i for i in range(self.player_count)]
-
         self.teams_not_eliminated = self.teams.copy()
+
+        # camera
+        self.total_offset_x = 0
+        self.total_offset_y = 0
+        
 
     # locks & turn
 

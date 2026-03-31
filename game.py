@@ -46,7 +46,7 @@ class Game():
         # actions dictionary for user input
         self.actions = {"left": False, "right": False, "up": False,
                         "down": False, "mouse_pressed": False, 
-                        "mouse_click": False, "mouse_pos": (0, 0), 
+                        "mouse_click": False, "mouse_pos": (0, 0), 'level_pos': [0, 0], 
                         "action1": False, "action2": False,
                         "space": False, "start": False, 
                         'esc': False}
