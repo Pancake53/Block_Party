@@ -1,6 +1,7 @@
 import pygame
 from gameObject import GameObject
 from healthBar import HealthBar
+from pygame.math import Vector2
 
 class Character(GameObject):
     '''
@@ -57,6 +58,8 @@ class Character(GameObject):
 
             self.health_bar.render(surface)
 
+
+
     def update(self, dt, actions, tiles):
         '''
         Updates obj position, if obj is moving
@@ -96,6 +99,12 @@ class Character(GameObject):
                 self.handle_actions(actions)
 
             self.health_bar.update()
+
+            if self.throwing_list:
+                self.game_world.update_arrow(
+                    Vector2(*self.throwing_list[0]),
+                    Vector2(*self.throwing_list[1])
+                )
 
         # bug fixing
         # if self.state['choosing']:

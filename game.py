@@ -46,7 +46,7 @@ class Game():
         # actions dictionary for user input
         self.actions = {"left": False, "right": False, "up": False,
                         "down": False, "mouse_pressed": False, 
-                        "mouse_click": False, "mouse_pos": (0, 0), 'level_pos': [0, 0], 
+                        "mouse_click": False, "mouse_pos": (0, 0), 
                         "action1": False, "action2": False,
                         "space": False, "start": False, 
                         'esc': False}
@@ -153,8 +153,8 @@ class Game():
             self.actions["mouse_click"] = True   
         
         unscaled_mouse_pos = pygame.mouse.get_pos()
-        self.actions["mouse_pos"] = [unscaled_mouse_pos[0] * self.scale_multiplier_x,
-                                      unscaled_mouse_pos[1] * self.scale_multiplier_y]
+        self.actions["mouse_pos"] = (unscaled_mouse_pos[0] * self.scale_multiplier_x,
+                                      unscaled_mouse_pos[1] * self.scale_multiplier_y)
         
 
     def update(self):

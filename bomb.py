@@ -1,5 +1,6 @@
 import pygame
 from gameObject import GameObject
+from pygame.math import Vector2
 
 class Bomb(GameObject):
     '''Player thrown object.
@@ -67,6 +68,8 @@ class Bomb(GameObject):
 
         if self.state['selected']:
             surface.blit(self.image, self.rect) 
+
+
 
 
     def update_pos_x(self, dt, tiles):

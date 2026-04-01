@@ -63,8 +63,7 @@ class GameObject():
         self.rect = pygame.Rect(6, 7, 6, 7)
         self.WIDTH = self.rect.width
         self.HEIGHT = self.rect.height
-
-        
+      
 
     def render(self, surface):
         '''
@@ -73,6 +72,8 @@ class GameObject():
         surface: game canvas
         '''
         pygame.draw.rect(surface, self.colour, self.rect)
+
+
 
     def update(self, dt, actions, tiles):
         '''
@@ -113,6 +114,11 @@ class GameObject():
             if not self.state['locked']:    
                 self.handle_actions(actions)
 
+            if self.throwing_list:
+                self.game_world.update_arrow(
+                Vector2(*self.throwing_list[0]),
+                Vector2(*self.throwing_list[1])
+                )
 
     def collision_test(self, tiles):
         '''
@@ -280,7 +286,7 @@ class GameObject():
 
         if self.state["drag"]:
             if actions["mouse_pressed"]:
-                self.throwing_list = [[self.rect.centerx, self.rect.centery],
+                self.throwing_list = [(self.rect.centerx, self.rect.centery),
                                       actions['mouse_pos'] ]
                 # render line or arrow function
 

@@ -67,6 +67,14 @@ class Game_World(State):
         self.round = int(self.state['turn'] 
                                     / self.player_count) + 1
         
+        # arrow
+        self.draw_arrow = False
+        self.arrow_W = 7
+        self.arrow_colour = (255, 255, 255)
+        self.rect_center = None 
+        self.end_point = None
+        
+        
 
 
     # update functions
@@ -80,6 +88,8 @@ class Game_World(State):
         delta_time: dt
         actions: user inputs dictionary
         '''
+        # reset variables
+        self.draw_arrow = False
         # update view based on mouse movement around level edges
         self.camera.update(delta_time, actions)
 
@@ -119,6 +129,14 @@ class Game_World(State):
                 char.update(delta_time, actions, self.tiles)
                 char.health_bar.update()
 
+    def update_arrow(self, rect_center, end_point):
+        '''
+        updates values and sets arrow to true
+        '''
+        self.rect_center = rect_center
+        self.end_point = end_point
+        self.draw_arrow = True
+    
     # render functions
 
     def render(self, surface):
@@ -128,6 +146,8 @@ class Game_World(State):
         
         surface: surface to render on
         '''
+        
+        # background
         surface.fill((self.BG_COL))
 
         self.game.draw_text(surface, "Gameplay",
@@ -139,7 +159,7 @@ class Game_World(State):
             tile.render(surface)
 
         self.render_turn(surface)
-
+        
         # characters
         self.render_characters(surface)
         # bomb
@@ -147,7 +167,9 @@ class Game_World(State):
         # explosion
         self.explosion.render(surface)
 
-        
+        # arrow
+        if self.draw_arrow:
+            self.render_arrow(self.rect_center, self.end_point, surface)
 
         if self.state['game_over']:
             self.render_winning(surface)
@@ -245,6 +267,33 @@ class Game_World(State):
         pygame.draw.rect(surface, colour, self.turn_rect)
         self.game.draw_text(surface,
                 "turn", self.game.BLACK, 55, self.game.GAME_H - 32, "Medium")
+
+
+
+    def render_arrow(self, rect_center, end_point, surface):
+        '''
+        render an arrow indicating the 
+        throwing direction and strenght
+
+        rect_center: center of the rect being thrown
+        end_point: current mouse pos
+        surface: surface to render to
+        '''
+        # print("raw:", self.throwing_list)
+        # print("types:", type(rect_center), type(end_point))
+        difference_vec = ( rect_center - end_point ) * 0.5
+        arrow_point = rect_center + difference_vec
+        # from end to rect center
+        pygame.draw.line(surface, self.arrow_colour, end_point, rect_center, self.arrow_W)
+        pygame.draw.line(surface, self.arrow_colour, rect_center, arrow_point, self.arrow_W)
+
+        # sides of the arrow
+        # left
+        left = difference_vec.rotate(135) + arrow_point
+        pygame.draw.line(surface, self.arrow_colour, left, arrow_point, self.arrow_W)
+        # right
+        left = difference_vec.rotate(225) + arrow_point
+        pygame.draw.line(surface, self.arrow_colour, left, arrow_point, self.arrow_W)
 
     # load functions
 
