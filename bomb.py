@@ -22,36 +22,40 @@ class Bomb(GameObject):
         self.WIDTH = self.rect.width
         self.HEIGHT = self.rect.height
 
-    def update(self, dt, actions, tiles):
-        '''
-        Updates obj position, if obj is moving
-        Handels inputs
+    # def update(self, dt, actions, tiles):
+    #     '''
+    #     Updates obj position, if obj is moving
+    #     Handels inputs
 
-        dt: delta time 
-        actions: user inputs dictionary
-        tiles: game levels collision tiles
-        '''
-        if self.state['locked']:
-            # only update if bomb is flying
-            
-            # check if out of bounds on x axis
-            if self.x_pos < - self.WIDTH / 2:
-                self.out_of_bounds("left")
-            elif self.x_pos > self.game_world.game.GAME_W - self.WIDTH / 2:
-                self.out_of_bounds("right")
-            # check if out of bounds on y axis
-            elif self.y_screen > self.game_world.game.GAME_H:
-                self.out_of_bounds("bottom")
-            else:
-                # moving and not out of bounds
-                self.state['moving'] = True
-                self.update_pos(dt, tiles)
+    #     dt: delta time 
+    #     actions: user inputs dictionary
+    #     tiles: game levels collision tiles
+    #     '''
+    #     # update if flying
+    #     if self.state['locked']:
+
+    #         # update level position
+    #         self.x_level = self.x_screen - self.game_world.camera.total_offset_x
+    #         self.y_level = self.y_screen - self.game_world.camera.total_offset_y
+
+    #         # check if out of bounds on x axis
+    #         if self.x_level < - self.WIDTH / 2:
+    #             self.out_of_bounds("left")
+    #         elif self.x_level > self.game_world.game.GAME_W - self.WIDTH / 2:
+    #             self.out_of_bounds("right")
+    #         # check if out of bounds on y axis
+    #         elif self.y_level > self.game_world.game.GAME_H:
+    #             self.out_of_bounds("bottom")
+    #         else:
+    #             # moving and not out of bounds
+    #             self.state['moving'] = True
+    #             self.update_pos(dt, tiles)
                 
             
 
 
-        if not self.state['locked']:    
-            self.handle_actions(actions)
+    #     if not self.state['locked']:    
+    #         self.handle_actions(actions)
     
 
     def render(self, surface):
@@ -73,8 +77,8 @@ class Bomb(GameObject):
         tiles: game levels collision tiles
         '''
         # x movement
-        self.x_pos += self.x_speed * dt # x_pos is used for calculations
-        self.rect.x = round(self.x_pos) # update rect position for collision_test
+        self.x_screen += self.x_speed * dt # x_pos is used for calculations
+        self.rect.x = round(self.x_screen) # update rect position for collision_test
         collisions = self.collision_test(tiles)
 
         if collisions:
@@ -112,10 +116,10 @@ class Bomb(GameObject):
         match side:
             # moving left -> move to right side of screen
             case "left":
-                self.x_pos = self.game_world.game.GAME_W - self.WIDTH / 2
+                self.x_screen = self.game_world.game.GAME_W - self.WIDTH / 2
             # moving right -> move to left side side of screen
             case "right":
-                self.x_pos = - self.WIDTH / 2
+                self.x_screen = - self.WIDTH / 2
             # fell off the map
             case "bottom":
                 self.reset_state()
@@ -148,18 +152,18 @@ class Bomb(GameObject):
         # requere new click
         if self.state["jump"] and not self.state["drag"]:
             if actions["mouse_click"]:
-                self.mouse_pos_list = [actions["mouse_pos"]]
+                self.throwing_list = []
                 self.state["drag"] = True
 
     def releasing(self):
         '''
         handels giving Obj velocity after mousedrag
         '''
-        x_speed = (self.mouse_pos_list[0][0] -self.mouse_pos_list[-1][0]) * self.throw_multiplier
-        y_speed = (self.mouse_pos_list[0][1] -self.mouse_pos_list[-1][1]) * self.throw_multiplier
+        x_speed = (self.throwing_list[0][0] -self.throwing_list[-1][0]) * self.throw_multiplier
+        y_speed = (self.throwing_list[0][1] -self.throwing_list[-1][1]) * self.throw_multiplier
         self.add_momentum(x_speed, y_speed)
 
-        self.mouse_pos_list = []
+        self.throwing_list = []
         self.state['locked'] = True
         # print(f'Round: {self.game_world.round}, Turn id: {self.game_world.current_turn}, Turns {self.game_world.state['turn']}')
         self.game_world.next_turn()
@@ -178,7 +182,7 @@ class Bomb(GameObject):
 
         for tile in tiles:
 
-            bomb_L = self.x_pos
+            bomb_L = self.x_screen
             bomb_R = bomb_L + self.WIDTH
 
             tile_L = tile.x
@@ -189,9 +193,9 @@ class Bomb(GameObject):
                 tile_R > bomb_L):
                 # print("left side of bomb colliding")
                 # update calculations
-                self.x_pos += tile_R - bomb_L
+                self.x_screen += tile_R - bomb_L
                 # update actual position
-                self.rect.x = self.x_pos
+                self.rect.x = self.x_screen
                 continue
 
             # left side of tile / right side of bomb
@@ -199,9 +203,9 @@ class Bomb(GameObject):
                 tile_L < bomb_R):
                 # print("right side of bomb colliding")
                 # update calculations
-                self.x_pos -= bomb_R - tile_L 
+                self.x_screen -= bomb_R - tile_L 
                 # update actual position
-                self.rect.x = self.x_pos
+                self.rect.x = self.x_screen
 
 
     

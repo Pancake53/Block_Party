@@ -47,11 +47,19 @@ class Game_World(State):
                             '\nis the lash',
                             'is\nvery special']
 
-        # Init needed classes
-        self.load_entities()
+       
 
+        
+
+        self.camera = Camera(self)
+
+        
+        # level data --> tiles and characters
         self.wrap_around = None
         self.load_level(level_name)
+        
+        # needed classes --> bomb, explosion, buttons
+        self.load_entities()
 
         # Game State
         self.state = {'turn': 0, 'selecting_locked': False, 'game_over': False}
@@ -151,7 +159,7 @@ class Game_World(State):
         surface: surface to render on
         '''
         choosing_char = None
-        for id, team in self.teams_not_eliminated.items():
+        for team in self.teams_not_eliminated.values():
             for char in team:
                 char.render(surface)
                 if char.state["choosing"]:
@@ -172,7 +180,7 @@ class Game_World(State):
         button_W = self.jump_button.width
         button_H = self.jump_button.height
         # char is next to left edge, render right
-        if char.x_pos < button_W + padding * 4:
+        if char.x_screen < button_W + padding * 4:
             # y
             y_jump = char.rect.centery - button_H - padding * 4
             y_bomb = y_jump + button_H + padding
@@ -182,7 +190,7 @@ class Game_World(State):
             x_jump = x_bomb = x_flag = x
 
         # char next to right edge, render left
-        elif char.x_pos > self.game.GAME_W - (button_W + padding * 4):
+        elif char.x_screen > self.game.GAME_W - (button_W + padding * 4):
             # y
             y_jump = char.rect.centery - button_H - padding * 4
             y_bomb = y_jump + button_H + padding
@@ -193,7 +201,7 @@ class Game_World(State):
 
 
         # char next to top, render below
-        elif char.y_pos < button_H * 2:
+        elif char.y_screen < button_H * 2:
             # y
             y = char.rect.y + char.rect.height + padding * 2
             y_jump = y_bomb = y_flag = y
@@ -244,14 +252,15 @@ class Game_World(State):
         '''
         loads classes and pygame obj at the init of level
         '''
+        self.turn_rect = pygame.Rect(15, self.game.GAME_H - 45, 80, 30)
+
         self.bomb = Bomb(-36, -36, self, self.game.assets["bomb_img"])
         self.explosion = Explosion(self.game.assets['explosion_img'])
         self.jump_button = Button(0, 0, image=self.game.assets['jump_img'])
         self.bomb_button = Button(0, 0, image=self.game.assets['bomb_img'])
         self.flag_button = Button(0, 0, image=self.game.assets['flag_img'])    
 
-        self.turn_rect = pygame.Rect(15, self.game.GAME_H - 45, 80, 30)
-        self.camera = Camera(self)
+        
 
     def load_level(self, level_name):
         '''
@@ -334,7 +343,7 @@ class Game_World(State):
         self.bomb.rect.centery = y_pos 
 
         # for calculations
-        self.bomb.x_pos = self.bomb.rect.x 
+        self.bomb.x_screen = self.bomb.rect.x 
         self.bomb.y_screen = self.bomb.rect.y 
 
         # check if bomb has spawned already colliding with a wall

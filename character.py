@@ -67,8 +67,12 @@ class Character(GameObject):
         tiles: game levels collision tiles
         '''
         if not self.state['eliminated']:
-            # only update if character is moving and on the screen
+            
+            # only update if character is moving
             if (self.x_speed != 0) or (self.y_speed != 0):
+                # update level position
+                self.x_level = self.x_screen - self.game_world.camera.total_offset_x
+                self.y_level = self.y_screen - self.game_world.camera.total_offset_y
                 # check if out of bounds on x axis
                 # out on left side
                 if self.x_level < - self.WIDTH + self.out_of_bounds_buffer:
@@ -174,22 +178,10 @@ class Character(GameObject):
         # requere new click
         if self.state["jump"] and not self.state["drag"]:
             if actions["mouse_click"]:
-                self.mouse_pos_list = [actions["mouse_pos"]]
+                self.throwing_list = []
                 self.state["drag"] = True
 
-    def dragging(self, actions):
-        '''
-        handels what happens during the mousedrag
 
-        actions: user inputs dictionary
-        '''
-
-        if self.state["drag"]:
-            if actions["mouse_pressed"]:
-                while len(self.mouse_pos_list) > 2:
-                    self.mouse_pos_list.pop()
-                self.mouse_pos_list.append(actions["mouse_pos"])
-                # render line or arrow function
         
     def throw_bomb(self):
         '''

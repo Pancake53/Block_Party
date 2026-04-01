@@ -12,7 +12,7 @@ class Explosion():
         '''
         init attributes
         
-        x & y: coordinates
+        x & y: center coordinates for explosion
         explosion_img: asset img for explosion
         '''
 
@@ -65,6 +65,9 @@ class Explosion():
 
         x & y: center coordinates for explosion
         '''
+        self.x_pos = x_pos
+        self.y_pos = y_pos
+
         self.rect.centerx = x_pos
         self.rect.centery = y_pos
         self.start_time = pygame.time.get_ticks()
@@ -79,4 +82,22 @@ class Explosion():
         self.active = False
         self.rect.x = -72
         self.rect.y = -72
+
+    def on_camera_move(self, x_offset, y_offset):
+        '''
+        update explosion position based on camera movement
+
+        x_offset: offset x axis
+        y_offset: offset y axis 
+        '''
+        if not self.active:
+            return
+        
+        # update screen x & y
+        self.x_pos += x_offset
+        self.y_pos += y_offset
+
+        # update rect
+        self.rect.centerx = self.x_pos
+        self.rect.centery = self.y_pos
 

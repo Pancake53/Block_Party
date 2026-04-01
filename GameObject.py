@@ -42,7 +42,7 @@ class GameObject():
                        "throw": False, 'moving': False, "locked": False, "eliminated": False}
 
         # for jumping, throwing
-        self.mouse_pos_list = []
+        self.throwing_list = []
   
         # rect
         self.CHARACTER_SIZE = 24
@@ -50,7 +50,20 @@ class GameObject():
         # how many pixels can in map to be considered 
         # to not be out of bounds
         # Buffer for levels with wrapping left/right
-        self.out_of_bounds_buffer = 5
+        self.out_of_bounds_buffer = 5 # only Char uses
+
+        # for camera, if no wrap around let objects fall out of screen
+        # despite the offset by camera
+        self.edge_buffer = (
+            self.game_world.camera.max_offset 
+            if not self.game_world.wrap_around
+            else 0)
+
+        # default Rect
+        self.rect = pygame.Rect(6, 7, 6, 7)
+        self.WIDTH = self.rect.width
+        self.HEIGHT = self.rect.height
+
         
 
     def render(self, surface):
@@ -71,15 +84,23 @@ class GameObject():
         tiles: game levels collision tiles
         '''
         if not self.state['eliminated']:
+            
             # only update if obj is moving and on the screen
             if (self.x_speed != 0) or (self.y_speed != 0):
-                # check if out of bounds on x axis
-                if (self.x_level < - self.CHARACTER_SIZE or
-                    self.x_level > self.game_world.game.GAME_W):
-                    self.out_of_bounds()
+
+                # update level position
+                self.x_level = self.x_screen - self.game_world.camera.total_offset_x
+                self.y_level = self.y_screen - self.game_world.camera.total_offset_y
+
+                #  check if out of bounds on x axis
+                if self.x_level < - self.WIDTH / 2 - self.edge_buffer:
+                    self.out_of_bounds("left")
+                elif self.x_level > (self.game_world.game.GAME_W
+                                      - self.WIDTH / 2 + self.edge_buffer):
+                    self.out_of_bounds("right")
                 # check if out of bounds on y axis
-                elif self.y_level > self.game_world.game.GAME_H:
-                    self.out_of_bound()
+                elif self.y_level > self.game_world.game.GAME_H + self.edge_buffer:
+                    self.out_of_bounds("bottom")
                 else:
                     # moving and not out of bounds
                     self.state['moving'] = True
@@ -224,7 +245,7 @@ class GameObject():
 
 
             # Releasing
-            if (not actions["mouse_pressed"]) and (len(self.mouse_pos_list) >= 2):
+            if (not actions["mouse_pressed"]) and (len(self.throwing_list) == 2):
                 self.releasing()
 
             if self.state["throw"]: # bomb placeholder
@@ -247,7 +268,7 @@ class GameObject():
         # requere new click
         if self.state["jump"] and not self.state["drag"]:
             if actions["mouse_click"]:
-                self.mouse_pos_list = [actions["mouse_pos"]]
+                self.throwing_list = []
                 self.state["drag"] = True
 
     def dragging(self, actions):
@@ -259,9 +280,8 @@ class GameObject():
 
         if self.state["drag"]:
             if actions["mouse_pressed"]:
-                while len(self.mouse_pos_list) > 2:
-                    self.mouse_pos_list.pop()
-                self.mouse_pos_list.append(actions["mouse_pos"])
+                self.throwing_list = [[self.rect.centerx, self.rect.centery],
+                                      actions['mouse_pos'] ]
                 # render line or arrow function
 
     def releasing(self):
@@ -270,11 +290,11 @@ class GameObject():
 
         actions: user inputs dictionary
         '''
-        x_speed = (self.mouse_pos_list[0][0] -self.mouse_pos_list[-1][0]) * self.throw_multiplier
-        y_speed = (self.mouse_pos_list[0][1] -self.mouse_pos_list[-1][1]) * self.throw_multiplier
-        self.add_momentum(x_speed, y_speed)
+        x_vector = (self.throwing_list[0][0] -self.throwing_list[-1][0]) * self.throw_multiplier
+        y_vector = (self.throwing_list[0][1] -self.throwing_list[-1][1]) * self.throw_multiplier
+        self.add_momentum(x_vector, y_vector)
 
-        self.mouse_pos_list = []
+        self.throwing_list = []
         self.reset_state()
         self.game_world.next_turn()
 
@@ -313,5 +333,10 @@ class GameObject():
         x_offset: offset x axis
         y_offset: offset y axis 
         '''
+        # update screen x & y
+        self.x_screen += x_offset
+        self.y_screen += y_offset
 
-        pass
+        # update rect
+        self.rect.x = self.x_screen
+        self.rect.y = self.y_screen
