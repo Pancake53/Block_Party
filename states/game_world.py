@@ -158,12 +158,14 @@ class Game_World(State):
         for tile in self.tiles:
             tile.render(surface)
 
-        self.render_turn(surface)
+        
         
         # characters
         self.render_characters(surface)
         # bomb
         self.bomb.render(surface)
+        # current turn
+        self.render_turn(surface)
         # explosion
         self.explosion.render(surface)
 
@@ -464,6 +466,10 @@ class Game_World(State):
                 char.reset_pos()
                 char.reset_state()
 
+        # reset tiles
+        for tile in self.tiles:
+            tile.reset()
+
         # game state
         self.state['turn'] = 0
         self.round = 0
@@ -472,8 +478,8 @@ class Game_World(State):
         self.teams_not_eliminated = self.teams.copy()
 
         # camera
-        self.total_offset_x = 0
-        self.total_offset_y = 0
+        self.camera.total_offset_x = 0
+        self.camera.total_offset_y = 0
         
 
     # locks & turn

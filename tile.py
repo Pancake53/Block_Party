@@ -6,6 +6,8 @@ class Tile:
         self.colour = colour
         self.x_pos = self.rect.x
         self.y_pos = self.rect.y
+        self.x_origin = self.x_pos
+        self.y_origin = self.y_pos
         
 
     def update(self, x_offset, y_offset):
@@ -17,3 +19,9 @@ class Tile:
 
     def render(self, surface):
         pygame.draw.rect(surface, self.colour, self.rect)
+
+    def reset(self):
+        self.x_pos = self.x_origin
+        self.y_pos = self.y_origin
+        self.rect.x = self.x_pos
+        self.rect.y = self.y_pos

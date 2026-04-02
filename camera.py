@@ -4,10 +4,18 @@ class Camera():
         self.game_world = game_world
 
         # Camera
-        self.camera_speed = 75
-        self.camera_buffer = 15 # px
-        self.right_edge = self.game_world.game.GAME_W - self.camera_buffer
-        self.bottom_edge = self.game_world.game.GAME_H - self.camera_buffer
+        self.camera_speed = 60
+        
+    
+        # 1x speed
+        self.edge_buffer_1x = 25 # px
+        self.right_edge_1x = self.game_world.game.GAME_W - self.edge_buffer_1x
+        self.bottom_edge_1x = self.game_world.game.GAME_H - self.edge_buffer_1x
+
+        # 2x speed
+        self.edge_buffer_2x = 5 # px # double speed if closer to edge
+        self.right_edge_2x = self.game_world.game.GAME_W - self.edge_buffer_2x
+        self.bottom_edge_2x = self.game_world.game.GAME_H - self.edge_buffer_2x
         self.total_offset_x = 0
         self.total_offset_y = 0
         self.max_offset = 100
@@ -29,22 +37,14 @@ class Camera():
         x_offset = 0
         y_offset = 0
 
-        y_offset, y_offset = self.update_y(y, delta_time)
-        x_offset, x_offset = self.update_x(x, delta_time)
+        y_offset = self.update_y(y, delta_time)
+        x_offset = self.update_x(x, delta_time)
 
         # move movables if new offset was applied
         if y_offset or x_offset:
-            # collision tiles
-            for tile in self.game_world.tiles:
-                tile.update(x_offset, y_offset)
-            # characters
-            for team in self.game_world.teams_not_eliminated.values():
-                for char in team:
-                    char.on_camera_move(x_offset, y_offset)
-            # bomb
-            self.game_world.bomb.on_camera_move(x_offset, y_offset)
-            # explosion
-            self.game_world.explosion.on_camera_move(x_offset, y_offset)
+            print(f'Offset, y: {y_offset}, x: {x_offset}')
+            self.update_positions(x_offset, y_offset)
+
 
     def update_y(self, y, delta_time): 
         '''
@@ -59,26 +59,36 @@ class Camera():
         '''
 
         # bottom of the screen --> objects go up
-        if (y > self.bottom_edge and
+        if (y > self.bottom_edge_1x and
             self.total_offset_y > - self.max_offset):
             
             # negative so things float up
             y_offset = - self.camera_speed * delta_time
+
+            if y > self.bottom_edge_2x:
+                y_offset *= 2
+
+            y_offset = int(y_offset)
             self.total_offset_y += y_offset # negative
             
-            return True, y_offset
+            return y_offset
 
         # top of the screen --> objects go down
-        if (y < self.camera_buffer and
+        if (y < self.edge_buffer_1x and
             self.total_offset_y < self.max_offset):
 
             # positive so things going down
             y_offset = self.camera_speed * delta_time
+
+            if y < self.edge_buffer_2x:
+                y_offset *= 2
+
+            y_offset = int(y_offset)
             self.total_offset_y += y_offset
             
-            return True, y_offset
+            return y_offset
         
-        return False, 0
+        return 0
     
     def update_x(self, x, delta_time): 
         '''
@@ -93,24 +103,54 @@ class Camera():
         '''
 
         # right edge of the screen --> offset negative --> objects to left
-        if (x > self.right_edge and
+        if (x > self.right_edge_1x and
             self.total_offset_x > - self.max_offset):
 
             # negative so obj move left
             x_offset = - self.camera_speed * delta_time
+
+            if x > self.right_edge_2x:
+                x_offset *= 2
+
+            x_offset = int(x_offset)
             self.total_offset_x += x_offset # negative
             
-            return True, x_offset
+            return x_offset
 
         # left edge of the screen --> offset positive --> objects go right
-        if (x < self.camera_buffer and
+        if (x < self.edge_buffer_1x and
             self.total_offset_x < self.max_offset):
 
             # positive so obj move right
             x_offset = self.camera_speed * delta_time
+
+            if x < self.edge_buffer_2x:
+                x_offset *= 2
+
+            x_offset = int(x_offset)
+
             self.total_offset_x += x_offset
             
-            return True, x_offset
+            return x_offset
         
-        return False, 0
-        
+        return 0
+
+    def update_positions(self, x_offset, y_offset):
+        '''
+        updates positions in game_world
+
+        x_offset: x-axis offset
+        y_offset: y-axis offset
+        '''
+        # collision tiles
+        for tile in self.game_world.tiles:
+            tile.update(x_offset, y_offset)
+        # characters
+        for team in self.game_world.teams_not_eliminated.values():
+            for char in team:
+                char.on_camera_move(x_offset, y_offset)
+        # bomb
+        self.game_world.bomb.on_camera_move(x_offset, y_offset)
+        # explosion
+        self.game_world.explosion.on_camera_move(x_offset, y_offset)
+    

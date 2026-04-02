@@ -1,5 +1,6 @@
 import pygame
 from pygame.math import Vector2
+from physics import Physics
 
 class GameObject():
     '''Interactive movable object in game world
@@ -144,6 +145,8 @@ class GameObject():
         '''
         self.update_pos_y(dt, tiles)
         self.update_pos_x(dt, tiles)
+
+
 
     def update_pos_y(self, dt, tiles):
         '''
