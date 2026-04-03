@@ -27,7 +27,7 @@ class Character(GameObject):
         self.colour = self.game_world.game.team_colours[team_id]
         # Physics
         # y bounce, lower value -> more small bounces
-        self.y_stop = 20 
+        self.y_stop = 50
         self.y_speed = 0.1
         # x speed stopper, if x_speed < x_stop -> x_speed = 0
         self.x_stop = 1 

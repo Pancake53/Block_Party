@@ -291,10 +291,10 @@ class Game_World(State):
 
         # sides of the arrow
         # left
-        left = difference_vec.rotate(135) + arrow_point
+        left = difference_vec.rotate(155) + arrow_point
         pygame.draw.line(surface, self.arrow_colour, left, arrow_point, self.arrow_W)
         # right
-        left = difference_vec.rotate(225) + arrow_point
+        left = difference_vec.rotate(205) + arrow_point
         pygame.draw.line(surface, self.arrow_colour, left, arrow_point, self.arrow_W)
 
     # load functions
@@ -472,7 +472,9 @@ class Game_World(State):
 
         # game state
         self.state['turn'] = 0
-        self.round = 0
+        self.current_turn = 0
+        self.round = int(self.state['turn'] 
+                                    / self.player_count) + 1
         self.state['game_over'] = False
         self.players_alive = [i for i in range(self.player_count)]
         self.teams_not_eliminated = self.teams.copy()

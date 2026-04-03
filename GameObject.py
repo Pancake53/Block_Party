@@ -156,7 +156,7 @@ class GameObject():
         tiles: game levels collision tiles
         '''
         self.y_screen += self.y_speed * dt # for calculations
-        self.rect.y = round(self.y_screen) # update rect w calculated pos
+        self.rect.y = int(self.y_screen) # update rect w calculated pos
         collisions = self.collision_test(tiles)
         # print(f"y: {round(self.y_speed,3)}")
         if not collisions:
@@ -181,7 +181,7 @@ class GameObject():
         '''
         # x movement
         self.x_screen += self.x_speed * dt # x_pos is used for calculations
-        self.rect.x = round(self.x_screen) # update rect position for collision_test
+        self.rect.x = int(self.x_screen) # update rect position for collision_test
         collisions = self.collision_test(tiles)
 
         if not collisions: # no collision
