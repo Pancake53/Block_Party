@@ -25,16 +25,10 @@ class Character(GameObject):
         self.width = width
         # Character colour based on team id
         self.colour = self.game_world.game.team_colours[team_id]
-        # Physics
-        # y bounce, lower value -> more small bounces
-        self.y_stop = 50
-        self.y_speed = 0.1
-        # x speed stopper, if x_speed < x_stop -> x_speed = 0
-        self.x_stop = 1 
-        # speed loss multiplier on collision
-        self.retention = 0.25 
         
-
+        # make fall down from spawn location
+        self.y_speed = 0.01
+        
         self.WIDTH = self.CHARACTER_SIZE * width
         self.HEIGHT = self.CHARACTER_SIZE * 2
         self.rect = pygame.Rect(x_pos, y_pos, self.WIDTH, self.HEIGHT)
@@ -102,8 +96,8 @@ class Character(GameObject):
 
             if self.throwing_list:
                 self.game_world.update_arrow(
-                    Vector2(*self.throwing_list[0]),
-                    Vector2(*self.throwing_list[1])
+                    Vector2(*self.throwing_list[0]), # center of char
+                    Vector2(*self.throwing_list[1]) # mouse pos
                 )
 
         # bug fixing
@@ -126,8 +120,8 @@ class Character(GameObject):
                 self.rect.left = tile.right # colliderect => False
                 self.x_screen = self.rect.x
 
-        self.x_speed = - self.x_speed * self.retention
-        self.y_speed *= self.retention # also reduce y speed, MAY NEED TWEAKING
+        self.x_speed = - self.x_speed * self.game_world.physics.retention
+        self.y_speed *= self.game_world.physics.retention # also reduce y speed, MAY NEED TWEAKING
 
     def collision_y_axis(self, collisions):
         '''
@@ -137,20 +131,20 @@ class Character(GameObject):
         '''
         tile = collisions[0]
         # print(f'collision on y-axis, char pos: {self.x_screen, self.y_screen}, tile pos: {tile.x, tile.y}')
-        self.x_speed *= self.retention # also reduce x speed, MAY NEED TWEAKING
+        self.x_speed *= self.game_world.physics.retention # also reduce x speed, MAY NEED TWEAKING
 
-        if self.y_speed > self.y_stop: 
+        if self.y_speed > self.game_world.physics.Y_STOP: 
             # top
             # print(f"colliding w top of tile, y: {round(self.y_speed,3)}, x: {round(self.x_speed,3)}")
             self.rect.bottom = tile.top
             self.y_screen = self.rect.y
-            self.y_speed = self.y_speed * -1 * self.retention
+            self.y_speed = self.y_speed * -1 * self.game_world.physics.retention
         elif -self.y_speed > 0: 
             # bottom
             # print("colliding w bottom of tile")
             self.rect.top = tile.bottom
             self.y_screen = self.rect.y
-            self.y_speed = self.y_speed * -1 * self.retention / 2
+            self.y_speed = self.y_speed * -1 * self.game_world.physics.retention / 2
         else:
             # top little momentum so momentum to 0
             # print("y_speed 0")

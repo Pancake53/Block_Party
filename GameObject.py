@@ -1,6 +1,6 @@
 import pygame
 from pygame.math import Vector2
-from physics import Physics
+
 
 class GameObject():
     '''Interactive movable object in game world
@@ -30,13 +30,7 @@ class GameObject():
 
         self.game_world = game_world
 
-        # Game physics
-        self.gravity = 250
-        self.throw_multiplier = 2.5
-        self.max_velocity = 330
-        self.min_jump = 10
-        self.force_mp = 250
-        # self.air_resistance = 0.99 # not in use
+        
 
         # state dictionary
         self.state = {"selected": False, "choosing": False, "jump": False, "drag": False,
@@ -115,10 +109,11 @@ class GameObject():
             if not self.state['locked']:    
                 self.handle_actions(actions)
 
+            # if dragging then send data into level class
             if self.throwing_list:
                 self.game_world.update_arrow(
-                Vector2(*self.throwing_list[0]),
-                Vector2(*self.throwing_list[1])
+                Vector2(*self.throwing_list[0]), # center of rect
+                Vector2(*self.throwing_list[1]) # mouse pos
                 )
 
     def collision_test(self, tiles):
@@ -160,7 +155,7 @@ class GameObject():
         collisions = self.collision_test(tiles)
         # print(f"y: {round(self.y_speed,3)}")
         if not collisions:
-            self.y_speed += self.gravity * dt
+            self.y_speed += self.game_world.physics.gravity * dt
         else: # collision on y axis
             self.collision_y_axis(collisions)
 
@@ -185,7 +180,7 @@ class GameObject():
         collisions = self.collision_test(tiles)
 
         if not collisions: # no collision
-            if abs(self.x_speed) < self.x_stop: # low speed limit
+            if abs(self.x_speed) < self.game_world.physics.X_STOP: # low speed limit
                 self.x_speed = 0
             # else:
                 # self.x_speed *= self.air_resistance
@@ -217,9 +212,9 @@ class GameObject():
         speed_vec = Vector2(x_speed, y_speed)
         total_speed = speed_vec.length()
 
-        if total_speed > self.max_velocity:
+        if total_speed > self.game_world.physics.max_velocity:
             normalized = speed_vec.normalize()
-            speed_vec = self.max_velocity * normalized
+            speed_vec = self.game_world.physics.max_velocity * normalized
 
         self.x_speed = speed_vec[0]
         self.y_speed = speed_vec[1]
@@ -299,8 +294,8 @@ class GameObject():
 
         actions: user inputs dictionary
         '''
-        x_vector = (self.throwing_list[0][0] -self.throwing_list[-1][0]) * self.throw_multiplier
-        y_vector = (self.throwing_list[0][1] -self.throwing_list[-1][1]) * self.throw_multiplier
+        x_vector = (self.throwing_list[0][0] -self.throwing_list[-1][0]) * self.game_world.physics.throw_multiplier
+        y_vector = (self.throwing_list[0][1] -self.throwing_list[-1][1]) * self.game_world.physics.throw_multiplier
         self.add_momentum(x_vector, y_vector)
 
         self.throwing_list = []

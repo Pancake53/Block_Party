@@ -81,7 +81,7 @@ class Bomb(GameObject):
         '''
         # x movement
         self.x_screen += self.x_speed * dt # x_pos is used for calculations
-        self.rect.x = round(self.x_screen) # update rect position for collision_test
+        self.rect.x = self.x_screen # update rect position for collision_test
         collisions = self.collision_test(tiles)
 
         if collisions:
@@ -162,8 +162,8 @@ class Bomb(GameObject):
         '''
         handels giving Obj velocity after mousedrag
         '''
-        x_speed = (self.throwing_list[0][0] -self.throwing_list[-1][0]) * self.throw_multiplier
-        y_speed = (self.throwing_list[0][1] -self.throwing_list[-1][1]) * self.throw_multiplier
+        x_speed = (self.throwing_list[0][0] -self.throwing_list[-1][0]) * self.game_world.physics.throw_multiplier
+        y_speed = (self.throwing_list[0][1] -self.throwing_list[-1][1]) * self.game_world.physics.throw_multiplier
         self.add_momentum(x_speed, y_speed)
 
         self.throwing_list = []

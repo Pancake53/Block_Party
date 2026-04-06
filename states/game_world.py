@@ -8,6 +8,7 @@ from explosion import Explosion
 from button import Button
 from tile import Tile
 from camera import Camera
+from physics import Physics
 
 
 
@@ -52,7 +53,7 @@ class Game_World(State):
         
 
         self.camera = Camera(self)
-
+        self.physics = Physics()
         
         # level data --> tiles and characters
         self.wrap_around = None
@@ -73,6 +74,7 @@ class Game_World(State):
         self.arrow_colour = (255, 255, 255)
         self.rect_center = None 
         self.end_point = None
+        self.diff_vector = None
         
         
 
@@ -129,13 +131,25 @@ class Game_World(State):
                 char.update(delta_time, actions, self.tiles)
                 char.health_bar.update()
 
-    def update_arrow(self, rect_center, end_point):
+    def update_arrow(self, rect_center, mouse_pos):
         '''
         updates values and sets arrow to true
         '''
+        # difference vector center and pos
+        self.diff_vector = Vector2(rect_center - mouse_pos)
         self.rect_center = rect_center
-        self.end_point = end_point
+        if self.diff_vector.length() > self.physics.max_arrow_len:
+            normalized = self.diff_vector.normalize()
+            self.diff_vector = self.physics.max_arrow_len * normalized
+            self.end_point = rect_center - self.diff_vector
+            self.draw_arrow = True
+            # print(f'Difference vector: {self.diff_vector}, end point: {self.end_point}')
+            return
+
+        self.rect_center = rect_center
+        self.end_point = mouse_pos
         self.draw_arrow = True
+        # print(f'Difference vector: {self.diff_vector}, end point: {self.end_point}')
     
     # render functions
 
@@ -171,7 +185,7 @@ class Game_World(State):
 
         # arrow
         if self.draw_arrow:
-            self.render_arrow(self.rect_center, self.end_point, surface)
+            self.render_arrow(surface)
 
         if self.state['game_over']:
             self.render_winning(surface)
@@ -270,9 +284,7 @@ class Game_World(State):
         self.game.draw_text(surface,
                 "turn", self.game.BLACK, 55, self.game.GAME_H - 32, "Medium")
 
-
-
-    def render_arrow(self, rect_center, end_point, surface):
+    def render_arrow(self, surface):
         '''
         render an arrow indicating the 
         throwing direction and strenght
@@ -283,19 +295,21 @@ class Game_World(State):
         '''
         # print("raw:", self.throwing_list)
         # print("types:", type(rect_center), type(end_point))
-        difference_vec = ( rect_center - end_point ) * 0.5
-        arrow_point = rect_center + difference_vec
-        # from end to rect center
-        pygame.draw.line(surface, self.arrow_colour, end_point, rect_center, self.arrow_W)
-        pygame.draw.line(surface, self.arrow_colour, rect_center, arrow_point, self.arrow_W)
+        
+        arrow_point = self.rect_center + self.diff_vector * 0.5
+        # from mouse to rect center
+        pygame.draw.line(surface, self.arrow_colour, self.end_point, self.rect_center, self.arrow_W)
+        # center to arrowpoint
+        pygame.draw.line(surface, self.arrow_colour, self.rect_center, arrow_point, self.arrow_W)
 
         # sides of the arrow
         # left
-        left = difference_vec.rotate(155) + arrow_point
-        pygame.draw.line(surface, self.arrow_colour, left, arrow_point, self.arrow_W)
+        sides = self.diff_vector * 0.55
+        end = sides.rotate(155) + arrow_point
+        pygame.draw.line(surface, self.arrow_colour, end, arrow_point, self.arrow_W)
         # right
-        left = difference_vec.rotate(205) + arrow_point
-        pygame.draw.line(surface, self.arrow_colour, left, arrow_point, self.arrow_W)
+        end = sides.rotate(205) + arrow_point
+        pygame.draw.line(surface, self.arrow_colour, end, arrow_point, self.arrow_W)
 
     # load functions
 
@@ -441,7 +455,7 @@ class Game_World(State):
             
             direction = char_pos - explosion_pos
             distance = max(direction.length(), 1)
-            force = char.force_mp / distance
+            force = self.physics.force_of_exp / distance
 
             char.take_damage(force)
             # if still alive after taking damage
