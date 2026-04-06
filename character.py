@@ -136,7 +136,7 @@ class Character(GameObject):
         collisions: list of overlapping tiles
         '''
         tile = collisions[0]
-        print(f'collision on y-axis, char pos: {self.x_screen, self.y_screen}, tile pos: {tile.x, tile.y}')
+        # print(f'collision on y-axis, char pos: {self.x_screen, self.y_screen}, tile pos: {tile.x, tile.y}')
         self.x_speed *= self.retention # also reduce x speed, MAY NEED TWEAKING
 
         if self.y_speed > self.y_stop: 

@@ -42,7 +42,7 @@ class Camera():
 
         # move movables if new offset was applied
         if y_offset or x_offset:
-            print(f'Offset, y: {y_offset}, x: {x_offset}')
+            # print(f'Offset, y: {y_offset}, x: {x_offset}')
             self.update_positions(x_offset, y_offset)
 
 

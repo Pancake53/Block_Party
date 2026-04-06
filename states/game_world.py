@@ -343,7 +343,10 @@ class Game_World(State):
                     if obj['type'] == "character":
                         self.load_character(obj)
 
-        self.teams_not_eliminated = self.teams.copy()
+        self.teams_not_eliminated = {team_id: characters[:]
+                                    for team_id, characters in 
+                                    self.teams.items()}
+
 
         if level_name.split('.')[0] in ['tree of life', 'swords']:
             self.wrap_around = True
@@ -477,7 +480,9 @@ class Game_World(State):
                                     / self.player_count) + 1
         self.state['game_over'] = False
         self.players_alive = [i for i in range(self.player_count)]
-        self.teams_not_eliminated = self.teams.copy()
+        self.teams_not_eliminated = {team_id: characters[:]
+                                    for team_id, characters in 
+                                    self.teams.items()}
 
         # camera
         self.camera.total_offset_x = 0
@@ -572,13 +577,13 @@ class Game_World(State):
 
         # if list not empty, update characters_not_eliminated and quit check
         if teams_chars_alive:
-            # update teams & chars that are not eliminated
+            # update chars that are not eliminated
             self.teams_not_eliminated[player_id].remove(char_eliminated)
             return
         
         # list empty, player eliminated
         self.players_alive.remove(player_id)
-        print(f'Player eliminated, alive ids: {self.players_alive}')
+        # print(f'Player eliminated, alive ids: {self.players_alive}')
         self.check_for_win()
     
     def check_for_win(self):
