@@ -1,6 +1,7 @@
 import os, pygame
 
 from states.title import Title
+from settings import Settings
 
 class Game():
     def __init__(self):
@@ -10,6 +11,9 @@ class Game():
         '''
         # booleans that handle closing
         self.running, self.playing = True, False
+
+        # create needed classes
+        self.settings = Settings()
 
         # window and game canvas
         self.GAME_W, self.GAME_H = 960, 540
@@ -37,7 +41,7 @@ class Game():
             (34, 136, 51), # Forest green
             (68, 119, 170), # Dark blue
             (255, 242, 89), # Yellow
-            (0, 0, 0), # Black
+            (0, 0, 61), # Gray
             (230, 159, 0), # Orange
             (213, 94, 0), # Dark orange
             (204, 51, 17) # Vibrant red
@@ -56,6 +60,10 @@ class Game():
         self.clock = pygame.time.Clock()
         self.dt = self.clock.tick(60) / 1000
 
+        # music 
+        pygame.mixer.init()
+        self.audio = {}
+
         # load assets
         self.assets = {}
         self.load_assets()
@@ -63,6 +71,8 @@ class Game():
         # state management
         self.state_stack = []
         self.load_states()
+
+        self.play_music('main_theme')
         
         
 
@@ -222,18 +232,26 @@ class Game():
         self.assets_dir = os.path.join("assets")
         self.image_dir = os.path.join(self.assets_dir, "images")
         self.font_dir = os.path.join(self.assets_dir, "font")
+        self.audio_dir = os.path.join(self.assets_dir, "audio")
         self.level_dir = os.path.join("levels")
         # self.tilemap_dir = os.path.join("tilemap") NOT IN USE
         # Assets themselves
+        # fonts
         self.font_title = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_TITLE)
         self.font_medium = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_MEDIUM)
         self.font_small = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_SMALL)
+        # assets
+        self.assets["explosion_img"] = pygame.image.load(os.path.join(self.image_dir, "explosion.png")).convert_alpha()
+        # ui
         self.assets["bomb_img"] = pygame.image.load(os.path.join(self.image_dir, "bomb.png")).convert_alpha()
         self.assets["jump_img"] = pygame.image.load(os.path.join(self.image_dir, "jump.png")).convert_alpha()
         self.assets["flag_img"] = pygame.image.load(os.path.join(self.image_dir, "white_flag.png")).convert_alpha()
-        self.assets["explosion_img"] = pygame.image.load(os.path.join(self.image_dir, "explosion.png")).convert_alpha()
+        
         self.assets["arrowleft_img"] = pygame.image.load(os.path.join(self.image_dir, "arrowleft.png")).convert_alpha()
         self.assets["arrowright_img"] = pygame.image.load(os.path.join(self.image_dir, "arrowright.png")).convert_alpha()
+
+        # audio
+        self.audio['main_theme'] = os.path.join(self.audio_dir, 'main_music.ogg')
 
     def reset_keys(self):
         '''
@@ -251,6 +269,7 @@ class Game():
         self.state_stack.append(self.title_screen)
 
     def toggle_fullscreen(self):
+    
         '''
         need I explain this
         updates fullscreen values
@@ -270,3 +289,22 @@ class Game():
             # scaling for new H and W
             self.scale_multiplier_x = self.GAME_W / self.WINDOW_W
             self.scale_multiplier_y = self.GAME_H / self.WINDOW_H
+
+
+    def play_music(self, audio_name, loops=-1):
+        '''
+        plays audio if audio exists in files
+
+        audio_name: filename of played audio
+        loops: looping mechanism (-1 = forever, 0 = once)
+        '''
+        if audio_name in self.audio:
+            pygame.mixer.music.load(self.audio[audio_name])
+            pygame.mixer.music.play(loops)
+
+    def change_volume(self):
+        '''
+        volume of audio
+        '''
+        pygame.mixer.music.set_volume(self.settings.music_vol * self.settings.master_volume)
+

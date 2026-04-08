@@ -4,10 +4,10 @@ class Settings():
     def __init__(self):
 
         # Audio
-        self.master_volume = 100
-        self.music_vol = 100
-        self.sfx_vol = 100
-        self.dialogue_vol = 100
+        self.master_volume = 0.5
+        self.music_vol = 0.5
+        self.sfx_vol = 0.5
+        self.dialogue_vol = 0.5
 
         self.mute = False
         self.skip_dialogue = False

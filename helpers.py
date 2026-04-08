@@ -24,3 +24,4 @@ def draw_shading_for_rect(top_color, rect, surface, shading_W = 2,
         bottom_color = right_color
     pygame.draw.line(surface, bottom_color, (rect.x, rect.y + rect.height),
                         (rect.x + rect.width, rect.y + rect.height), shading_W)
+
