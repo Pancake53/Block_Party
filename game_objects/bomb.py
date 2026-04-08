@@ -1,5 +1,5 @@
 import pygame
-from gameObject import GameObject
+from game_objects.gameObject import GameObject
 from pygame.math import Vector2
 
 class Bomb(GameObject):

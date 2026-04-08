@@ -2,12 +2,12 @@ import pygame, json, os, random
 from pygame.math import Vector2
 
 from states.state import State
-from character import Character
-from bomb import Bomb
-from explosion import Explosion
-from button import Button
-from tile import Tile
-from camera import Camera
+from game_objects.character import Character
+from game_objects.bomb import Bomb
+from game_objects.explosion import Explosion
+from UI.button import Button
+from game_objects.tile import Tile
+from UI.camera import Camera
 from physics import Physics
 
 

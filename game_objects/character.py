@@ -1,6 +1,6 @@
 import pygame
-from gameObject import GameObject
-from healthBar import HealthBar
+from game_objects.gameObject import GameObject
+from UI.healthBar import HealthBar
 from pygame.math import Vector2
 
 class Character(GameObject):

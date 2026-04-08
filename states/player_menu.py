@@ -2,7 +2,7 @@ import pygame
 
 from states.state import State
 from states.level_menu import Level_Menu
-from button import Button
+from UI.button import Button
 from helpers import draw_shading_for_rect
 
 class Player_Menu(State):
