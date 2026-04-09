@@ -20,6 +20,14 @@ class Camera():
         self.total_offset_y = 0
         self.max_offset = 100
 
+        if self.game_world.wrap_around:
+            self.update_x = self.update_x_wrap_around
+            self.update_y = self.update_y_normal
+        else:
+            self.update_x = self.update_x_normal
+            self.update_y = self.update_y_normal
+
+
     def update(self, delta_time, actions):
         '''
         moves 'camera' by moving every object on screen
@@ -45,8 +53,13 @@ class Camera():
             # print(f'Offset, y: {y_offset}, x: {x_offset}')
             self.update_positions(x_offset, y_offset)
 
+    def update_x(self, delta_time, actions):
+        self.update_x(delta_time, actions)
 
-    def update_y(self, y, delta_time): 
+    def update_y(self, delta_time, actions):
+        self.update_y(delta_time, actions)
+
+    def update_y_normal(self, y, delta_time): 
         '''
         updates y offset
 
@@ -68,7 +81,7 @@ class Camera():
             if y > self.bottom_edge_2x:
                 y_offset *= 2
 
-            y_offset = int(y_offset)
+            y_offset = round(y_offset)
             self.total_offset_y += y_offset # negative
             
             return y_offset
@@ -83,14 +96,14 @@ class Camera():
             if y < self.edge_buffer_2x:
                 y_offset *= 2
 
-            y_offset = int(y_offset)
+            y_offset = round(y_offset)
             self.total_offset_y += y_offset
             
             return y_offset
         
         return 0
     
-    def update_x(self, x, delta_time): 
+    def update_x_normal(self, x, delta_time): 
         '''
         updates x offset
 
@@ -112,7 +125,7 @@ class Camera():
             if x > self.right_edge_2x:
                 x_offset *= 2
 
-            x_offset = int(x_offset)
+            x_offset = round(x_offset)
             self.total_offset_x += x_offset # negative
             
             return x_offset
@@ -127,13 +140,61 @@ class Camera():
             if x < self.edge_buffer_2x:
                 x_offset *= 2
 
-            x_offset = int(x_offset)
+            x_offset = round(x_offset)
 
             self.total_offset_x += x_offset
             
             return x_offset
         
         return 0
+
+    def update_x_wrap_around(self, x, delta_time): 
+        '''
+        updates x offset
+
+        x: screen x mouse pos
+        delta_time: time since last frame
+
+        Returns: 
+        True if new offset
+        New offset
+        '''
+
+        # right edge of the screen --> offset negative --> objects to left
+        if (x > self.right_edge_1x):
+
+            # negative so obj move left
+            x_offset = - self.camera_speed * delta_time
+
+            if x > self.right_edge_2x:
+                x_offset *= 2
+
+            x_offset = round(x_offset)
+            self.total_offset_x += x_offset # negative
+
+            # set temporary tiles to the same as tiles
+            self.game_world.temp_tiles = self.game_world.tiles
+            return x_offset
+
+        # left edge of the screen --> offset positive --> objects go right
+        if (x < self.edge_buffer_1x):
+
+            # positive so obj move right
+            x_offset = self.camera_speed * delta_time
+
+            if x < self.edge_buffer_2x:
+                x_offset *= 2
+
+            x_offset = round(x_offset)
+
+            self.total_offset_x += x_offset
+
+            # set temporary tiles to the same as tiles
+            self.game_world.temp_tiles = self.game_world.tiles
+            return x_offset
+        
+        return 0
+
 
     def update_positions(self, x_offset, y_offset):
         '''
@@ -142,9 +203,13 @@ class Camera():
         x_offset: x-axis offset
         y_offset: y-axis offset
         '''
+        # var
+        self.game_world.camera_moved = True
         # collision tiles
+        self.game_world.temp_tiles = self.game_world.tiles.copy()
         for tile in self.game_world.tiles:
             tile.update(x_offset, y_offset)
+        self.game_world.tiles = self.game_world.temp_tiles.copy()
         # characters
         for team in self.game_world.teams_not_eliminated.values():
             for char in team:

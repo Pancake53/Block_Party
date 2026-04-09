@@ -81,7 +81,7 @@ class Title(State):
             if since_last_add > self.interval:
                 self.load_rect()
                 self.last_add = elapsed
-                print(f"rect added, time since last rect: {since_last_add}")
+                # print(f"rect added, time since last rect: {since_last_add}")
                 if len(self.rects) == self.max_rects:
                     self.max_added = True
 

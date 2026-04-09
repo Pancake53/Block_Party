@@ -37,6 +37,8 @@ class Character(GameObject):
         self.max_hp = 100
         self.current_hp = 100
         self.health_bar = HealthBar(self)
+
+
        
 
     def render(self, surface):
@@ -64,46 +66,10 @@ class Character(GameObject):
         tiles: game levels collision tiles
         '''
         if not self.state['eliminated']:
-            
-            # only update if character is moving
-            if (self.x_speed != 0) or (self.y_speed != 0):
-                # update level position
-                self.x_level = self.x_screen - self.game_world.camera.total_offset_x
-                self.y_level = self.y_screen - self.game_world.camera.total_offset_y
-                # check if out of bounds on x axis
-                # out on left side
-                if self.x_level < - self.WIDTH + self.out_of_bounds_buffer:
-                    self.out_of_bounds('left')
-                # out on right side
-                elif self.x_level > self.game_world.game.GAME_W - self.out_of_bounds_buffer:
-                    self.out_of_bounds('right')
-                # check if out of bounds on y axis
-                elif self.y_level > self.game_world.game.GAME_H:
-                    self.out_of_bounds('bottom')
-                else:
-                    # moving and not out of bounds
-                    self.state['moving'] = True
-                    self.update_pos(dt, tiles)
-                
-            else:
-                self.state['moving'] = False
-
-
-            if not self.state['locked']:    
-                self.handle_actions(actions)
-
+            self.update(dt, actions, tiles)
             self.health_bar.update()
 
-            if self.throwing_list:
-                self.game_world.update_arrow(
-                    Vector2(*self.throwing_list[0]), # center of char
-                    Vector2(*self.throwing_list[1]) # mouse pos
-                )
-
-        # bug fixing
-        # if self.state['choosing']:
-        #     print(f'char state: {self.state}')
-
+        
     def collision_x_axis(self, collisions):
         '''
         reaction to collision on x axis
@@ -237,34 +203,3 @@ class Character(GameObject):
         # checks if all players characters are eliminated
         self.game_world.check_for_player_eliminated(self)
 
-    def out_of_bounds(self, side):
-        '''
-        handels logic for going outside of map
-        '''
-        # levels that wrap around on sides
-        if self.game_world.wrap_around:
-            self.wrap_around(side)
-        # normal levels
-        else:
-            self.eliminated()
-
-    def wrap_around(self, side):
-        '''
-        wrap around logic
-
-        side: of map
-        '''
-        match side:
-            # moving left -> move to right side of the screen
-            case 'left':
-                self.x_level = self.game_world.game.GAME_W - self.out_of_bounds_buffer
-                self.x_screen = self.x_level + self.game_world.camera.total_offset_x
-                self.rect.x = self.x_screen
-            # moving right -> move to left side
-            case 'right':
-                self.x_level = - self.CHARACTER_SIZE + self.out_of_bounds_buffer
-                self.x_screen = self.x_level + self.game_world.camera.total_offset_x
-                self.rect.x = self.x_screen
-            # fell through the floor
-            case 'bottom':
-                self.eliminated()

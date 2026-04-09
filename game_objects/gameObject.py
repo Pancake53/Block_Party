@@ -42,22 +42,26 @@ class GameObject():
         # rect
         self.CHARACTER_SIZE = 24
 
-        # how many pixels can in map to be considered 
-        # to not be out of bounds
-        # Buffer for levels with wrapping left/right
-        self.out_of_bounds_buffer = 5 # only Char uses
-
         # for camera, if no wrap around let objects fall out of screen
         # despite the offset by camera
-        self.edge_buffer = (
-            self.game_world.camera.max_offset 
-            if not self.game_world.wrap_around
-            else 0)
+        self.edge_buffer = self.game_world.camera.max_offset 
+
+        # update function -> check if out of bounds
+        # func is different if level wraps around
+        if self.game_world.wrap_around:
+            self.update = self.update_wrap_around
+        else:
+            self.update = self.update_normal
+        
+        
+
 
         # default Rect
         self.rect = pygame.Rect(6, 7, 6, 7)
         self.WIDTH = self.rect.width
         self.HEIGHT = self.rect.height
+
+        
       
 
     def render(self, surface):
@@ -68,9 +72,14 @@ class GameObject():
         '''
         pygame.draw.rect(surface, self.colour, self.rect)
 
-
-
     def update(self, dt, actions, tiles):
+        '''
+        calls the appropriate update function for gamemode
+        '''
+        if not self.state['eliminated']:
+            self.update(dt, actions, tiles)
+
+    def update_normal(self, dt, actions, tiles):
         '''
         Updates obj position, if obj is moving
         Handels inputs
@@ -79,42 +88,110 @@ class GameObject():
         actions: user inputs dictionary
         tiles: game levels collision tiles
         '''
-        if not self.state['eliminated']:
+        
             
-            # only update if obj is moving and on the screen
-            if (self.x_speed != 0) or (self.y_speed != 0):
-
-                # update level position
-                self.x_level = self.x_screen - self.game_world.camera.total_offset_x
-                self.y_level = self.y_screen - self.game_world.camera.total_offset_y
-
-                #  check if out of bounds on x axis
-                if self.x_level < - self.WIDTH / 2 - self.edge_buffer:
-                    self.out_of_bounds("left")
-                elif self.x_level > (self.game_world.game.GAME_W
-                                      - self.WIDTH / 2 + self.edge_buffer):
-                    self.out_of_bounds("right")
-                # check if out of bounds on y axis
-                elif self.y_level > self.game_world.game.GAME_H + self.edge_buffer:
-                    self.out_of_bounds("bottom")
-                else:
-                    # moving and not out of bounds
-                    self.state['moving'] = True
-                    self.update_pos(dt, tiles)
-                
-            else:
-                self.state['moving'] = False
+        # only update if obj is moving and on the screen
+        if (self.x_speed != 0) or (self.y_speed != 0):
+            if not self.check_out_of_bounds_normal():
+                # moving and not out of bounds
+                self.state['moving'] = True
+                self.update_pos(dt, tiles)
+        else:
+            self.state['moving'] = False
 
 
-            if not self.state['locked']:    
-                self.handle_actions(actions)
+        if not self.state['locked']:    
+            self.handle_actions(actions)
 
-            # if dragging then send data into level class
-            if self.throwing_list:
-                self.game_world.update_arrow(
-                Vector2(*self.throwing_list[0]), # center of rect
-                Vector2(*self.throwing_list[1]) # mouse pos
-                )
+        # if dragging then send data into level class
+        if self.throwing_list:
+            self.game_world.update_arrow(
+            Vector2(*self.throwing_list[0]), # center of rect
+            Vector2(*self.throwing_list[1]) # mouse pos
+            )
+
+    def check_out_of_bounds_normal(self):
+        '''
+        out of bounds check logic for normal levels
+
+        return True if out of bounds
+        '''
+        # update level position
+        self.x_level = self.x_screen - self.game_world.camera.total_offset_x
+        self.y_level = self.y_screen - self.game_world.camera.total_offset_y
+
+        #  check if out of bounds on x axis
+        if self.x_level < - self.WIDTH / 2 - self.edge_buffer:
+            self.out_of_bounds("left")
+            return True
+        elif self.x_level > (self.game_world.game.GAME_W
+                                - self.WIDTH / 2 + self.edge_buffer):
+            self.out_of_bounds("right")
+            return True
+        # check if out of bounds on y axis
+        elif self.y_level > self.game_world.game.GAME_H + self.edge_buffer:
+            self.out_of_bounds("bottom")
+            return True
+        # not out of bounds
+        return False
+        
+
+    def update_wrap_around(self, dt, actions, tiles):
+        '''
+        Updates obj position, if obj is moving
+        Handels inputs
+
+        dt: delta time 
+        actions: user inputs dictionary
+        tiles: game levels collision tiles
+        '''
+        
+            
+        # only update if obj is moving or cam moved:
+        if ((self.x_speed != 0) or 
+            (self.y_speed != 0)):
+            if not self.check_out_of_bounds_wrap():
+                # not out of bounds / no need to wrap
+                self.state['moving'] = True
+                self.update_pos(dt, tiles)
+        else:
+            self.state['moving'] = False
+
+
+        if not self.state['locked']:    
+            self.handle_actions(actions)
+
+        # if dragging then send data into level class
+        if self.throwing_list:
+            self.game_world.update_arrow(
+            Vector2(*self.throwing_list[0]), # center of rect
+            Vector2(*self.throwing_list[1]) # mouse pos
+            )
+        
+        
+
+    def check_out_of_bounds_wrap(self):
+        '''
+        out of bounds check logic for wrapping levels
+
+        returns True if out of bounds and need to wrap
+        '''
+
+        #  check if out of bounds on x axis
+        if self.x_screen < - self.WIDTH / 2:
+            self.out_of_bounds("left")
+            return True
+        elif self.x_screen > (self.game_world.game.GAME_W
+                                - self.WIDTH / 2):
+            self.out_of_bounds("right")
+            return True
+        # check if out of bounds on y axis
+        elif self.y_screen > self.game_world.game.GAME_H + self.edge_buffer:
+            self.out_of_bounds("bottom")
+            return True
+        
+        return False
+
 
     def collision_test(self, tiles):
         '''
@@ -327,8 +404,35 @@ class GameObject():
         for state in self.state:
             self.state[state] = False
 
-    def out_of_bounds(self):
-        pass
+    def out_of_bounds(self, side):
+        '''
+        handels logic for going outside of map
+        '''
+        # levels that wrap around on sides
+        if self.game_world.wrap_around:
+            self.wrap_around(side)
+        # normal levels
+        else:
+            self.eliminated()
+
+    def wrap_around(self, side):
+        '''
+        wrap around logic
+
+        side: of map
+        '''
+        match side:
+            # moving left -> move to right side of the screen
+            case 'left':
+                self.x_screen += self.game_world.game.GAME_W
+                self.rect.x = self.x_screen
+            # moving right -> move to left side
+            case 'right':
+                self.x_screen -= self.game_world.game.GAME_W
+                self.rect.x = self.x_screen
+            # fell through the floor
+            case 'bottom':
+                self.eliminated()
 
     def on_camera_move(self, x_offset, y_offset):
         '''
@@ -340,6 +444,10 @@ class GameObject():
         # update screen x & y
         self.x_screen += x_offset
         self.y_screen += y_offset
+
+        if self.game_world.wrap_around:
+            if self.check_out_of_bounds_wrap():
+                return
 
         # update rect
         self.rect.x = self.x_screen

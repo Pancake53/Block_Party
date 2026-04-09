@@ -22,6 +22,7 @@ class Game_World(State):
         self.BG_COL = (0, 153, 136) # (56, 175, 218) light blue
         self.TILE_COL = (181, 67, 0)
         self.tiles = []
+        self.temp_tiles = []
         
 
         self.player_count = player_count
@@ -52,12 +53,19 @@ class Game_World(State):
 
         
 
-        self.camera = Camera(self)
+
         self.physics = Physics()
+        # set variable
+        self.wrap_around = (level_name.split('.')[0] 
+                        in ['tree of life', 'swords'])
+        
+        # camera
+        self.camera = Camera(self)
+        self.camera_moved = False
         
         # level data --> tiles and characters
-        self.wrap_around = None
         self.load_level(level_name)
+       
         
         # needed classes --> bomb, explosion, buttons
         self.load_entities()
@@ -92,13 +100,16 @@ class Game_World(State):
         '''
         # reset variables
         self.draw_arrow = False
-        # update view based on mouse movement around level edges
+        self.camera_moved = False
+        # update view based on mouse movement 
+        # around level edges, on_camera_move and 
+        # update tiles
         self.camera.update(delta_time, actions)
 
         self.update_characters(delta_time, actions)
             
         self.bomb.update(delta_time, actions, self.tiles)
-
+        
         self.explosion.update()
         self.handle_actions(actions)
         # print(self.game_state)
@@ -151,6 +162,37 @@ class Game_World(State):
         self.draw_arrow = True
         # print(f'Difference vector: {self.diff_vector}, end point: {self.end_point}')
     
+    # only for wrapping levels
+    def wrap_tiles(self, tile, side):
+        '''
+        handels wrapping tiles on wrapping levels
+        creates new tiles as needed and deletes unnecessary ones
+        
+        tile: tile that need wrapping
+        side: side of the tile that went over on x-axis ('left'/'right')
+        '''
+        match side:
+            case 'left':
+                # dublicate to right side of the sceen
+                x = tile.rect.x + self.game.GAME_W
+            case 'right':
+                # dublicate to left side of the sceen
+                x = tile.rect.x - self.game.GAME_W
+            case _:
+                print("error in tile dublicating")
+
+        new_tile = Tile(x, tile.rect.y, tile.rect.width,
+                         tile.rect.height, self.TILE_COL, self)
+        self.temp_tiles.append(new_tile)
+
+    def delete_tile(self, tile):
+        '''
+        delete tile that has gone over the side
+
+        tile: tile to be deleted
+        '''
+        self.temp_tiles.remove(tile)
+
     # render functions
 
     def render(self, surface):
@@ -319,7 +361,7 @@ class Game_World(State):
         '''
         self.turn_rect = pygame.Rect(15, self.game.GAME_H - 45, 80, 30)
 
-        self.bomb = Bomb(-36, -36, self, self.game.assets["bomb_img"])
+        self.bomb = Bomb(-1000, -1000, self, self.game.assets["bomb_img"])
         self.explosion = Explosion(self.game.assets['explosion_img'])
         self.jump_button = Button(0, 0, image=self.game.assets['jump_img'])
         self.bomb_button = Button(0, 0, image=self.game.assets['bomb_img'])
@@ -336,6 +378,8 @@ class Game_World(State):
 
         level_name: filename with level data
         '''
+
+
         # level data
         path = os.path.join(self.game.level_dir, level_name)
 
@@ -350,7 +394,8 @@ class Game_World(State):
                     if obj['type'] == "collision_tile":
                         self.tiles.append(
                             Tile(obj["x"], obj["y"],
-                                obj["width"], obj["height"], self.TILE_COL)
+                                obj["width"], obj["height"], 
+                                self.TILE_COL, self)
                         )
                         
                     # playable characters
@@ -360,10 +405,9 @@ class Game_World(State):
         self.teams_not_eliminated = {team_id: characters[:]
                                     for team_id, characters in 
                                     self.teams.items()}
+        self.temp_tiles = self.tiles.copy()
 
-
-        if level_name.split('.')[0] in ['tree of life', 'swords']:
-            self.wrap_around = True
+        
         # print(f'Level Loaded \nLevel Data:\n{self.teams}')
 
     def load_character(self, obj):

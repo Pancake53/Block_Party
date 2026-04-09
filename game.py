@@ -73,6 +73,7 @@ class Game():
         self.load_states()
 
         self.play_music('main_theme')
+        self.change_volume()
         
         
 

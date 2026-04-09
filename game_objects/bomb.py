@@ -23,40 +23,42 @@ class Bomb(GameObject):
         self.WIDTH = self.rect.width
         self.HEIGHT = self.rect.height
 
-    # def update(self, dt, actions, tiles):
-    #     '''
-    #     Updates obj position, if obj is moving
-    #     Handels inputs
+    def update(self, dt, actions, tiles):
+        '''
+        Updates obj position, if obj is moving
+        Handels inputs
 
-    #     dt: delta time 
-    #     actions: user inputs dictionary
-    #     tiles: game levels collision tiles
-    #     '''
-    #     # update if flying
-    #     if self.state['locked']:
+        dt: delta time 
+        actions: user inputs dictionary
+        tiles: game levels collision tiles
+        '''
+        # update if flying
+        if self.state['locked']:
+            self.update(dt, actions, tiles)
+        else:
+            self.handle_actions(actions)
+        #     # update level position
+        #     self.x_level = self.x_screen - self.game_world.camera.total_offset_x
+        #     self.y_level = self.y_screen - self.game_world.camera.total_offset_y
 
-    #         # update level position
-    #         self.x_level = self.x_screen - self.game_world.camera.total_offset_x
-    #         self.y_level = self.y_screen - self.game_world.camera.total_offset_y
-
-    #         # check if out of bounds on x axis
-    #         if self.x_level < - self.WIDTH / 2:
-    #             self.out_of_bounds("left")
-    #         elif self.x_level > self.game_world.game.GAME_W - self.WIDTH / 2:
-    #             self.out_of_bounds("right")
-    #         # check if out of bounds on y axis
-    #         elif self.y_level > self.game_world.game.GAME_H:
-    #             self.out_of_bounds("bottom")
-    #         else:
-    #             # moving and not out of bounds
-    #             self.state['moving'] = True
-    #             self.update_pos(dt, tiles)
+        #     # check if out of bounds on x axis
+        #     if self.x_level < - self.WIDTH / 2:
+        #         self.out_of_bounds("left")
+        #     elif self.x_level > self.game_world.game.GAME_W - self.WIDTH / 2:
+        #         self.out_of_bounds("right")
+        #     # check if out of bounds on y axis
+        #     elif self.y_level > self.game_world.game.GAME_H:
+        #         self.out_of_bounds("bottom")
+        #     else:
+        #         # moving and not out of bounds
+        #         self.state['moving'] = True
+        #         self.update_pos(dt, tiles)
                 
             
 
 
-    #     if not self.state['locked']:    
-    #         self.handle_actions(actions)
+        # if not self.state['locked']:    
+        #     self.handle_actions(actions)
     
 
     def render(self, surface):
