@@ -16,7 +16,7 @@ from physics import Physics
 
 
 class Game_World(State):
-    def __init__(self, game, level_name, player_count=4):
+    def __init__(self, game, level_name, created_chars):
         super().__init__(game)
         
         self.BG_COL = (0, 153, 136) # (56, 175, 218) light blue
@@ -25,8 +25,9 @@ class Game_World(State):
         self.temp_tiles = []
         
 
-        self.player_count = player_count
-        self.players_alive = [i for i in range(player_count)]
+        self.player_count = len(created_chars)
+        self.created_chars = created_chars
+        self.players_alive = [i for i in range(self.player_count)]
 
         # stores player character data as team_id: [characters]
         self.teams = {i: [] for i in range(self.player_count)}

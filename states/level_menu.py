@@ -9,10 +9,11 @@ class Level_Menu(State):
     '''
     level menu for choosing level
     '''
-    def __init__(self, game, player_count=2):
+    def __init__(self, game, created_chars):
         super().__init__(game)
 
-        self.player_count = player_count
+        self.player_count = len(created_chars)
+        self.created_chars = created_chars
 
         self.BROWN = (181, 67, 0)
 
@@ -60,7 +61,7 @@ class Level_Menu(State):
         if actions["start"]:
             new_state = Game_World(self.game,
                                     self.filenames[self.current_level],
-                                      player_count=self.player_count)
+                                       self.created_chars)
             new_state.enter_state()
 
         if actions["esc"]:

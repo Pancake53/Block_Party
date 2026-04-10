@@ -12,8 +12,26 @@ class Char_Creating(State):
         self.players_left = players_left - 1
         # all characters created by players so far
         self.created_chars = created_chars
+        # dictionary with player id as the first key
+        # next key is id for each part of the char
+        # containing a dict for colour and rect obj
+        
+        # selecting players id
+        self.player_id = len(self.created_chars) + 1
 
         self.selected = False
+
+        self.colour_id = players_left
+        self.colour = self.game.team_colours[self.colour_id]
+        self.load_classes() # Buttons / UI elements 
+
+        self.left_clicked = False
+        self.right_clicked = False
+
+        # changes with regard to which rect has been last clicked
+        self.selected_part = 0 # TO-DO
+
+        
 
 
     def update(self, delta_time, actions):
@@ -26,9 +44,27 @@ class Char_Creating(State):
         delta_time: dt
         actions: user inputs dictionary
         '''
-
+        print(self.created_chars)
         self.handle_actions(actions)
         
+        if self.left_clicked:
+            if self.colour_id == 0:
+                self.colour_id = len(self.game.team_colours) - 1
+            else:
+                self.colour_id -= 1
+
+            self.colour = self.game.team_colours[self.colour_id]
+            self.character_parts[self.selected_part]['colour'] = self.colour
+
+        if self.right_clicked:
+            if self.colour_id == len(self.game.team_colours) - 1:
+                self.colour_id = 0
+            else:
+                self.colour_id += 1
+
+            self.colour = self.game.team_colours[self.colour_id]
+            self.character_parts[self.selected_part]['colour'] = self.colour
+
 
         if self.selected:
             self.change_state()
@@ -42,8 +78,6 @@ class Char_Creating(State):
             self.exit_state()
             self.game.reset_keys()
 
-        if actions["mouse_click"]:
-            self.selected = True
 
     def change_state(self):
         '''
@@ -53,20 +87,19 @@ class Char_Creating(State):
         or 
         to select selection screen
         '''
+        self.created_chars[self.player_id] = self.character_parts
+
         if self.players_left > 0:
             # more characters to be created
             new_state = Char_Creating(self.game, self.players_left, self.created_chars)
-            new_state.enter_state()
-            # reset the selected state
-            self.selected = False
+            
         else:
             # all characters created, go to selecting level
-            self.created_chars = [1, 2, 3] # comment out later
-            new_state = Level_Menu(self.game, len(self.created_chars))
-            new_state.enter_state()
-            # reset the selected state
-            self.selected = False
-
+            new_state = Level_Menu(self.game, self.created_chars)
+            
+        new_state.enter_state()
+        # reset the selected state
+        self.selected = False
 
     def render(self, surface):
         '''
@@ -75,11 +108,81 @@ class Char_Creating(State):
         surface: surface to render on
         '''
         surface.fill((self.game.BLACK))
+
+        pygame.draw.rect(surface, self.game.BG_COL, self.level_bg)
+
         self.game.draw_text(surface, "Create your character",
                              self.game.WHITE, self.game.GAME_W / 2,
                                self.game.GAME_H / 8)
         
-        self.game.draw_text(surface, f"Player: {self.players_left}",
-                             self.game.WHITE, self.game.GAME_W / 2,
-                               self.game.GAME_H / 2)
+        self.game.draw_text(surface, f"Player {self.player_id}",
+                             self.game.WHITE, self.game.GAME_W * 0.75,
+                               self.game.GAME_H * 0.75)
         
+        
+        
+        self.render_buttons(surface)
+        self.render_character(surface)
+
+    def render_buttons(self, surface):
+        '''
+        renders buttons duh and controls what actions get 
+        triggered by them
+        '''
+        # switch colours between presets
+        self.left_clicked = self.left_arrow.action_on_button(
+            self.left_arrow_x, self.left_arrow_y, 
+            surface, self.game.actions)
+        
+        self.right_clicked = self.right_arrow.action_on_button(
+            self.right_arrow_x, self.right_arrow_y,
+            surface, self.game.actions)
+        
+        # done button
+        self.selected = self.done_button.action_on_button(
+            self.done_button_x, self.done_button_y,
+            surface, self.game.actions
+        )
+        
+        
+    def render_character(self, surface):
+        '''
+        renders the rects of character
+        '''
+        for part in self.character_parts.values():
+            pygame.draw.rect(surface, part['colour'], part['rect'])
+
+    def load_classes(self):
+        '''
+        init needed classes and coordination calculations
+        '''
+        self.level_bg = pygame.Rect(self.game.GAME_W / 4, self.game.GAME_H / 4,
+                                                  self.game.GAME_W / 2, self.game.GAME_H / 2)
+
+        self.left_arrow = Button(0, 0, button_colour=(139, 139, 139),
+                                  hover_colour=(50, 50, 50), image = 
+                                 self.game.assets["arrowleft_img"])
+        self.right_arrow = Button(0, 0, button_colour=(139, 139, 139),
+                                  hover_colour=(50, 50, 50), image =
+                                  self.game.assets["arrowright_img"])
+        
+        self.done_button = Button(0, 0, width=100, height=50)
+        
+        # starting colour, position and dimensions
+        width = 50
+        height = width * 2
+        x = self.game.GAME_W / 2 - width / 2
+        y = self.game.GAME_H / 2 - height / 2
+        rect = pygame.Rect(x, y, width, height)
+        self.character_parts = {0: {'colour': self.colour, 'rect': rect}}
+        
+        # calculate locations for buttons
+        # 1 arrow
+        self.left_arrow_x = self.game.GAME_W / 6 - self.left_arrow.rect.width / 2
+        self.left_arrow_y = self.game.GAME_H / 2 - self.left_arrow.rect.height / 2
+        # 2 arrow
+        self.right_arrow_x = self.game.GAME_W * 5 / 6 - self.right_arrow.rect.width / 2
+        self.right_arrow_y = self.game.GAME_H / 2 - self.right_arrow.rect.height / 2
+        # Done
+        self.done_button_x = self.game.GAME_W - self.done_button.rect.width - 10
+        self.done_button_y = self.game.GAME_H - self.done_button.rect.height - 10
