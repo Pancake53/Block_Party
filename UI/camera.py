@@ -172,8 +172,7 @@ class Camera():
             x_offset = round(x_offset)
             self.total_offset_x += x_offset # negative
 
-            # set temporary tiles to the same as tiles
-            self.game_world.temp_tiles = self.game_world.tiles
+            
             return x_offset
 
         # left edge of the screen --> offset positive --> objects go right
@@ -189,8 +188,7 @@ class Camera():
 
             self.total_offset_x += x_offset
 
-            # set temporary tiles to the same as tiles
-            self.game_world.temp_tiles = self.game_world.tiles
+            
             return x_offset
         
         return 0
@@ -206,7 +204,7 @@ class Camera():
         # var
         self.game_world.camera_moved = True
         # collision tiles
-        self.game_world.temp_tiles = self.game_world.tiles.copy()
+        # self.game_world.temp_tiles = self.game_world.tiles.copy()
         for tile in self.game_world.tiles:
             tile.update(x_offset, y_offset)
         self.game_world.tiles = self.game_world.temp_tiles.copy()

@@ -1,7 +1,7 @@
 import pygame
 
 from states.state import State
-from states.level_menu import Level_Menu
+from states.char_creating import Char_Creating
 from UI.button import Button
 from helpers import draw_shading_for_rect
 
@@ -61,7 +61,7 @@ class Player_Menu(State):
         self.game.reset_keys()
 
         if self.selected:
-            new_state = Level_Menu(self.game, self.player_count)
+            new_state = Char_Creating(self.game, self.player_count)
             new_state.enter_state()
             # reset the selected state
             self.selected = False
