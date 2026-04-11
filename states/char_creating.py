@@ -17,7 +17,7 @@ class Char_Creating(State):
         # containing a dict for colour and rect obj
         
         # selecting players id
-        self.player_id = len(self.created_chars) + 1
+        self.player_id = len(self.created_chars)
 
         self.selected = False
 
@@ -115,9 +115,9 @@ class Char_Creating(State):
                              self.game.WHITE, self.game.GAME_W / 2,
                                self.game.GAME_H / 8)
         
-        self.game.draw_text(surface, f"Player {self.player_id}",
-                             self.game.WHITE, self.game.GAME_W * 0.75,
-                               self.game.GAME_H * 0.75)
+        self.game.draw_text(surface, f"Player {self.player_id + 1}",
+                             self.game.WHITE, self.game.GAME_W * 0.25,
+                               self.game.GAME_H * 0.25)
         
         
         
@@ -149,7 +149,7 @@ class Char_Creating(State):
         '''
         renders the rects of character
         '''
-        for part in self.character_parts.values():
+        for part in self.character_parts:
             pygame.draw.rect(surface, part['colour'], part['rect'])
 
     def load_classes(self):
@@ -174,7 +174,7 @@ class Char_Creating(State):
         x = self.game.GAME_W / 2 - width / 2
         y = self.game.GAME_H / 2 - height / 2
         rect = pygame.Rect(x, y, width, height)
-        self.character_parts = {0: {'colour': self.colour, 'rect': rect}}
+        self.character_parts = [{'colour': self.colour, 'rect': rect}]
         
         # calculate locations for buttons
         # 1 arrow
@@ -186,3 +186,6 @@ class Char_Creating(State):
         # Done
         self.done_button_x = self.game.GAME_W - self.done_button.rect.width - 10
         self.done_button_y = self.game.GAME_H - self.done_button.rect.height - 10
+
+        self.done_text_x = self.game.GAME_W - self.done_button.rect.width - 10
+        self.done_text_y = self.game.GAME_H - self.done_button.rect.width - 10

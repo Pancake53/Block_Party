@@ -41,7 +41,7 @@ class Game_World(State):
                             'is\nthe biggest nerd', 
                             'is\ngoofy as heck',
                             'claimed\nvictory royale',
-                            '\nended it in style', 
+                            '\nis better', 
                             'proved\nunstoppable',
                             'brought\nthe paintrain',
                             'sealed\ntheir enemies fate',

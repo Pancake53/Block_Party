@@ -24,7 +24,7 @@ class Character(GameObject):
         self.team_id = team_id
         self.width = width
         # Character colour based on team id
-        self.colour = self.game_world.game.team_colours[team_id]
+        self.colour = self.game_world.created_chars[team_id][0]['colour']
         
         # make fall down from spawn location
         self.y_speed = 0.01

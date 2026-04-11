@@ -72,8 +72,12 @@ class Game():
         self.state_stack = []
         self.load_states()
 
+        # audio
+        # music
         self.play_music('main_theme')
-        self.change_volume()
+        self.change_volume('music')
+        self.music_muted = False
+        # sounds
         
         
 
@@ -122,6 +126,9 @@ class Game():
                 # Fullscreen
                 if event.key == pygame.K_f:
                     self.toggle_fullscreen()
+                # Toggle audio
+                if event.key == pygame.K_m:
+                    self.toggle_music()
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_ESCAPE:
@@ -303,9 +310,26 @@ class Game():
             pygame.mixer.music.load(self.audio[audio_name])
             pygame.mixer.music.play(loops)
 
-    def change_volume(self):
+    def change_volume(self, type):
         '''
         volume of audio
-        '''
-        pygame.mixer.music.set_volume(self.settings.music_vol * self.settings.master_volume)
 
+        type: which audio type to change volume (music, sounds or narrating)
+        '''
+        match type:
+            case 'music':
+                pygame.mixer.music.set_volume(
+                    self.settings.music_vol
+                    * self.settings.master_volume)
+                
+            case _:
+                print('Invalid type input in change_volume')
+
+    def toggle_music (self):
+        self.music_muted = not self.music_muted
+
+        if self.music_muted:
+            pygame.mixer.music.set_volume(0)
+
+        else: # music unmuted
+            self.change_volume('music')

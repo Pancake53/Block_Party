@@ -43,7 +43,6 @@ class Player_Menu(State):
         # loads Button classes and rects
         self.load_menu()
 
-        self.game.change_volume()
 
     def update(self, delta_time, actions):
         '''
