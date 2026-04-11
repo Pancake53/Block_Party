@@ -122,8 +122,11 @@ class Character(GameObject):
     def clicking(self, actions):
         '''
         handels hovered mouse clicks for Obj
+
+        own function because reverses
+            all own players characters states on click
         '''
-        # print(f'"CLICK!! : " {self.state}')
+        
         # Selecting
         if not (self.state["jump"] or self.state["throw"]):
         # print("select condition met") 
@@ -167,7 +170,8 @@ class Character(GameObject):
 
     def reset_pos(self):
         '''
-        reset position
+        reset position for restarting round
+        full hp
         '''
         # calculated values to origin
         self.x_screen = self.origin[0]

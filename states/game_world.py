@@ -146,12 +146,12 @@ class Game_World(State):
         self.teams_not_eliminated = self.temp_teams_not_eliminated.copy()
                 
 
-    def update_arrow(self, rect_center, mouse_pos):
+    def update_arrow(self, rect_center, mouse_pos, diff_vector):
         '''
         updates values and sets arrow to true
         '''
         # difference vector center and pos
-        self.diff_vector = Vector2(rect_center - mouse_pos)
+        self.diff_vector = diff_vector
         self.rect_center = rect_center
         if self.diff_vector.length() > self.physics.max_arrow_len:
             normalized = self.diff_vector.normalize()
@@ -456,6 +456,8 @@ class Game_World(State):
         # state
         self.bomb.state["selected"] = True
         self.bomb.state["jump"] = True
+        self.bomb.state["locked"] = False
+
         # rect x&y
         self.bomb.rect.centerx = x_pos 
         self.bomb.rect.centery = y_pos 

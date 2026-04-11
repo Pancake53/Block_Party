@@ -49,7 +49,7 @@ class Game():
         
         # actions dictionary for user input
         self.actions = {"left": False, "right": False, "up": False,
-                        "down": False, "mouse_pressed": False, 
+                        "down": False, "m1": False, "m3": False,
                         "mouse_click": False, "mouse_pos": (0, 0), 
                         "action1": False, "action2": False,
                         "space": False, "start": False, 
@@ -150,19 +150,20 @@ class Game():
                 if event.key == pygame.K_SPACE:
                     self.actions["space"] = False
 
+            # Mouse events
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # print("mousebuttonDOWN")
-                self.actions["mouse_pressed"] = True
-                # print(f"mouse_click: {self.actions["mouse_click"]}")
-
-            # else: # if we have no (down or up) mouse action then click = false 
-            #     self.actions["mouse_click"] = False    
-            #     print("NOT mousebuttondown")
-            #     print(f"mouse_click: {self.actions["mouse_click"]}")
+                if event.button == 1:
+                    self.actions["m1"] = True
+                if event.button == 3:
+                    self.actions["m3"] = True
 
             if event.type == pygame.MOUSEBUTTONUP:
                 # print("mousebuttonUP")
-                self.actions["mouse_pressed"] = False
+                if event.button == 1:
+                    self.actions["m1"] = False
+                if event.button == 3:
+                    self.actions["m3"] = False
                 
         # print(f"mouse_click: {self.actions["mouse_click"]}") 
 

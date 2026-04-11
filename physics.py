@@ -10,7 +10,7 @@ class Physics:
         self.Y_STOP = 50 
         # x speed stopper, if x_speed < x_stop -> x_speed = 0
         self.X_STOP = 1 
-        self.MIN_JUMP = 10
+        self.MIN_JUMP = 15
 
         # VARIABLES
 
@@ -24,7 +24,7 @@ class Physics:
         # speed loss multiplier on collision
         self.retention = 0.25 
 
-        # bomb damage
+        # bomb damage multip (divided by distance)
         self.force_of_exp = 250
         
 

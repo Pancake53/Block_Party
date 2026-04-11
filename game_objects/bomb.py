@@ -160,19 +160,7 @@ class Bomb(GameObject):
                 self.throwing_list = []
                 self.state["drag"] = True
 
-    def releasing(self):
-        '''
-        handels giving Obj velocity after mousedrag
-        '''
-        x_speed = (self.throwing_list[0][0] -self.throwing_list[-1][0]) * self.game_world.physics.throw_multiplier
-        y_speed = (self.throwing_list[0][1] -self.throwing_list[-1][1]) * self.game_world.physics.throw_multiplier
-        self.add_momentum(x_speed, y_speed)
 
-        self.throwing_list = []
-        self.state['locked'] = True
-        # print(f'Round: {self.game_world.round}, Turn id: {self.game_world.current_turn}, Turns {self.game_world.state['turn']}')
-        self.game_world.next_turn()
-        # print(f'Game World State: {self.game_world.state}')
 
     def fix_spawn(self, tiles): 
         '''
@@ -213,6 +201,5 @@ class Bomb(GameObject):
                 self.rect.x = self.x_screen
 
 
-    
                 
             

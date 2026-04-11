@@ -79,6 +79,8 @@ class GameObject():
         if not self.state['eliminated']:
             self.update(dt, actions, tiles)
 
+            
+
     def update_normal(self, dt, actions, tiles):
         '''
         Updates obj position, if obj is moving
@@ -103,13 +105,9 @@ class GameObject():
         if not self.state['locked']:    
             self.handle_actions(actions)
 
-        # if dragging then send data into level class
-        if self.throwing_list:
-            self.game_world.update_arrow(
-            Vector2(*self.throwing_list[0]), # center of rect
-            Vector2(*self.throwing_list[1]) # mouse pos
-            )
-
+        # when dragging 
+        self.handle_drag()
+ 
     def check_out_of_bounds_normal(self):
         '''
         out of bounds check logic for normal levels
@@ -134,7 +132,6 @@ class GameObject():
             return True
         # not out of bounds
         return False
-        
 
     def update_wrap_around(self, dt, actions, tiles):
         '''
@@ -161,14 +158,8 @@ class GameObject():
         if not self.state['locked']:    
             self.handle_actions(actions)
 
-        # if dragging then send data into level class
-        if self.throwing_list:
-            self.game_world.update_arrow(
-            Vector2(*self.throwing_list[0]), # center of rect
-            Vector2(*self.throwing_list[1]) # mouse pos
-            )
-        
-        
+        # when dragging 
+        self.handle_drag()  
 
     def check_out_of_bounds_wrap(self):
         '''
@@ -273,7 +264,7 @@ class GameObject():
         '''
         pass
 
-    def add_momentum(self, x_speed, y_speed): 
+    def add_momentum(self, direction_vec): 
         ''' 
         give gameObject clamped x and y momentum
 
@@ -286,15 +277,16 @@ class GameObject():
         # self.y_speed = max(-self.max_velocity,
         #                 min(y_speed, self.max_velocity))
 
-        speed_vec = Vector2(x_speed, y_speed)
-        total_speed = speed_vec.length()
+        # multiply to get more momentum
+        direction_vec *= self.game_world.physics.throw_multiplier
+        # if total momentum overspill normalize
+        if direction_vec.length() > self.game_world.physics.max_velocity:
+            normalized = direction_vec.normalize()
+            direction_vec = self.game_world.physics.max_velocity * normalized
 
-        if total_speed > self.game_world.physics.max_velocity:
-            normalized = speed_vec.normalize()
-            speed_vec = self.game_world.physics.max_velocity * normalized
-
-        self.x_speed = speed_vec[0]
-        self.y_speed = speed_vec[1]
+        # add momentum to object
+        self.x_speed = direction_vec[0] 
+        self.y_speed = direction_vec[1] 
 
 
 
@@ -305,10 +297,7 @@ class GameObject():
 
         actions: user inputs dictionary
 
-        '''
-       
-            
-
+        '''   
         # Handle mouse clicks for selecting obj
         
 
@@ -324,13 +313,22 @@ class GameObject():
             if self.state["drag"]:
                 self.dragging(actions)
 
+            # resetting actions
+            if actions["m3"]:
+                self.throwing_list = []
+                self.reset_state()
+                if self.__class__.__name__ == 'Bomb':
+                    self.reset_pos()
+
 
             # Releasing
-            if (not actions["mouse_pressed"]) and (len(self.throwing_list) == 2):
+            if (not actions["m1"]) and (len(self.throwing_list) == 2):
                 self.releasing()
 
             if self.state["throw"]: # bomb placeholder
                 self.throw_bomb()
+
+        
 
     def clicking(self, actions):
         '''
@@ -339,11 +337,8 @@ class GameObject():
 
         # Selecting
         if not (self.state["jump"] or self.state["throw"]):
-        # print("select condition met") 
-
-            # print("collision")
             self.state["selected"] = not self.state["selected"]
-            # print(f"state: {self.state}")
+            
 
         # Jumping / entering into drag
         # requere new click
@@ -360,10 +355,22 @@ class GameObject():
         '''
 
         if self.state["drag"]:
-            if actions["mouse_pressed"]:
+            if actions["m1"]:
                 self.throwing_list = [(self.rect.centerx, self.rect.centery),
                                       actions['mouse_pos'] ]
-                # render line or arrow function
+            
+    def handle_drag(self):
+        '''
+        handels what happens to dragging data
+        '''
+        if self.throwing_list:
+            self.diff_vector = Vector2(self.throwing_list[0]) - Vector2(self.throwing_list[1])
+            if self.diff_vector.length() > self.game_world.physics.MIN_JUMP:
+                self.game_world.update_arrow(
+                    self.throwing_list[0], 
+                    self.throwing_list[1], self.diff_vector)
+        
+                
 
     def releasing(self):
         '''
@@ -371,14 +378,20 @@ class GameObject():
 
         actions: user inputs dictionary
         '''
-        x_vector = (self.throwing_list[0][0] -self.throwing_list[-1][0]) * self.game_world.physics.throw_multiplier
-        y_vector = (self.throwing_list[0][1] -self.throwing_list[-1][1]) * self.game_world.physics.throw_multiplier
-        self.add_momentum(x_vector, y_vector)
+        if self.diff_vector.length() > self.game_world.physics.MIN_JUMP:
+            self.add_momentum(self.diff_vector)
+            self.game_world.next_turn()
+            self.throwing_list = []
+            if self.__class__.__name__ == 'Bomb':
+                self.state['locked'] = True
+            else:
+                self.reset_state()
 
-        self.throwing_list = []
-        self.reset_state()
-        self.game_world.next_turn()
-
+        else:
+            self.throwing_list = []
+            self.reset_state()
+            if self.__class__.__name__ == 'Bomb':
+                self.reset_pos()
 
     def throw_bomb(self):
         pass
