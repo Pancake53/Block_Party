@@ -11,7 +11,7 @@ class Character(GameObject):
       action such as selecting, jumping, spawning in bomb
     
     '''
-    def __init__(self, team_id, x_pos, y_pos, game_world, colour_id = 0, width=1):
+    def __init__(self, team_id, x_pos, y_pos, game_world):
         '''Initialize attributes
 
         game_world: level the character loads into
@@ -22,14 +22,15 @@ class Character(GameObject):
         '''
         super().__init__(x_pos, y_pos, game_world)
         self.team_id = team_id
-        self.width = width
+        
+
         # Character colour based on team id
         self.colour = self.game_world.created_chars[team_id][0]['colour']
         
         # make fall down from spawn location
         self.y_speed = 0.01
         
-        self.WIDTH = self.CHARACTER_SIZE * width
+        self.WIDTH = self.CHARACTER_SIZE
         self.HEIGHT = self.CHARACTER_SIZE * 2
         self.rect = pygame.Rect(x_pos, y_pos, self.WIDTH, self.HEIGHT)
        

@@ -28,6 +28,7 @@ class Game_World(State):
         self.player_count = len(created_chars)
         self.created_chars = created_chars
         self.players_alive = [i for i in range(self.player_count)]
+        print(f'Players alive: {self.players_alive}')
 
         # stores player character data as team_id: [characters]
         self.teams = {i: [] for i in range(self.player_count)}
@@ -42,7 +43,7 @@ class Game_World(State):
                             'is\ngoofy as heck',
                             'claimed\nvictory royale',
                             '\nis better', 
-                            'proved\nunstoppable',
+                            'has\nclapped cheeks',
                             'brought\nthe paintrain',
                             'sealed\ntheir enemies fate',
                             '\nreigned supreme',
@@ -131,7 +132,7 @@ class Game_World(State):
         #  or if bomb is being thrown
         characters_locked = self.check_for_character_lock()
         # update self.turn
-
+        
         for id, team in self.teams_not_eliminated.items():
             turn_lock = (id != self.current_turn) # for each team
             for char in team:
@@ -141,7 +142,9 @@ class Game_World(State):
                     char.state['locked'] = turn_lock
                         
                 char.update(delta_time, actions, self.tiles)
-                char.health_bar.update()
+
+        self.teams_not_eliminated = self.temp_teams_not_eliminated.copy()
+                
 
     def update_arrow(self, rect_center, mouse_pos):
         '''
@@ -322,7 +325,7 @@ class Game_World(State):
         render whose turn it is
         bottom left of screen
         '''
-        colour = self.game.team_colours[self.current_turn]
+        colour = self.created_chars[self.current_turn][0]['colour']
         pygame.draw.rect(surface, colour, self.turn_rect)
         self.game.draw_text(surface,
                 "turn", self.game.BLACK, 55, self.game.GAME_H - 32, "Medium")
@@ -406,6 +409,8 @@ class Game_World(State):
         self.teams_not_eliminated = {team_id: characters[:]
                                     for team_id, characters in 
                                     self.teams.items()}
+        self.temp_teams_not_eliminated = self.teams_not_eliminated.copy()
+
         self.temp_tiles = self.tiles.copy()
 
         
@@ -426,8 +431,8 @@ class Game_World(State):
 
         one_char_per_player = False
         # TESTING SECTION COMMENT OUT LATER
-        # if self.teams[player_id]: 
-        #     one_char_per_player = True
+        if self.teams[player_id]: 
+            one_char_per_player = True
 
         if not one_char_per_player:
             self.teams[player_id].append(
@@ -627,19 +632,14 @@ class Game_World(State):
 
         # eliminated characters team
         player_id = char_eliminated.team_id
-
-        teams_chars_alive = False
-
-        for char in self.teams_not_eliminated[player_id]:
-            if not char.state['eliminated']:
-                teams_chars_alive = True
-
-        # if list not empty, update characters_not_eliminated and quit check
-        if teams_chars_alive:
-            # update chars that are not eliminated
-            self.teams_not_eliminated[player_id].remove(char_eliminated)
-            return
+        print(f'Player id: {player_id}')
         
+        # remove character from temporary not eliminated list
+        self.temp_teams_not_eliminated[player_id].remove(char_eliminated)
+        # if players list of characters after this is not empty return to loop
+        if self.temp_teams_not_eliminated[player_id]:
+            return 
+            
         # list empty, player eliminated
         self.players_alive.remove(player_id)
         # print(f'Player eliminated, alive ids: {self.players_alive}')
@@ -658,7 +658,7 @@ class Game_World(State):
             # len of teams alive is one, only one team left
             case 1:
                 self.state['game_over'] = True
-                self.winner_id = self.players_alive[0] + 1
+                self.winner_id = self.players_alive[0]
                 # select at random one of the victory messages
                 self.displayed_message = self.victory_messages[random.randint(0, len(self.victory_messages) - 1)]
                 
@@ -683,7 +683,7 @@ class Game_World(State):
         difines what happens when someone wins        
         '''
 
-        text = f'Player {self.winner_id} {self.displayed_message}'
+        text = f'Player {self.winner_id + 1} {self.displayed_message}'
         self.game.draw_text(surface, text, self.game.BLACK, self.game.GAME_W / 2, self.game.GAME_H / 2)
 
     def surrender(self, player_id):
