@@ -34,9 +34,10 @@ class Bomb(GameObject):
         '''
         # update if flying
         if self.state['locked']:
-            self.update(dt, actions, tiles)
+            self.update_chosen(dt, actions, tiles)
         else:
             self.handle_actions(actions)
+            self.handle_drag()
         #     # update level position
         #     self.x_level = self.x_screen - self.game_world.camera.total_offset_x
         #     self.y_level = self.y_screen - self.game_world.camera.total_offset_y

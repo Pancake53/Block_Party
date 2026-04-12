@@ -143,7 +143,10 @@ class Game_World(State):
                         
                 char.update(delta_time, actions, self.tiles)
 
-        self.teams_not_eliminated = self.temp_teams_not_eliminated.copy()
+        self.teams_not_eliminated = {team_id: characters[:]
+                                    for team_id, characters in 
+                                    self.temp_teams_not_eliminated.items()
+                                    if characters}
                 
 
     def update_arrow(self, rect_center, mouse_pos, diff_vector):
@@ -409,7 +412,10 @@ class Game_World(State):
         self.teams_not_eliminated = {team_id: characters[:]
                                     for team_id, characters in 
                                     self.teams.items()}
-        self.temp_teams_not_eliminated = self.teams_not_eliminated.copy()
+        
+        self.temp_teams_not_eliminated = {team_id: characters[:]
+                                    for team_id, characters in 
+                                    self.teams_not_eliminated.items()}
 
         self.temp_tiles = self.tiles.copy()
 
@@ -549,6 +555,10 @@ class Game_World(State):
         self.teams_not_eliminated = {team_id: characters[:]
                                     for team_id, characters in 
                                     self.teams.items()}
+        
+        self.temp_teams_not_eliminated = {team_id: characters[:]
+                                    for team_id, characters in 
+                                    self.teams_not_eliminated.items()}
 
         # camera
         self.camera.total_offset_x = 0
@@ -581,11 +591,10 @@ class Game_World(State):
         
         return False
     
-    def turn_based_lock(self):
+    def handle_current_turn(self):
         '''
         locks characters based on games turn state
 
-        character: character which is being inspected
         '''
         self.current_turn = self.state['turn'] % self.player_count
         # reverse order on second round
@@ -594,8 +603,10 @@ class Game_World(State):
             self.current_turn = self.player_count - self.current_turn - 1
             # eliminated players turn
             while self.current_turn not in self.players_alive:
-                # change turn will we get a valid turn
-                self.next_turn()
+                # change turn until get a valid turn
+                self.state['turn'] += 1
+                self.round = int(self.state['turn'] 
+                                    / self.player_count) + 1
                 self.current_turn = self.player_count - self.state['turn'] % self.player_count
 
             return
@@ -606,6 +617,8 @@ class Game_World(State):
         while self.current_turn not in self.players_alive:
             # change turn will we get a valid turn
             self.state['turn'] += 1
+            self.round = int(self.state['turn'] 
+                                    / self.player_count) + 1
             self.current_turn = self.state['turn'] % self.player_count
 
         return 
@@ -618,7 +631,7 @@ class Game_World(State):
         self.round = int(self.state['turn'] 
                                     / self.player_count) + 1
         
-        self.turn_based_lock()
+        self.handle_current_turn()
 
     # checks
 
@@ -643,9 +656,13 @@ class Game_World(State):
             return 
             
         # list empty, player eliminated
+        
         self.players_alive.remove(player_id)
         # print(f'Player eliminated, alive ids: {self.players_alive}')
         self.check_for_win()
+        # if eliminated players turn was to be next then skip forward
+        if player_id == self.current_turn:
+            self.next_turn()
     
     def check_for_win(self):
         '''

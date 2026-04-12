@@ -38,6 +38,7 @@ class GameObject():
 
         # for jumping, throwing
         self.throwing_list = []
+        self.diff_vector = None
   
         # rect
         self.CHARACTER_SIZE = 24
@@ -49,9 +50,9 @@ class GameObject():
         # update function -> check if out of bounds
         # func is different if level wraps around
         if self.game_world.wrap_around:
-            self.update = self.update_wrap_around
+            self.update_chosen = self.update_wrap_around
         else:
-            self.update = self.update_normal
+            self.update_chosen = self.update_normal
         
         
 
@@ -77,7 +78,8 @@ class GameObject():
         calls the appropriate update function for gamemode
         '''
         if not self.state['eliminated']:
-            self.update(dt, actions, tiles)
+            self.update_chosen(dt, actions, tiles)
+            print("updating gameObj")
 
             
 
@@ -157,6 +159,7 @@ class GameObject():
 
         if not self.state['locked']:    
             self.handle_actions(actions)
+
 
         # when dragging 
         self.handle_drag()  
@@ -378,6 +381,7 @@ class GameObject():
 
         actions: user inputs dictionary
         '''
+        # if over minimum jump, then jump
         if self.diff_vector.length() > self.game_world.physics.MIN_JUMP:
             self.add_momentum(self.diff_vector)
             self.game_world.next_turn()
@@ -387,6 +391,7 @@ class GameObject():
             else:
                 self.reset_state()
 
+        # else reset
         else:
             self.throwing_list = []
             self.reset_state()

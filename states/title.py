@@ -17,7 +17,7 @@ class Title(State):
         self.start_time = pygame.time.get_ticks()
         self.interval = 3000
         self.last_add = self.start_time
-        self.max_rects = 12
+        self.max_rects = 15
         self.directions = [-3, 3]
         self.max_added = False
     

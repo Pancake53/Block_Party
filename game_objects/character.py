@@ -67,7 +67,7 @@ class Character(GameObject):
         tiles: game levels collision tiles
         '''
         if not self.state['eliminated']:
-            self.update(dt, actions, tiles)
+            self.update_chosen(dt, actions, tiles)
             self.health_bar.update()
 
         
