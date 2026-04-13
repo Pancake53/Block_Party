@@ -41,7 +41,7 @@ class Title(State):
         for rect in self.rects:
             rect.update()
 
-        if actions["m1"]:
+        if actions["mouse_click"]:
             new_state = Player_Menu(self.game)
             new_state.enter_state()
 

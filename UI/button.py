@@ -78,11 +78,11 @@ class Button():
         if hovered:
             # hover button
             self.draw_button(self.hover_col, surface)
-            if pygame.mouse.get_just_pressed()[0]:
+            # click button
+            if actions["mouse_click"]:
                 self.draw_button(self.click_col, surface)
                 # pressed button
                 pressed = True
-                actions["mouse_click"] = False
         else:
             # default button
             self.draw_button(self.button_col, surface)

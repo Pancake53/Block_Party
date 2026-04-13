@@ -6,23 +6,40 @@ from UI.button import Button
 from helpers import draw_shading_for_rect
 
 class Char_Creating(State):
-    def __init__(self, game, players_left, created_chars={}):
+    def __init__(self, game, players_left, created_chars=None):
         self.game = game
         # how many players havent created their characters yet
         self.players_left = players_left - 1
+
+        # About created_chars
         # all characters created by players so far
-        self.created_chars = created_chars
         # dictionary with player id as the first key
-        # next key is id for each part of the char
-        # containing a dict for colour and rect obj
+        # value is list of character parts, which 
+        # contain a dict for colour and rect obj
         
         # selecting players id
-        self.player_id = len(self.created_chars)
+        if created_chars:
+            self.created_chars = created_chars
+            self.player_id = len(self.created_chars)
+            self.taken_colours = [part['colour']
+                                for character_parts in created_chars.values()
+                                for part in character_parts 
+                                if part['main']
+                                ]
+        else:
+            self.player_id = 0
+            self.created_chars = {}
+            self.taken_colours = []
 
         self.selected = False
 
-        self.colour_id = players_left
-        self.colour = self.game.team_colours[self.colour_id]
+        # set startoff colour
+        self.colour_id = 0
+        self.main_colour = self.game.team_colours[self.colour_id]
+        while self.main_colour in self.taken_colours:
+            self.colour_id += 1
+            self.main_colour = self.game.team_colours[self.colour_id]
+
         self.load_classes() # Buttons / UI elements 
 
         self.left_clicked = False
@@ -44,30 +61,66 @@ class Char_Creating(State):
         delta_time: dt
         actions: user inputs dictionary
         '''
-        print(self.created_chars)
+        # print(self.created_chars)
         self.handle_actions(actions)
         
+        self.handle_col_change()
+        
+
+        if self.selected:
+            self.change_state()
+
+    def handle_col_change(self):
+        '''
+        handels colour change
+        '''
+        self.change_col_left()
+
+        self.change_col_right()
+
+
+    def change_col_left(self):
+        '''
+        handle left button colour change logic
+        wrap around and assignment
+        '''
         if self.left_clicked:
             if self.colour_id == 0:
                 self.colour_id = len(self.game.team_colours) - 1
             else:
                 self.colour_id -= 1
+                
+            self.main_colour = self.game.team_colours[self.colour_id]
+            while self.main_colour in self.taken_colours:
+                if self.colour_id == 0:
+                    self.colour_id = len(self.game.team_colours) - 1
+                else:
+                    self.colour_id -= 1
+                self.main_colour = self.game.team_colours[self.colour_id]
 
-            self.colour = self.game.team_colours[self.colour_id]
-            self.character_parts[self.selected_part]['colour'] = self.colour
+            self.character_parts[self.selected_part]['colour'] = self.main_colour
 
+
+    def change_col_right(self):
+        '''
+        handle right button colour change logic
+        wrap around and assignment
+        '''
         if self.right_clicked:
             if self.colour_id == len(self.game.team_colours) - 1:
                 self.colour_id = 0
             else:
                 self.colour_id += 1
 
-            self.colour = self.game.team_colours[self.colour_id]
-            self.character_parts[self.selected_part]['colour'] = self.colour
+            self.main_colour = self.game.team_colours[self.colour_id]
+            while self.main_colour in self.taken_colours:
+                if self.colour_id == len(self.game.team_colours) - 1:
+                    self.colour_id = 0
+                else:
+                    self.colour_id += 1
+                self.main_colour = self.game.team_colours[self.colour_id]
+            self.character_parts[self.selected_part]['colour'] = self.main_colour
 
-
-        if self.selected:
-            self.change_state()
 
     def handle_actions(self, actions):
         '''
@@ -174,7 +227,7 @@ class Char_Creating(State):
         x = self.game.GAME_W / 2 - width / 2
         y = self.game.GAME_H / 2 - height / 2
         rect = pygame.Rect(x, y, width, height)
-        self.character_parts = [{'colour': self.colour, 'rect': rect}]
+        self.character_parts = [{'main': True, 'colour': self.main_colour, 'rect': rect}]
         
         # calculate locations for buttons
         # 1 arrow

@@ -56,8 +56,6 @@ class Player_Menu(State):
         '''
 
         self.handle_actions(actions)
-        
-        self.game.reset_keys()
 
         if self.selected:
             new_state = Char_Creating(self.game, self.player_count)

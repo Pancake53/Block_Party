@@ -25,7 +25,7 @@ class Level_Menu(State):
         self.right_arrow = None
         
         self.load_classes() # Buttons
-        self.load_levels()
+        self.load_levels() # All levels data and transforming
 
     def update(self, delta_time, actions):
         '''
@@ -37,10 +37,9 @@ class Level_Menu(State):
         delta_time: dt
         actions: user inputs dictionary
         '''
+        
 
         self.handle_actions(actions)
-        
-        self.game.reset_keys()
 
         if self.left_clicked:
             # first level loop around to last
@@ -101,6 +100,9 @@ class Level_Menu(State):
         self.right_clicked = self.right_arrow.action_on_button(
             self.right_arrow_x,
             self.right_arrow_y, surface, self.game.actions)
+        
+        # print(f'Left: {self.left_clicked}, Right: {self.right_clicked}')
+
 
     def load_classes(self):
         '''
