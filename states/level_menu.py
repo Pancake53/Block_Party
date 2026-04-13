@@ -166,17 +166,42 @@ class Level_Menu(State):
 
         return Rect obj of tile
         '''
-        x_center = tile['x'] + tile['width'] / 2
-        y_center = tile['y'] + tile['height'] / 2
+        x = tile['x']
+        y = tile['y']
+        W = tile['width']
+        H = tile['height']
+        # Remove bits that are outside of level
+        # width
+        if x < 0:
+            W += x
+            x = 0
 
+        elif x + W > self.game.GAME_W:
+            W -= x + W - self.game.GAME_W
+
+        # height
+        if y < 0:
+            H += y
+            y = 0
+
+        elif y + H > self.game.GAME_H:
+            H -= y + H - self.game.GAME_H
+
+        # Scaling
+        x_center = x + W / 2
+        y_center = y + H / 2
+
+        # positive if on the left side of center
+        # and negative if on the right
         x_distance_from_center = self.game.GAME_W / 2 - x_center 
         y_distance_from_center = self.game.GAME_H / 2 - y_center
 
+        # bring everything closer to center
         x_center += x_distance_from_center / 2
         y_center += y_distance_from_center / 2
 
-        width = tile['width'] / 2
-        height = tile['height'] / 2
+        width = W / 2
+        height = H / 2
 
         x = x_center - width / 2
         y = y_center - height / 2
