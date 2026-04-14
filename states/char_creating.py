@@ -89,7 +89,7 @@ class Char_Creating(State):
                 self.colour_id = len(self.game.team_colours) - 1
             else:
                 self.colour_id -= 1
-                
+
             self.main_colour = self.game.team_colours[self.colour_id]
             while self.main_colour in self.taken_colours:
                 if self.colour_id == 0:
@@ -129,7 +129,6 @@ class Char_Creating(State):
 
         if actions["esc"]:
             self.exit_state()
-            self.game.reset_keys()
 
 
     def change_state(self):

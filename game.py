@@ -261,6 +261,11 @@ class Game():
 
         # audio
         self.audio['main_theme'] = os.path.join(self.audio_dir, 'main_music.ogg')
+        self.audio['sea_ambiance'] = os.path.join(self.audio_dir, 'sea_ambiance.ogg')
+        self.audio['smile'] = os.path.join(self.audio_dir, 'smile.ogg')
+        self.audio['middle_ages'] = os.path.join(self.audio_dir, 'middle_ages.ogg')
+        self.audio['mystical_forest'] = os.path.join(self.audio_dir, 'mystical_forest.ogg')
+
 
     def reset_keys(self):
         '''
@@ -308,6 +313,7 @@ class Game():
         loops: looping mechanism (-1 = forever, 0 = once)
         '''
         if audio_name in self.audio:
+            pygame.mixer.music.fadeout(500)
             pygame.mixer.music.load(self.audio[audio_name])
             pygame.mixer.music.play(loops)
 

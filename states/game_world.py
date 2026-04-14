@@ -85,6 +85,17 @@ class Game_World(State):
         self.rect_center = None 
         self.end_point = None
         self.diff_vector = None
+
+        # audio
+        self.LEVEL_MUSIC = {
+           'ship.tmj' : 'sea_ambiance',
+           'shipwreck.tmj' : 'sea_ambiance',
+           'smily.tmj' : 'smile',
+           'swords.tmj' : 'middle_ages',
+           'tree of life.tmj' : 'mystical_forest'
+
+        }
+        self.game.play_music(self.LEVEL_MUSIC[level_name])
         
         
 
@@ -437,8 +448,8 @@ class Game_World(State):
 
         one_char_per_player = False
         # TESTING SECTION COMMENT OUT LATER
-        if self.teams[player_id]: 
-            one_char_per_player = True
+        # if self.teams[player_id]: 
+        #     one_char_per_player = True
 
         if not one_char_per_player:
             self.teams[player_id].append(
