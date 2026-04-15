@@ -30,10 +30,11 @@ class Game():
 
         # default
         self.BG_COL = (0, 153, 136)
+        self.TILE_COL = (181, 67, 0)
         self.BLACK, self.WHITE = (0, 0, 0), (255, 255, 255)
-        self.FONT_TITLE = 40
-        self.FONT_MEDIUM = 15
-        self.FONT_SMALL = 8
+        self.FONT_TITLE = 50
+        self.FONT_MEDIUM = 20
+        self.FONT_SMALL = 15
 
         self.team_colours = [
         
@@ -73,10 +74,25 @@ class Game():
         self.load_states()
 
         # audio
-        # music
-        self.play_music('main_theme')
-        self.change_volume('music')
+        # music and volume control
         self.music_muted = False
+        self.MUSIC = {
+            'menu' : 
+                {'track' : self.audio['main_theme'], 'volume': 0.5},
+           'ship.tmj' : 
+                {'track' : self.audio['sea_ambiance'], 'volume':  1.5},
+           'shipwreck.tmj' : 
+                {'track' : self.audio['sea_ambiance'], 'volume':  1.5},
+           'smily.tmj' : 
+                {'track' : self.audio['smile'], 'volume':  0.7},
+           'swords.tmj' :
+                {'track' : self.audio['middle_ages'], 'volume':  1.2},
+           'tree of life.tmj' :
+                {'track' : self.audio['mystical_forest'], 'volume':  0.8}
+        }
+
+        self.play_music('menu')
+
         # sounds
         
         
@@ -305,19 +321,27 @@ class Game():
             self.scale_multiplier_y = self.GAME_H / self.WINDOW_H
 
 
-    def play_music(self, audio_name, loops=-1):
+    def play_music(self, audio_context, loops=-1):
         '''
         plays audio if audio exists in files
 
         audio_name: filename of played audio
         loops: looping mechanism (-1 = forever, 0 = once)
         '''
-        if audio_name in self.audio:
-            pygame.mixer.music.fadeout(500)
-            pygame.mixer.music.load(self.audio[audio_name])
-            pygame.mixer.music.play(loops)
+        if audio_context not in self.MUSIC:
+            print(f'Music context not found: {audio_context}')
+            return
+        
+        track = self.MUSIC[audio_context]['track']
+        custom_volume = self.MUSIC[audio_context]['volume']
 
-    def change_volume(self, type):
+        pygame.mixer.music.fadeout(500)
+        pygame.mixer.music.load(track)
+        pygame.mixer.music.play(loops)
+        self.change_volume('music', custom_volume)
+        
+
+    def change_volume(self, type, custom_volume = 1.0):
         '''
         volume of audio
 
@@ -327,7 +351,8 @@ class Game():
             case 'music':
                 pygame.mixer.music.set_volume(
                     self.settings.music_vol
-                    * self.settings.master_volume)
+                    * self.settings.master_volume 
+                    * custom_volume)
                 
             case _:
                 print('Invalid type input in change_volume')

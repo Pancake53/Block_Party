@@ -163,7 +163,7 @@ class Char_Creating(State):
 
         pygame.draw.rect(surface, self.game.BG_COL, self.level_bg)
 
-        self.game.draw_text(surface, "Create your character",
+        self.game.draw_text(surface, "Create palikka",
                              self.game.WHITE, self.game.GAME_W / 2,
                                self.game.GAME_H / 8)
         

@@ -95,7 +95,7 @@ class Title(State):
         surface.fill((self.game.BLACK))
         for rect in self.rects:
             rect.render(surface)
-        self.game.draw_text(surface, "Block Party",
+        self.game.draw_text(surface, "Perkeleen\npalikka peli",
                              self.game.WHITE, self.game.GAME_W / 2,
                                self.game.GAME_H / 2)
         

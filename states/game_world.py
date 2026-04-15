@@ -86,16 +86,10 @@ class Game_World(State):
         self.end_point = None
         self.diff_vector = None
 
-        # audio
-        self.LEVEL_MUSIC = {
-           'ship.tmj' : 'sea_ambiance',
-           'shipwreck.tmj' : 'sea_ambiance',
-           'smily.tmj' : 'smile',
-           'swords.tmj' : 'middle_ages',
-           'tree of life.tmj' : 'mystical_forest'
 
-        }
-        self.game.play_music(self.LEVEL_MUSIC[level_name])
+
+       
+        self.game.play_music(level_name)
         
         
 
@@ -342,7 +336,7 @@ class Game_World(State):
         colour = self.created_chars[self.current_turn][0]['colour']
         pygame.draw.rect(surface, colour, self.turn_rect)
         self.game.draw_text(surface,
-                "turn", self.game.BLACK, 55, self.game.GAME_H - 32, "Medium")
+                "turn", self.game.BLACK, 55, self.game.GAME_H - 32, "Small")
 
     def render_arrow(self, surface):
         '''
