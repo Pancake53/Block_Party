@@ -84,13 +84,10 @@ class Game_World(State):
         self.arrow_colour = (255, 255, 255)
         self.rect_center = None 
         self.end_point = None
-        self.diff_vector = None
+        self.diff_vector = None  
 
-
-
-       
+        # music     
         self.game.play_music(level_name)
-        
         
 
 
