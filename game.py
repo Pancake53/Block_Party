@@ -28,10 +28,12 @@ class Game():
         self.scale_multiplier_x = self.GAME_W / self.WINDOW_W
         self.scale_multiplier_y = self.GAME_H / self.WINDOW_H
 
-        # default
+        # colours
         self.BG_COL = (0, 153, 136)
         self.TILE_COL = (181, 67, 0)
         self.BLACK, self.WHITE = (0, 0, 0), (255, 255, 255)
+
+        # fonts
         self.FONT_TITLE = 50
         self.FONT_MEDIUM = 20
         self.FONT_SMALL = 15

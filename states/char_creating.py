@@ -19,6 +19,7 @@ class Char_Creating(State):
         
         # selecting players id
         if created_chars:
+            self.created_characters_for_render = []
             self.created_chars = created_chars
             self.player_id = len(self.created_chars)
             self.taken_colours = [part['colour']
@@ -40,7 +41,7 @@ class Char_Creating(State):
             self.colour_id += 1
             self.main_colour = self.game.team_colours[self.colour_id]
 
-        self.load_classes() # Buttons / UI elements 
+        self.load_classes() # Buttons / UI elements / coordinates
 
         self.left_clicked = False
         self.right_clicked = False
@@ -162,19 +163,23 @@ class Char_Creating(State):
         surface.fill((self.game.BLACK))
 
         pygame.draw.rect(surface, self.game.BG_COL, self.level_bg)
+        draw_shading_for_rect(self.game.TILE_COL,
+            self.level_bg, surface, shading_W=5)
 
         self.game.draw_text(surface, "Create palikka",
                              self.game.WHITE, self.game.GAME_W / 2,
                                self.game.GAME_H / 8)
         
-        self.game.draw_text(surface, f"Player {self.player_id + 1}",
-                             self.game.WHITE, self.game.GAME_W * 0.25,
-                               self.game.GAME_H * 0.25)
+        # self.game.draw_text(surface, f"Player {self.player_id + 1}",
+        #                     self.game.WHITE, self.game.GAME_W * 0.25,
+        #                       self.game.GAME_H * 0.25)
         
         
         
         self.render_buttons(surface)
         self.render_character(surface)
+        if self.player_id > 0:
+            self.render_created_characters(surface)
 
     def render_buttons(self, surface):
         '''
@@ -195,6 +200,13 @@ class Char_Creating(State):
             self.done_button_x, self.done_button_y,
             surface, self.game.actions
         )
+
+        self.game.draw_text(surface,
+            'Done', self.game.TILE_COL,
+            self.done_text_x,
+            self.done_text_y,
+            size='Medium'
+        )
         
         
     def render_character(self, surface):
@@ -204,6 +216,10 @@ class Char_Creating(State):
         for part in self.character_parts:
             pygame.draw.rect(surface, part['colour'], part['rect'])
 
+    def render_created_characters(self, surface):
+        for created_char in self.created_characters_for_render:
+            pygame.draw.rect(surface, created_char[1], created_char[0])
+
     def load_classes(self):
         '''
         init needed classes and coordination calculations
@@ -211,14 +227,14 @@ class Char_Creating(State):
         self.level_bg = pygame.Rect(self.game.GAME_W / 4, self.game.GAME_H / 4,
                                                   self.game.GAME_W / 2, self.game.GAME_H / 2)
 
-        self.left_arrow = Button(0, 0, button_colour=(139, 139, 139),
-                                  hover_colour=(50, 50, 50), image = 
+        self.left_arrow = Button(0, 0, button_colour=self.game.BG_COL,
+                                  hover_colour=self.game.TILE_COL, image = 
                                  self.game.assets["arrowleft_img"])
-        self.right_arrow = Button(0, 0, button_colour=(139, 139, 139),
-                                  hover_colour=(50, 50, 50), image =
+        self.right_arrow = Button(0, 0, button_colour=self.game.BG_COL,
+                                  hover_colour=self.game.TILE_COL, image =
                                   self.game.assets["arrowright_img"])
         
-        self.done_button = Button(0, 0, width=100, height=50)
+        self.done_button = Button(0, 0, width=100, height=50, button_colour=self.game.BG_COL)
         
         # starting colour, position and dimensions
         width = 50
@@ -239,5 +255,27 @@ class Char_Creating(State):
         self.done_button_x = self.game.GAME_W - self.done_button.rect.width - 10
         self.done_button_y = self.game.GAME_H - self.done_button.rect.height - 10
 
-        self.done_text_x = self.game.GAME_W - self.done_button.rect.width - 10
-        self.done_text_y = self.game.GAME_H - self.done_button.rect.width - 10
+        self.done_text_x = self.done_button_x + self.done_button.width / 2
+        self.done_text_y = self.done_button_y + self.done_button.height / 2
+
+        self.load_created_characters()
+
+
+    def load_created_characters(self):
+        # Created chatacters
+        # rectangle 
+        if self.created_chars:
+            base_W = 30
+            base_H = 60
+            y = self.game.GAME_H - base_H * 1.5
+            for i, colour in enumerate(self.taken_colours):
+                x = base_W * 2 * (1 + i)
+                self.created_characters_for_render.append([
+                    pygame.Rect(x, y, base_W, base_H),
+                    colour
+                ])
+
+        # to do make this use created_chars dictionary
+        # and shapes from it scaled
+                
+

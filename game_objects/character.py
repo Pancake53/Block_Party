@@ -192,8 +192,15 @@ class Character(GameObject):
 
         damage: force of bomb
         '''
-        self.current_hp -= min(50, 
-                                    max(int(damage * 1.8), 10))
+        damage = min(50, # max
+            max(int(damage * 1.8), # scale
+            10)) # min
+        
+        if self.game_world.round >= 3:
+            if damage == 50:
+                self.game_world.grant_another_turn()
+
+        self.current_hp -= damage
         if self.current_hp <= 0:
             self.eliminated()
 

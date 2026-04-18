@@ -635,6 +635,13 @@ class Game_World(State):
         
         self.handle_current_turn()
 
+    def grant_another_turn(self):
+        self.state['turn'] -= 1
+        self.round = int(self.state['turn'] 
+                                    / self.player_count) + 1
+        
+        self.handle_current_turn()
+
     # checks
 
     def check_for_player_eliminated(self, char_eliminated):
