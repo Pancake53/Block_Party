@@ -25,7 +25,7 @@ class Character(GameObject):
         
 
         # Character colour based on team id
-        self.colour = self.game_world.created_chars[team_id][0]['colour']
+        self.colour = self.game_world.created_chars[team_id]['main_colour']
         
         # make fall down from spawn location
         self.y_speed = 0.01
@@ -39,9 +39,6 @@ class Character(GameObject):
         self.current_hp = 100
         self.health_bar = HealthBar(self)
 
-
-       
-
     def render(self, surface):
         '''
         Render char on given surface
@@ -54,8 +51,6 @@ class Character(GameObject):
             #     self.game_world.render_selections(self.rect.x, self.rect.y)
 
             self.health_bar.render(surface)
-
-
 
     def update(self, dt, actions, tiles):
         '''

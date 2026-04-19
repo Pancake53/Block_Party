@@ -28,7 +28,10 @@ class Game_World(State):
         self.player_count = len(created_chars)
         self.created_chars = created_chars
         self.players_alive = [i for i in range(self.player_count)]
-        print(f'Players alive: {self.players_alive}')
+        self.colours = [char['main_colour']
+                        for char in created_chars.values()
+        ]
+        
 
         # stores player character data as team_id: [characters]
         self.teams = {i: [] for i in range(self.player_count)}
@@ -330,7 +333,7 @@ class Game_World(State):
         render whose turn it is
         bottom left of screen
         '''
-        colour = self.created_chars[self.current_turn][0]['colour']
+        colour = self.colours[self.current_turn]
         pygame.draw.rect(surface, colour, self.turn_rect)
         self.game.draw_text(surface,
                 "turn", self.game.BLACK, 55, self.game.GAME_H - 32, "Small")

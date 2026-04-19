@@ -41,7 +41,7 @@ class GameObject():
         self.diff_vector = None
   
         # rect
-        self.CHARACTER_SIZE = 24
+        self.CHARACTER_SIZE = self.game_world.game.CHARACTER_SIZE
 
         # for camera, if no wrap around let objects fall out of screen
         # despite the offset by camera

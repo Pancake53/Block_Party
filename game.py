@@ -38,6 +38,8 @@ class Game():
         self.FONT_MEDIUM = 20
         self.FONT_SMALL = 15
 
+        self.CHARACTER_SIZE = 24
+
         self.team_colours = [
         
             (204, 121, 167), # Purple
