@@ -202,6 +202,9 @@ class GameObject():
                 collisions.append(tile.rect)
         return collisions
     
+    def collision_test_characters(self, chars):
+        pass
+    
     def update_pos(self, dt, tiles): # only active if we have speed
         '''
         Updates object position

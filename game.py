@@ -38,7 +38,11 @@ class Game():
         self.FONT_MEDIUM = 20
         self.FONT_SMALL = 15
 
-        self.CHARACTER_SIZE = 24
+        # surface / character size
+        self.CHARACTER_SIZE = 24                
+        self.surface_multip = 5
+        self.char_surface_H = 16 * self.surface_multip
+        self.char_surface_W = 9 * self.surface_multip
 
         self.team_colours = [
         
@@ -116,8 +120,7 @@ class Game():
         '''
         update actions dictionary based on user input
         '''
-        # reset
-        self.actions["mouse_click"] = False
+        
         
         # event loop
         for event in pygame.event.get():
@@ -189,7 +192,10 @@ class Game():
 
         if pygame.mouse.get_just_pressed()[0]:
             # for clicking only interaction
-            self.actions["mouse_click"] = True   
+            self.actions["mouse_click"] = True 
+        else:
+            # reset
+            self.actions["mouse_click"] = False  
         
         unscaled_mouse_pos = pygame.mouse.get_pos()
         self.actions["mouse_pos"] = (unscaled_mouse_pos[0] * self.scale_multiplier_x,

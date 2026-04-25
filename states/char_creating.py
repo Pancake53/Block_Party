@@ -237,8 +237,10 @@ class Char_Creating(State):
     def create_surface_from_created_char(self):
         '''
         create a surface from created character
+
+        returns:
+        a dict with keys main_colour and char_surface
         '''
-        # new dict for created characters
         new_dict = {}
         main_colour = next(
             part['colour']
@@ -248,7 +250,7 @@ class Char_Creating(State):
 
         # create new surface and 
         char_surface = pygame.Surface(
-            (self.char_surface_W, self.char_surface_H),
+            (self.game.char_surface_W, self.game.char_surface_H),
             pygame.SRCALPHA) # transparent
 
         # render each part onto character surface
@@ -334,26 +336,26 @@ class Char_Creating(State):
         '''
         loads initial box into view
         '''
-        # surface / character size
-        self.surface_multip = 5
-        self.char_surface_H = 16 * self.surface_multip
-        self.char_surface_W = 9 * self.surface_multip
+
 
         # scale of big view char to the real char in game
-        self.scalar = self.bg_char_creating.height / self.char_surface_H
+        self.scalar = self.bg_char_creating.height / self.game.char_surface_H
+
         # starting colour, position and dimensions, hitbox
-        width = self.game.CHARACTER_SIZE * self.scalar
-        height = width * 2
+        height = self.game.char_surface_W * self.scalar
+        width = height / 2
         print(f'Scalar: {self.scalar}, width: {width}')
+
         x = self.bg_char_creating.x + self.bg_char_creating.width / 2 - width / 2
         y = self.bg_char_creating.y + self.bg_char_creating.height - height
+
         rect = pygame.Rect(x, y, width, height)
         self.character_parts = [{'main': True, 'colour': self.main_colour, 'rect': rect}]
 
         # second rect for testing !!!
-        self.add_hat(x, y, width, height)
+        self.default_outfit(x, y, width, height)
         
-    def add_hat(self, x, y, width, height):
+    def default_outfit(self, x, y, width, height):
         # hat :D
         # bottom part
         width *= 1.5
@@ -420,10 +422,10 @@ class Char_Creating(State):
         # contain keys main_colour and char_surface
 
         if self.created_chars:
-            x = self.char_surface_W
+            x = self.game.char_surface_W
 
             for id, dict in self.created_chars.items():
-                y = self.char_surface_H * 1.5 * (1 + id)
+                y = self.game.char_surface_H * 1.5 * (1 + id)
                 self.created_characters_for_render.append(
                     {'x': x,
                     'y': y,
@@ -434,5 +436,7 @@ class Char_Creating(State):
                     }
                 )     
                         
+    def spawn_part(self):
+        pass
 
 

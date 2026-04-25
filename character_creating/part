@@ -1,0 +1,73 @@
+import pygame
+from helpers import draw_shading_for_rect
+
+class Part():
+    def __init__(self, x, y, width, height, colour, layer, main=False):
+        '''
+        pass in atributes
+        '''
+        self.x = x
+        self.y = y
+        self.W = width
+        self.H = height
+        self.colour = colour
+        # height from bottom, 
+        # eg 0 is covered by other parts
+        self.layer = layer
+        # if main = True, then part
+        # determines characters main colour
+        self.main = main
+
+        # state managment for part
+        self.state = {'selected': True, 'resize': False}
+
+        # create rect obj
+        self.rect = pygame.Rect(self.x, self.y, self.W, self.H)
+
+        # variables
+        # how many pixels part moves at a time when resizing
+        self.move_buffer = 4
+
+
+
+    def render(self, surface):
+        '''
+        render part, outline, mouse
+        '''
+        pygame.draw.rect(surface, self.colour, self.rect)
+        if self.state['selected']:
+            draw_shading_for_rect((0, 0, 0), self.rect, surface, 3)
+
+
+    def update(self, dt, actions):
+        '''
+        make part react to mouse actions
+        '''
+        self.mouse_actions(dt, actions)
+
+    def mouse_actions(self, dt, actions):
+
+        hovered = self.rect.collidepoint(actions["mouse_pos"])
+
+        if hovered:
+            if actions['mouse_click']:
+                self.state['selected'] = -self.state['selected']
+
+    # Resize
+    def resize(self, actions):
+        pass
+
+    # Colour
+    def get_colour(self):
+        return self.colour
+    
+    def change_colour(self, new_colour):
+        if self.state['selected']:
+            self.colour = new_colour
+
+    
+
+
+    
+
+

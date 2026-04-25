@@ -24,8 +24,11 @@ class Character(GameObject):
         self.team_id = team_id
         
 
-        # Character colour based on team id
+        # Team Colour
         self.colour = self.game_world.created_chars[team_id]['main_colour']
+        self.colour = (0, 0, 0)
+        # Team Skin
+        self.skin_surface = self.game_world.created_chars[team_id]['char_surface']
         
         # make fall down from spawn location
         self.y_speed = 0.01
@@ -33,6 +36,10 @@ class Character(GameObject):
         self.WIDTH = self.CHARACTER_SIZE
         self.HEIGHT = self.CHARACTER_SIZE * 2
         self.rect = pygame.Rect(x_pos, y_pos, self.WIDTH, self.HEIGHT)
+
+        self.skin_offset_x = - self.game_world.game.char_surface_W + self.WIDTH * 1.5
+        self.skin_offset_y = - self.game_world.game.char_surface_H + self.HEIGHT
+        
        
         # Health points
         self.max_hp = 100
@@ -47,6 +54,11 @@ class Character(GameObject):
         '''
         if not self.state['eliminated']:
             pygame.draw.rect(surface, self.colour, self.rect)
+            surface.blit(self.skin_surface, (
+                self.rect.x + self.skin_offset_x,
+                self.rect.y + self.skin_offset_y
+                )
+            )
             # if self.state["choosing"]:
             #     self.game_world.render_selections(self.rect.x, self.rect.y)
 
