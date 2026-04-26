@@ -9,7 +9,7 @@ class HealthBar():
     each character has own health bar
     '''
 
-    def __init__(self, character, offset_x=-25, offset_y=-20):
+    def __init__(self, character, offset_x=-25, offset_y=-45):
         '''
         init attributes
         character: character who owns the healthBar

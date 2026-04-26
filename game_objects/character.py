@@ -37,7 +37,7 @@ class Character(GameObject):
         self.HEIGHT = self.CHARACTER_SIZE * 2
         self.rect = pygame.Rect(x_pos, y_pos, self.WIDTH, self.HEIGHT)
 
-        self.skin_offset_x = - self.game_world.game.char_surface_W + self.WIDTH * 1.5
+        self.skin_offset_x = - self.game_world.game.char_surface_W / 2 + self.WIDTH / 2
         self.skin_offset_y = - self.game_world.game.char_surface_H + self.HEIGHT
         
        

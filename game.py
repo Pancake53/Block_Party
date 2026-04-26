@@ -42,7 +42,7 @@ class Game():
         self.CHARACTER_SIZE = 24                
         self.surface_multip = 5
         self.char_surface_H = 16 * self.surface_multip
-        self.char_surface_W = 9 * self.surface_multip
+        self.char_surface_W = 8 * self.surface_multip
 
         self.team_colours = [
         

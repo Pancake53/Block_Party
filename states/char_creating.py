@@ -1,5 +1,6 @@
 import pygame
 
+from part import Part
 from states.state import State
 from states.level_menu import Level_Menu
 from UI.button import Button
@@ -42,6 +43,7 @@ class Char_Creating(State):
             self.colour_id += 1
             self.main_colour = self.game.team_colours[self.colour_id]
 
+        self.selected_colour = self.main_colour
 
         self.left_clicked = False
         self.right_clicked = False
@@ -49,6 +51,10 @@ class Char_Creating(State):
         # changes with regard to which rect has been last clicked
         self.selected_part = 0 # TO-DO
 
+        self.top_part = None
+        self.top_part_pos = 0
+        self.character_parts = []
+        
 
         
 
@@ -67,12 +73,39 @@ class Char_Creating(State):
         '''
         # print(self.created_chars)
         self.handle_actions(actions)
-        
         self.handle_col_change()
-        
+
+        self.update_parts(delta_time, actions)
 
         if self.selected:
             self.change_state()
+
+    def handle_actions(self, actions):
+        '''
+        handels actions based on user input
+        '''
+
+        if actions["esc"]:
+            self.exit_state()
+
+        self.mouse_actions(actions)
+
+    def mouse_actions(self, actions):
+        '''
+        mouse over the parts 
+        and checking which part is the top one
+        '''
+        mouse_pos = actions['mouse_pos']
+
+        for part in self.character_parts:
+            if part.hovered:
+                if not self.top_part:
+                    self.top_part = part
+                    self.top_part_layer = part.layer
+
+                elif part.layer > self.top_part_layer:
+                    self.top_part = part
+                    self.top_part_layer = part.layer
 
     def handle_col_change(self):
         '''
@@ -81,7 +114,6 @@ class Char_Creating(State):
         self.change_col_left()
 
         self.change_col_right()
-
 
     def change_col_left(self):
         '''
@@ -102,8 +134,7 @@ class Char_Creating(State):
                     self.colour_id -= 1
                 self.main_colour = self.game.team_colours[self.colour_id]
 
-            self.character_parts[self.selected_part]['colour'] = self.main_colour
-
+            self.character_parts[self.selected_part].colour = self.main_colour
 
     def change_col_right(self):
         '''
@@ -123,16 +154,11 @@ class Char_Creating(State):
                 else:
                     self.colour_id += 1
                 self.main_colour = self.game.team_colours[self.colour_id]
-            self.character_parts[self.selected_part]['colour'] = self.main_colour
+            self.character_parts[self.selected_part].colour = self.main_colour
 
-
-    def handle_actions(self, actions):
-        '''
-        handels actions based on user input
-        '''
-
-        if actions["esc"]:
-            self.exit_state()
+    def update_parts(self, dt, actions):
+        for part in self.character_parts:
+            part.update(dt, actions)
 
     def change_state(self):
         '''
@@ -181,7 +207,7 @@ class Char_Creating(State):
         
         
         self.render_buttons(surface)
-        self.render_character(surface)
+        self.render_parts(surface)
         if self.player_id > 0:
             self.render_created_characters(surface)
 
@@ -212,13 +238,12 @@ class Char_Creating(State):
             size='Medium'
         ) 
         
-    def render_character(self, surface):
+    def render_parts(self, surface):
         '''
-        renders the rects of character
+        calls each parts render function
         '''
         for part in self.character_parts:
-
-            pygame.draw.rect(surface, part['colour'], part['rect'])
+            part.render(surface)
 
     def render_created_characters(self, surface):
         # About created_characters_for_render
@@ -243,9 +268,9 @@ class Char_Creating(State):
         '''
         new_dict = {}
         main_colour = next(
-            part['colour']
+            part.colour
             for part in self.character_parts 
-            if part['main']
+            if part.main
         )
 
         # create new surface and 
@@ -262,48 +287,42 @@ class Char_Creating(State):
         new_dict['char_surface'] = char_surface
         return new_dict
     
-    # BUG TEST THIS
+    
     def scale_part(self, part, char_surface):
         '''
         rescales a single part and draws it on surface
         '''
-        colour = part['colour']
-        rect = part['rect']
+        colour = part.colour
+        rect = part.rect
 
         # coordinates
-        # BUG TEST THIS SHIT
+        
         x = ( rect.x + rect.width / 2 - self.bg_char_creating.x ) / self.scalar
         y = ( rect.y + rect.height / 2 - self.bg_char_creating.y ) / self.scalar
 
         # dimensions
-        rect.width /= self.scalar
-        rect.height /= self.scalar
+        w = rect.width / self.scalar
+        h = rect.height / self.scalar
 
         # reposition
-        rect.x = x - rect.width / 2
-        rect.y = y - rect.height / 2
+        x -= w / 2
+        y -= h / 2
 
-        pygame.draw.rect(char_surface, colour, rect)
+        pygame.draw.rect(char_surface, colour,
+                          pygame.Rect(x, y, w, h))
             
     def load(self):
         '''
-        init needed classes and coordination calculations
+        calls other load functions
         '''
-        # background, area to create char in 
-        W = self.game.GAME_W / 4
-        H = W * 16 / 9
-        self.bg_char_creating = pygame.Rect(W / 1.5, 
-                                    self.game.GAME_H / 2 - H / 2,
-                                    W, H)
 
-
-        self.load_buttons()
+        self.load_ui()
         
         self.load_hitbox()
         
         self.load_created_characters()
 
-    def load_buttons(self):
+    def load_ui(self):
         '''
         load needed buttons for the view
         '''
@@ -336,21 +355,27 @@ class Char_Creating(State):
         '''
         loads initial box into view
         '''
+        # background, area to create char in 
+        W = self.game.GAME_W / 4
+        H = W * self.game.char_surface_H / self.game.char_surface_W
+        x = W * 0.75 # from left side 
+        y = self.game.GAME_H / 2 - H / 2 # center
 
+        self.bg_char_creating = pygame.Rect(x, y, W, H) 
 
         # scale of big view char to the real char in game
+        # scalar = 3
         self.scalar = self.bg_char_creating.height / self.game.char_surface_H
 
         # starting colour, position and dimensions, hitbox
-        height = self.game.char_surface_W * self.scalar
+        height = self.game.CHARACTER_SIZE * 2 * self.scalar
         width = height / 2
         print(f'Scalar: {self.scalar}, width: {width}')
 
         x = self.bg_char_creating.x + self.bg_char_creating.width / 2 - width / 2
         y = self.bg_char_creating.y + self.bg_char_creating.height - height
 
-        rect = pygame.Rect(x, y, width, height)
-        self.character_parts = [{'main': True, 'colour': self.main_colour, 'rect': rect}]
+        self.spawn_part(x, y, width, height, self.main_colour, main= True)
 
         # second rect for testing !!!
         self.default_outfit(x, y, width, height)
@@ -364,22 +389,14 @@ class Char_Creating(State):
         x -= width / 1.5 * 0.25
         print(f'x: {x}, y: {y}')
         colour = (209, 31, 4)
-        self.character_parts.append({
-            'main': False,
-            'colour': colour,
-            'rect': pygame.Rect(x, y, width, height)
-        })
+        self.spawn_part(x, y, width, height, colour)
         # top part
         width *= 0.5
         y -= height 
         x += width * 0.5
         print(f'x: {x}, y: {y}')
         colour = (209, 31, 4)
-        self.character_parts.append({
-            'main': False,
-            'colour': colour,
-            'rect': pygame.Rect(x, y, width, height)
-        })
+        self.spawn_part(x, y, width, height, colour)
 
         # eyes and smile
         # left eye
@@ -387,27 +404,17 @@ class Char_Creating(State):
         width = 6
         height = width
         colour = self.game.BLACK
-        self.character_parts.append({
-            'main': False,
-            'colour': colour,
-            'rect': pygame.Rect(x, y, width, height)
-        })
+        
+        self.spawn_part(x, y, width, height, colour)
+    
         # right eye
         x += width * 3
-        self.character_parts.append({
-            'main': False,
-            'colour': colour,
-            'rect': pygame.Rect(x, y, width, height)
-        })
+        self.spawn_part(x, y, width, height, colour)
         # smile
         x -= width * 3
         y += width * 3
         width *= 5
-        self.character_parts.append({
-            'main': False,
-            'colour': colour,
-            'rect': pygame.Rect(x, y, width, height)
-        })
+        self.spawn_part(x, y, width, height, colour)
 
     def load_created_characters(self):
         '''
@@ -436,7 +443,16 @@ class Char_Creating(State):
                     }
                 )     
                         
-    def spawn_part(self):
-        pass
+    def spawn_part(self, x, y, width, height, colour = None, main = False):
+        '''
+        creates new Part obj and adds it character parts
+        '''
+        if colour is None:
+            colour = self.selected_colour
+
+        layer = len(self.character_parts)
+        new_part = Part(x, y, width, height, colour, layer, self, main)
+        self.character_parts.append(new_part)
+
 
 
