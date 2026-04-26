@@ -1,4 +1,5 @@
 import pygame
+
 from helpers import draw_shading_for_rect
 
 class Part():
@@ -29,7 +30,9 @@ class Part():
 
         # state managment for part
         self.hovered = False
-        self.state = {'selected': False, 'moving': False, 'resize': False}
+        self.state = {'top': False, 'selected': False,
+                    'move': False, 'resize_W': False, 'resize_H': False}
+        self.old_mouse_pos = None
 
         # create rect obj
         self.rect = pygame.Rect(self.x, self.y, self.W, self.H)
@@ -37,6 +40,11 @@ class Part():
         # variables
         # how many pixels part moves at a time when resizing
         self.move_buffer = self.char_creating.scalar
+
+        # determines what is considered an edge and what is center
+        # larger value => less space for center/moving, more for resizing 
+        self.edge_buffer_W = self.W / 6
+        self.edge_buffer_H = self.H / 6
 
 
 
@@ -61,21 +69,82 @@ class Part():
 
         self.hovered = self.rect.collidepoint(actions["mouse_pos"])
 
-        if self.hovered:
-            if actions['mouse_click']:
-                self.state['selected'] = not self.state['selected']
+        # 'top' is based on position of mouse and 
+        # layers of part that exist in the same position
+        if actions['mouse_click']:
+            # print('mouse clicked now this shit should reset right')
+            if self.state['top']:
+                self.old_mouse_pos = None
+                if not self.state['selected']:
+                    self.state['selected'] = True
+            else:
+                # print('it should reset')
+                self.reset_state()
 
-            if actions['m1']:
+        # after the part is selected
+        if self.state['selected']:
+            print(f'States: {self.state}')
+            if self.state['move']:
+                self.move(actions)
+                print('moving')
+            elif self.state['resize_W']:
+                self.resize_W(actions)
+            elif self.state['resize_W']:
+                self.resize_W(actions)
+
+            elif actions['m1']:
+                # print('m1')
                 self.m1_actions(actions)
 
     def m1_actions(self, actions):
         '''
         reacts to m1 actions
         '''
-        pass
+        x, y = actions['mouse_pos']
+        # move zone
+        if self.x + self.edge_buffer_W < x < self.x + self.W - self.edge_buffer_W:
+            self.state['move'] = True
+        elif self.y + self.edge_buffer_H < y < self.y + self.H - self.edge_buffer_H:
+            self.state['move'] = True
+
+        # resize zone
+        elif self.x - self.edge_buffer_W < x < self.x + self.W + self.edge_buffer_W:
+            self.state['resize_W'] = True
+        elif self.y - self.edge_buffer_H < y < self.y + self.H + self.edge_buffer_H:
+            self.state['resize_H'] = True
+
+    def move(self, actions):
+        '''
+        moves the piece w mouse
+        '''
+        # dragging stopped
+        if not actions['m1']:
+            self.state['move'] = False
+            return
+
+        # if no history of mouse pos then get some and return
+        if self.old_mouse_pos is None:
+            self.old_mouse_pos = actions['mouse_pos']
+            return
+        
+        x_movement = actions['mouse_pos'][0] - self.old_mouse_pos[0]
+        y_movement = actions['mouse_pos'][1] - self.old_mouse_pos[1]
+        
+        self.x += x_movement
+        self.y += y_movement
+
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+        # store current value into old value
+        self.old_mouse_pos = actions['mouse_pos']
+
+        
 
     # Resize
-    def resize(self, actions):
+    def resize_W(self, actions):
+        pass
+    def resize_H(self, actions):
         pass
 
     # Colour
@@ -84,7 +153,9 @@ class Part():
         if self.state['selected']:
             self.colour = new_colour
 
-        
+    def reset_state(self):
+        for key in self.state.keys():
+            self.state[key] = False
 
     
 

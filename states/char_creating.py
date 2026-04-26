@@ -49,7 +49,7 @@ class Char_Creating(State):
         self.right_clicked = False
 
         # changes with regard to which rect has been last clicked
-        self.selected_part = 0 # TO-DO
+        self.selected_part = None
 
         self.top_part = None
         self.top_part_pos = 0
@@ -97,15 +97,34 @@ class Char_Creating(State):
         '''
         mouse_pos = actions['mouse_pos']
 
+        self.update_selection(actions)
+        
+    def update_selection(self, actions):
+        '''
+        update which part is selected
+        '''
+        # reset
+        self.top_part = None
+        self.top_part_pos = 0
+
         for part in self.character_parts:
+            # mouse over part
             if part.hovered:
+                # if first part
                 if not self.top_part:
                     self.top_part = part
                     self.top_part_layer = part.layer
-
+                # part is on top of another
                 elif part.layer > self.top_part_layer:
                     self.top_part = part
                     self.top_part_layer = part.layer
+
+        for part in self.character_parts:
+            if part == self.top_part:
+                part.state['top'] = True
+            else:
+                part.state['top'] = False    
+
 
     def handle_col_change(self):
         '''
