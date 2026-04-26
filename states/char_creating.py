@@ -49,7 +49,7 @@ class Char_Creating(State):
         self.right_clicked = False
 
         # changes with regard to which rect has been last clicked
-        self.selected_part = None
+        self.selected_part = 0
 
         self.top_part = None
         self.top_part_pos = 0

@@ -30,8 +30,11 @@ class Part():
 
         # state managment for part
         self.hovered = False
-        self.state = {'top': False, 'selected': False,
-                    'move': False, 'resize_W': False, 'resize_H': False}
+        self.state = {'top': False, 'selected': False, 'move': False, 
+                      
+                    'resize_left': False, 'resize_right': False,
+                    'resize_top': False, 'resize_bottom': False}
+        
         self.old_mouse_pos = None
 
         # create rect obj
@@ -43,8 +46,10 @@ class Part():
 
         # determines what is considered an edge and what is center
         # larger value => less space for center/moving, more for resizing 
-        self.edge_buffer_W = self.W / 6
-        self.edge_buffer_H = self.H / 6
+        self.min_size = 8
+        self.min_edge = 3
+        self.edge_buffer_W = max(self.min_edge, self.W / 12)
+        self.edge_buffer_H = max(self.min_edge / 2, self.H / 12)
 
 
 
@@ -74,7 +79,7 @@ class Part():
         if actions['mouse_click']:
             # print('mouse clicked now this shit should reset right')
             if self.state['top']:
-                self.old_mouse_pos = None
+                
                 if not self.state['selected']:
                     self.state['selected'] = True
             else:
@@ -87,11 +92,14 @@ class Part():
             if self.state['move']:
                 self.move(actions)
                 print('moving')
-            elif self.state['resize_W']:
-                self.resize_W(actions)
-            elif self.state['resize_W']:
-                self.resize_W(actions)
-
+            elif self.state['resize_left']:
+                self.resize_left(actions)
+            elif self.state['resize_right']:
+                self.resize_right(actions)
+            elif self.state['resize_top']:
+                self.resize_top(actions)
+            elif self.state['resize_bottom']:
+                self.resize_bottom(actions)
             elif actions['m1']:
                 # print('m1')
                 self.m1_actions(actions)
@@ -101,17 +109,51 @@ class Part():
         reacts to m1 actions
         '''
         x, y = actions['mouse_pos']
-        # move zone
-        if self.x + self.edge_buffer_W < x < self.x + self.W - self.edge_buffer_W:
-            self.state['move'] = True
-        elif self.y + self.edge_buffer_H < y < self.y + self.H - self.edge_buffer_H:
-            self.state['move'] = True
 
-        # resize zone
-        elif self.x - self.edge_buffer_W < x < self.x + self.W + self.edge_buffer_W:
-            self.state['resize_W'] = True
-        elif self.y - self.edge_buffer_H < y < self.y + self.H + self.edge_buffer_H:
-            self.state['resize_H'] = True
+        # move zone
+        # width
+        if (self.x + self.edge_buffer_W < 
+            x < self.x + self.rect.width - self.edge_buffer_W and 
+        # height    
+        self.y + self.edge_buffer_H < 
+        y < self.y + self.rect.height - self.edge_buffer_H):
+            self.state['move'] = True
+            return
+
+        # resize part
+        # right
+        right_edge = self.x + self.rect.width
+        if (right_edge - self.edge_buffer_W < 
+              x < right_edge + self.edge_buffer_W 
+                and  
+        self.y < y < self.y + self.rect.height):
+            self.state['resize_right'] = True
+            return
+        
+        # left
+        left_edge = self.x
+        if (left_edge - self.edge_buffer_W < 
+              x < left_edge + self.edge_buffer_W 
+                and  
+        self.y < y < self.y + self.rect.height):
+            self.state['resize_left'] = True
+            return
+        
+        # top
+        top_edge = self.y
+        if (self.x < x < self.x + self.rect.width
+                and  
+        top_edge - self.edge_buffer_H < y < top_edge + self.edge_buffer_H):
+            self.state['resize_top'] = True
+            return
+        
+        # bottom
+        bottom_edge = self.y + self.rect.height
+        if (self.x < x < self.x + self.rect.width
+                and  
+        bottom_edge - self.edge_buffer_H < y < bottom_edge + self.edge_buffer_H):
+            self.state['resize_bottom'] = True
+            return
 
     def move(self, actions):
         '''
@@ -119,6 +161,7 @@ class Part():
         '''
         # dragging stopped
         if not actions['m1']:
+            self.old_mouse_pos = None
             self.state['move'] = False
             return
 
@@ -142,10 +185,123 @@ class Part():
         
 
     # Resize
-    def resize_W(self, actions):
-        pass
-    def resize_H(self, actions):
-        pass
+
+    def resize_left(self, actions):
+        '''
+        resize width left
+        '''
+        # dragging stopped
+        if not actions['m1']:
+            self.old_mouse_pos = None
+            self.state['resize_left'] = False
+            return
+
+        # if no history of mouse pos then get some and return
+        if self.old_mouse_pos is None:
+            self.old_mouse_pos = actions['mouse_pos']
+            return
+        
+        width_change =  self.old_mouse_pos[0] - actions['mouse_pos'][0]
+        
+        self.W += width_change
+        self.W = max(self.min_size, self.W)
+        self.rect.width = self.W
+
+        self.x -= width_change
+        self.rect.x = self.x
+
+        # store current value into old value
+        self.old_mouse_pos = actions['mouse_pos']
+
+        self.edge_buffer_W = max(self.min_edge, self.W / 12)
+        
+
+    def resize_right(self, actions):
+        '''
+        resize width left
+        '''
+        # dragging stopped
+        if not actions['m1']:
+            self.old_mouse_pos = None
+            self.state['resize_right'] = False
+            return
+
+        # if no history of mouse pos then get some and return
+        if self.old_mouse_pos is None:
+            self.old_mouse_pos = actions['mouse_pos']
+            return
+        
+        width_change = actions['mouse_pos'][0] - self.old_mouse_pos[0]
+        
+        self.W += width_change
+        self.W = max(self.min_size, self.W)
+        self.rect.width = self.W
+
+        # store current value into old value
+        self.old_mouse_pos = actions['mouse_pos']
+
+        # update edge buffer
+        self.edge_buffer_W = max(self.min_edge, self.W / 12)
+        
+
+
+    def resize_top(self, actions):
+        '''
+        resize height top
+        '''
+        # dragging stopped
+        if not actions['m1']:
+            self.old_mouse_pos = None
+            self.state['resize_top'] = False
+            return
+
+        # if no history of mouse pos then get some and return
+        if self.old_mouse_pos is None:
+            self.old_mouse_pos = actions['mouse_pos']
+            return
+        
+        height_change = self.old_mouse_pos[1] - actions['mouse_pos'][1] 
+        
+        self.H += height_change
+        self.H = max(self.min_size, self.H)
+        self.rect.height = self.H
+
+        self.y -= height_change
+        self.rect.y = self.y
+
+        # store current value into old value
+        self.old_mouse_pos = actions['mouse_pos']
+
+        # update edge buffer
+        self.edge_buffer_H = max(self.min_edge, self.W / 12)
+
+    def resize_bottom(self, actions):
+        '''
+        resize height bottom
+        '''
+        # dragging stopped
+        if not actions['m1']:
+            self.old_mouse_pos = None
+            self.state['resize_bottom'] = False
+            return
+
+        # if no history of mouse pos then get some and return
+        if self.old_mouse_pos is None:
+            self.old_mouse_pos = actions['mouse_pos']
+            return
+        
+        height_change = actions['mouse_pos'][1] - self.old_mouse_pos[1]
+        
+        self.H += height_change
+        self.H = max(self.min_size, self.H)
+        self.rect.height = self.H
+
+
+        # store current value into old value
+        self.old_mouse_pos = actions['mouse_pos']
+
+        # update edge buffer
+        self.edge_buffer_H = max(self.min_edge, self.W / 12)
 
     # Colour
       
