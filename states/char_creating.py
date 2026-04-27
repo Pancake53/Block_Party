@@ -49,7 +49,7 @@ class Char_Creating(State):
         self.right_clicked = False
 
         # changes with regard to which rect has been last clicked
-        self.selected_part = 0
+        self.selected_part = None
 
         self.top_part = None
         self.top_part_pos = 0
@@ -73,7 +73,7 @@ class Char_Creating(State):
         '''
         # print(self.created_chars)
         self.handle_actions(actions)
-        self.handle_col_change()
+        self.handle_buttons()
 
         self.update_parts(delta_time, actions)
 
@@ -126,13 +126,16 @@ class Char_Creating(State):
                 part.state['top'] = False    
 
 
-    def handle_col_change(self):
+    def handle_buttons(self):
         '''
         handels colour change
         '''
         self.change_col_left()
 
         self.change_col_right()
+
+        if self.create_part:
+            self.spawn_part()
 
     def change_col_left(self):
         '''
@@ -145,15 +148,20 @@ class Char_Creating(State):
             else:
                 self.colour_id -= 1
 
-            self.main_colour = self.game.team_colours[self.colour_id]
-            while self.main_colour in self.taken_colours:
-                if self.colour_id == 0:
-                    self.colour_id = len(self.game.team_colours) - 1
-                else:
-                    self.colour_id -= 1
-                self.main_colour = self.game.team_colours[self.colour_id]
+            self.selected_colour = self.game.team_colours[self.colour_id]
 
-            self.character_parts[self.selected_part].colour = self.main_colour
+            if self.selected_part is None:
+                self.selected_part = self.character_parts[0]
+
+            if self.selected_part.main:
+                while self.selected_colour in self.taken_colours:
+                    if self.colour_id == 0:
+                        self.colour_id = len(self.game.team_colours) - 1
+                    else:
+                        self.colour_id -= 1
+                    self.selected_colour = self.game.team_colours[self.colour_id]
+
+            self.selected_part.colour = self.selected_colour
 
     def change_col_right(self):
         '''
@@ -166,14 +174,22 @@ class Char_Creating(State):
             else:
                 self.colour_id += 1
 
-            self.main_colour = self.game.team_colours[self.colour_id]
-            while self.main_colour in self.taken_colours:
-                if self.colour_id == len(self.game.team_colours) - 1:
-                    self.colour_id = 0
-                else:
-                    self.colour_id += 1
-                self.main_colour = self.game.team_colours[self.colour_id]
-            self.character_parts[self.selected_part].colour = self.main_colour
+            self.selected_colour = self.game.team_colours[self.colour_id]
+
+            if self.selected_part is None:
+                self.selected_part = self.character_parts[0]
+
+            if self.selected_part.main:
+                while self.selected_colour in self.taken_colours:
+                    if self.colour_id == len(self.game.team_colours) - 1:
+                        self.colour_id = 0
+                    else:
+                        self.colour_id += 1
+                    self.selected_colour = self.game.team_colours[self.colour_id]
+
+            self.selected_part.colour = self.selected_colour
+                
+
 
     def update_parts(self, dt, actions):
         for part in self.character_parts:
@@ -250,10 +266,23 @@ class Char_Creating(State):
             surface, self.game.actions
         )
 
+        # new part
+        self.create_part = self.new_piece_button.action_on_button(
+            self.new_piece_button_x, self.new_piece_button_y,
+            surface, self.game.actions
+        )
+
         self.game.draw_text(surface,
             'Done', self.game.TILE_COL,
             self.done_text_x,
             self.done_text_y,
+            size='Medium'
+        ) 
+
+        self.game.draw_text(surface,
+            'New piece', self.game.TILE_COL,
+            self.new_piece_text_x,
+            self.new_piece_text_y,
             size='Medium'
         ) 
         
@@ -356,6 +385,9 @@ class Char_Creating(State):
         
         self.done_button = Button(0, 0, width=100, height=50, button_colour=self.game.BG_COL)
 
+        self.new_piece_button = Button(0, 0, button_colour=self.game.BG_COL,
+                                        width=200, height=50)
+
         # calculate locations for buttons
         # 1 arrow
         self.left_arrow_x = self.game.GAME_W / 6 - self.left_arrow.rect.width / 2
@@ -367,8 +399,22 @@ class Char_Creating(State):
         self.done_button_x = self.game.GAME_W - self.done_button.rect.width - 10
         self.done_button_y = self.game.GAME_H - self.done_button.rect.height - 10
 
+        
+        padding = self.new_piece_button.rect.width * 0.5
+        self.new_piece_button_x = (self.game.GAME_W - 
+            self.new_piece_button.rect.width - padding)
+        self.new_piece_button_y = (self.game.GAME_H * 2 / 3 -
+            self.new_piece_button.rect.height / 2)
+        
+
+        # centered text
         self.done_text_x = self.done_button_x + self.done_button.width / 2
         self.done_text_y = self.done_button_y + self.done_button.height / 2
+
+        self.new_piece_text_x = (self.new_piece_button_x 
+            + self.new_piece_button.width / 2)
+        self.new_piece_text_y = (self.new_piece_button_y 
+            + self.new_piece_button.height / 2)
 
     def load_hitbox(self):
         '''
@@ -462,15 +508,29 @@ class Char_Creating(State):
                     }
                 )     
                         
-    def spawn_part(self, x, y, width, height, colour = None, main = False):
+    def spawn_part(self, x = None, y = None, W = None, H = None, colour = None, main = False):
         '''
         creates new Part obj and adds it character parts
         '''
+        if x is None:
+            x = self.new_piece_button_x
+        
+        if y is None:
+            y = self.new_piece_button_y + self.new_piece_button.height * 1.5
+
+        if W is None:   
+            W = self.new_piece_button.width
+
+        if H is None:
+            H = self.new_piece_button.height
+
         if colour is None:
             colour = self.selected_colour
 
+        
+
         layer = len(self.character_parts)
-        new_part = Part(x, y, width, height, colour, layer, self, main)
+        new_part = Part(x, y, W, H, colour, layer, self, main)
         self.character_parts.append(new_part)
 
 

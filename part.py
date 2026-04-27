@@ -82,6 +82,7 @@ class Part():
                 
                 if not self.state['selected']:
                     self.state['selected'] = True
+                    self.char_creating.selected_part = self
             else:
                 # print('it should reset')
                 self.reset_state()
