@@ -56,7 +56,12 @@ class Char_Creating(State):
         self.character_parts = []
         
 
-        
+        # cursor assets easier
+        self.cursor = None
+        self.cursor_half = 25
+        self.move_cursor = self.game.assets['move_cursor']
+        self.resize_width_cursor = self.game.assets['resize_width_cursor']
+        self.resize_height_cursor = self.game.assets['resize_height_cursor']
 
 
         self.load() # Buttons / UI elements / coordinates
@@ -246,6 +251,8 @@ class Char_Creating(State):
         if self.player_id > 0:
             self.render_created_characters(surface)
 
+        self.render_cursor(surface)
+
     def render_buttons(self, surface):
         '''
         renders buttons duh and controls what actions get 
@@ -306,6 +313,31 @@ class Char_Creating(State):
             draw_shading_for_rect(self.game.TILE_COL,
                 char_dict['rect'], surface)
 
+    def render_cursor(self, surface):
+        '''
+        render custom cursor based on mouse pos
+        '''
+        print(self.cursor)
+        if self.cursor == 'move':
+            pygame.mouse.set_visible(False)
+            surface.blit(self.move_cursor, self.center_cursor())
+
+        elif self.cursor == 'resize_width':
+            pygame.mouse.set_visible(False)
+            surface.blit(self.resize_width_cursor, self.center_cursor())
+
+
+        elif self.cursor == 'resize_height':
+            pygame.mouse.set_visible(False)
+            surface.blit(self.resize_height_cursor, self.center_cursor())
+
+        else:
+            pygame.mouse.set_visible(True)
+
+    def center_cursor(self):
+
+        x, y =  self.game.actions['mouse_pos']
+        return (x - self.cursor_half, y - self.cursor_half)    
 
     def create_surface_from_created_char(self):
         '''
@@ -450,14 +482,14 @@ class Char_Creating(State):
         # bottom part
         width *= 1.5
         height *= 0.2
-        y -= height 
+        y -= height - 4
         x -= width / 1.5 * 0.25
         print(f'x: {x}, y: {y}')
         colour = (209, 31, 4)
         self.spawn_part(x, y, width, height, colour)
         # top part
         width *= 0.5
-        y -= height 
+        y -= height - 4
         x += width * 0.5
         print(f'x: {x}, y: {y}')
         colour = (209, 31, 4)
@@ -466,7 +498,7 @@ class Char_Creating(State):
         # eyes and smile
         # left eye
         y += height * 3
-        width = 6
+        width = 8
         height = width
         colour = self.game.BLACK
         
@@ -478,7 +510,7 @@ class Char_Creating(State):
         # smile
         x -= width * 3
         y += width * 3
-        width *= 5
+        width *= 4
         self.spawn_part(x, y, width, height, colour)
 
     def load_created_characters(self):
@@ -519,10 +551,9 @@ class Char_Creating(State):
             y = self.new_piece_button_y + self.new_piece_button.height * 1.5
 
         if W is None:   
-            W = self.new_piece_button.width
-
+            W = 50
         if H is None:
-            H = self.new_piece_button.height
+            H = 50
 
         if colour is None:
             colour = self.selected_colour

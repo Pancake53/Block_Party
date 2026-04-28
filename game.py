@@ -269,6 +269,7 @@ class Game():
         self.font_dir = os.path.join(self.assets_dir, "font")
         self.audio_dir = os.path.join(self.assets_dir, "audio")
         self.level_dir = os.path.join("levels")
+        self.cursor_dir = os.path.join(self.image_dir, "cursors")
         # self.tilemap_dir = os.path.join("tilemap") NOT IN USE
         # Assets themselves
         # fonts
@@ -282,9 +283,14 @@ class Game():
         self.assets["jump_img"] = pygame.image.load(os.path.join(self.image_dir, "jump.png")).convert_alpha()
         self.assets["flag_img"] = pygame.image.load(os.path.join(self.image_dir, "white_flag.png")).convert_alpha()
         
+        # buttons
         self.assets["arrowleft_img"] = pygame.image.load(os.path.join(self.image_dir, "arrowleft.png")).convert_alpha()
         self.assets["arrowright_img"] = pygame.image.load(os.path.join(self.image_dir, "arrowright.png")).convert_alpha()
 
+        # cursors
+        self.assets['move_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "move4.png")).convert_alpha() 
+        self.assets['resize_width_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "resize_width.png")).convert_alpha()
+        self.assets['resize_height_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "resize_height.png")).convert_alpha()
         # audio
         self.audio['main_theme'] = os.path.join(self.audio_dir, 'main_music.ogg')
         self.audio['sea_ambiance'] = os.path.join(self.audio_dir, 'sea_ambiance.ogg')

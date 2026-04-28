@@ -46,10 +46,12 @@ class Part():
 
         # determines what is considered an edge and what is center
         # larger value => less space for center/moving, more for resizing 
-        self.min_size = 8
-        self.min_edge = 3
+        self.min_size = 12
+        self.min_edge = self.min_size / 4
         self.edge_buffer_W = max(self.min_edge, self.W / 12)
         self.edge_buffer_H = max(self.min_edge / 2, self.H / 12)
+
+
 
 
 
@@ -78,17 +80,25 @@ class Part():
         # layers of part that exist in the same position
         if actions['mouse_click']:
             # print('mouse clicked now this shit should reset right')
-            if self.state['top']:
+            # part is selected and resizing out size of its hovered
+            if (self.state['selected'] 
+                and
+            self.char_creating.cursor == ('resize_width' or 'resize_height')):
+                pass
+
+            elif self.state['top']:
                 
                 if not self.state['selected']:
                     self.state['selected'] = True
                     self.char_creating.selected_part = self
+
             else:
                 # print('it should reset')
                 self.reset_state()
 
         # after the part is selected
         if self.state['selected']:
+            
             print(f'States: {self.state}')
             if self.state['move']:
                 self.move(actions)
@@ -101,11 +111,11 @@ class Part():
                 self.resize_top(actions)
             elif self.state['resize_bottom']:
                 self.resize_bottom(actions)
-            elif actions['m1']:
+            else:
                 # print('m1')
-                self.m1_actions(actions)
+                self.mouse_pos_actions(actions)
 
-    def m1_actions(self, actions):
+    def mouse_pos_actions(self, actions):
         '''
         reacts to m1 actions
         '''
@@ -118,43 +128,56 @@ class Part():
         # height    
         self.y + self.edge_buffer_H < 
         y < self.y + self.rect.height - self.edge_buffer_H):
-            self.state['move'] = True
+            self.char_creating.cursor = 'move'
+            if actions['m1']:
+                self.state['move'] = True
             return
 
         # resize part
         # right
         right_edge = self.x + self.rect.width
-        if (right_edge - self.edge_buffer_W < 
-              x < right_edge + self.edge_buffer_W 
+        if (right_edge - self.edge_buffer_W <= 
+              x <= right_edge + self.edge_buffer_W 
                 and  
         self.y < y < self.y + self.rect.height):
-            self.state['resize_right'] = True
+            self.char_creating.cursor = 'resize_width'
+            if actions['m1']:
+                self.state['resize_right'] = True
             return
         
         # left
         left_edge = self.x
-        if (left_edge - self.edge_buffer_W < 
-              x < left_edge + self.edge_buffer_W 
+        if (left_edge - self.edge_buffer_W <= 
+              x <= left_edge + self.edge_buffer_W 
                 and  
         self.y < y < self.y + self.rect.height):
-            self.state['resize_left'] = True
+            self.char_creating.cursor = 'resize_width'
+            if actions['m1']:
+                self.state['resize_left'] = True
             return
         
         # top
         top_edge = self.y
         if (self.x < x < self.x + self.rect.width
                 and  
-        top_edge - self.edge_buffer_H < y < top_edge + self.edge_buffer_H):
-            self.state['resize_top'] = True
+        top_edge - self.edge_buffer_H <= y <= top_edge + self.edge_buffer_H):
+            self.char_creating.cursor = 'resize_height'
+            if actions['m1']:
+                self.state['resize_top'] = True
             return
         
         # bottom
         bottom_edge = self.y + self.rect.height
         if (self.x < x < self.x + self.rect.width
                 and  
-        bottom_edge - self.edge_buffer_H < y < bottom_edge + self.edge_buffer_H):
-            self.state['resize_bottom'] = True
+        bottom_edge - self.edge_buffer_H <= y <= bottom_edge + self.edge_buffer_H):
+            self.char_creating.cursor = 'resize_height'
+            if actions['m1']:
+                self.state['resize_bottom'] = True
             return
+        
+        else:
+            self.char_creating.cursor = None
 
     def move(self, actions):
         '''
@@ -208,8 +231,9 @@ class Part():
         self.W = max(self.min_size, self.W)
         self.rect.width = self.W
 
-        self.x -= width_change
-        self.rect.x = self.x
+        if self.W > self.min_size:
+            self.x -= width_change
+            self.rect.x = self.x
 
         # store current value into old value
         self.old_mouse_pos = actions['mouse_pos']
@@ -267,8 +291,9 @@ class Part():
         self.H = max(self.min_size, self.H)
         self.rect.height = self.H
 
-        self.y -= height_change
-        self.rect.y = self.y
+        if self.H > self.min_size:
+            self.y -= height_change
+            self.rect.y = self.y
 
         # store current value into old value
         self.old_mouse_pos = actions['mouse_pos']
