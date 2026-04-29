@@ -278,7 +278,7 @@ class Game():
         self.font_small = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_SMALL)
         # assets
         self.assets["explosion_img"] = pygame.image.load(os.path.join(self.image_dir, "explosion.png")).convert_alpha()
-        # ui
+        # level ui
         self.assets["bomb_img"] = pygame.image.load(os.path.join(self.image_dir, "bomb.png")).convert_alpha()
         self.assets["jump_img"] = pygame.image.load(os.path.join(self.image_dir, "jump.png")).convert_alpha()
         self.assets["flag_img"] = pygame.image.load(os.path.join(self.image_dir, "white_flag.png")).convert_alpha()
@@ -286,6 +286,7 @@ class Game():
         # buttons
         self.assets["arrowleft_img"] = pygame.image.load(os.path.join(self.image_dir, "arrowleft.png")).convert_alpha()
         self.assets["arrowright_img"] = pygame.image.load(os.path.join(self.image_dir, "arrowright.png")).convert_alpha()
+        self.assets['reset_img'] = pygame.image.load(os.path.join(self.image_dir, "reset.png")).convert_alpha()
 
         # cursors
         self.assets['move_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "move4.png")).convert_alpha() 

@@ -81,9 +81,7 @@ class Part():
         if actions['mouse_click']:
             # print('mouse clicked now this shit should reset right')
             # part is selected and resizing out size of its hovered
-            if (self.state['selected'] 
-                and
-            self.char_creating.cursor == ('resize_width' or 'resize_height')):
+            if (self.char_creating.cursor in ('resize_width', 'resize_height')):
                 pass
 
             elif self.state['top']:
@@ -99,10 +97,10 @@ class Part():
         # after the part is selected
         if self.state['selected']:
             
-            print(f'States: {self.state}')
+            # print(f'States: {self.state}')
             if self.state['move']:
                 self.move(actions)
-                print('moving')
+                # print('moving')
             elif self.state['resize_left']:
                 self.resize_left(actions)
             elif self.state['resize_right']:

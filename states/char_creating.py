@@ -1,9 +1,11 @@
 import pygame
 
+
 from part import Part
 from states.state import State
 from states.level_menu import Level_Menu
 from UI.button import Button
+from UI.slider import Slider
 from helpers import draw_shading_for_rect
 
 class Char_Creating(State):
@@ -26,15 +28,13 @@ class Char_Creating(State):
             self.taken_colours = [char['main_colour']
                                 for char in self.created_chars.values()]
     
-            print(f'{self.taken_colours}')
+            # print(f'{self.taken_colours}')
         else:
             self.player_id = 0
             self.created_chars = {}
             self.taken_colours = []
 
         # print(f'{self.created_chars}')
-
-        self.selected = False
 
         # set startoff colour
         self.colour_id = 0
@@ -44,9 +44,15 @@ class Char_Creating(State):
             self.main_colour = self.game.team_colours[self.colour_id]
 
         self.selected_colour = self.main_colour
+        self.red, self.green, self.blue = self.selected_colour
 
+        # button pressed states 
+        self.selected = False
         self.left_clicked = False
         self.right_clicked = False
+        self.new_piece = False
+        self.duplicate = False
+        self.reset = False
 
         # changes with regard to which rect has been last clicked
         self.selected_part = None
@@ -63,6 +69,8 @@ class Char_Creating(State):
         self.resize_width_cursor = self.game.assets['resize_width_cursor']
         self.resize_height_cursor = self.game.assets['resize_height_cursor']
 
+        # sliders
+        self.sliders = []
 
         self.load() # Buttons / UI elements / coordinates
 
@@ -79,6 +87,8 @@ class Char_Creating(State):
         # print(self.created_chars)
         self.handle_actions(actions)
         self.handle_buttons()
+        for slider in self.sliders:
+            slider.update(actions)
 
         self.update_parts(delta_time, actions)
 
@@ -142,6 +152,17 @@ class Char_Creating(State):
         if self.create_part:
             self.spawn_part()
 
+        if self.duplicate:
+            if self.selected_part:
+                self.spawn_part(self.selected_part.x + 12, 
+                                self.selected_part.y - 12, 
+                                self.selected_part.W,
+                                self.selected_part.H,
+                                self.selected_part.colour)
+                
+        if self.reset:
+            self.reset_parts()
+
     def change_col_left(self):
         '''
         handle left button colour change logic
@@ -167,6 +188,8 @@ class Char_Creating(State):
                     self.selected_colour = self.game.team_colours[self.colour_id]
 
             self.selected_part.colour = self.selected_colour
+            self.red, self.green, self.blue = self.selected_colour
+            self.update_sliders()   
 
     def change_col_right(self):
         '''
@@ -193,6 +216,8 @@ class Char_Creating(State):
                     self.selected_colour = self.game.team_colours[self.colour_id]
 
             self.selected_part.colour = self.selected_colour
+            self.red, self.green, self.blue = self.selected_colour
+            self.update_sliders()            
                 
 
 
@@ -247,6 +272,7 @@ class Char_Creating(State):
         
         
         self.render_buttons(surface)
+        self.render_slicers(surface)
         self.render_parts(surface)
         if self.player_id > 0:
             self.render_created_characters(surface)
@@ -278,6 +304,16 @@ class Char_Creating(State):
             self.new_piece_button_x, self.new_piece_button_y,
             surface, self.game.actions
         )
+        # duplicate selected
+        self.duplicate = self.copy_selected_button.action_on_button(
+            self.copy_selected_button_x, self.copy_selected_button_y,
+            surface, self.game.actions
+        )
+
+        self.reset = self.reset_button.action_on_button(
+            self.reset_button_x, self.reset_button_y,
+            surface, self.game.actions
+        )
 
         self.game.draw_text(surface,
             'Done', self.game.TILE_COL,
@@ -292,7 +328,19 @@ class Char_Creating(State):
             self.new_piece_text_y,
             size='Medium'
         ) 
+
+        self.game.draw_text(surface,
+            'Duplicate', self.game.TILE_COL,
+            self.copy_selected_text_x,
+            self.copy_selected_text_y,
+            size='Medium'
+        ) 
         
+    def render_slicers(self, surface):
+
+        for slider in self.sliders:
+            slider.render(surface)
+
     def render_parts(self, surface):
         '''
         calls each parts render function
@@ -317,7 +365,7 @@ class Char_Creating(State):
         '''
         render custom cursor based on mouse pos
         '''
-        print(self.cursor)
+        # print(self.cursor)
         if self.cursor == 'move':
             pygame.mouse.set_visible(False)
             surface.blit(self.move_cursor, self.center_cursor())
@@ -406,7 +454,44 @@ class Char_Creating(State):
         '''
         load needed buttons for the view
         '''
+        
+        self.load_buttons()
+        self.load_coordinates()
+        self.load_text_coordinates()
+        self.load_sliders()
+        
 
+
+    def load_sliders(self):
+        '''
+        loads slider objects
+        '''
+        w = 255
+        h = 20
+        x = (self.left_arrow_x + self.left_arrow.width + self.right_arrow_x) / 2 - w / 2
+        y = self.left_arrow_y + self.left_arrow.height / 2 - h * 2
+        self.red_slider = Slider("red",
+                            x, y, w, h, 
+                            0, 255, self.red, 
+                            on_change=self.update_colour, colour=(255, 0, 0))
+
+        y += h * 2
+        self.green_slider = Slider("green",
+                            x, y, w, h, 
+                            0, 255, 
+                            self.green, 
+                            on_change=self.update_colour, colour=(0, 255, 0))
+
+        y += h * 2
+        self.blue_slider = Slider("blue", 
+                            x, y, w, h, 
+                            0, 255, 
+                            self.blue, 
+                            on_change=self.update_colour, colour=(0, 0, 255))
+
+        self.sliders.extend([self.red_slider, self.green_slider, self.blue_slider])
+
+    def load_buttons(self):
 
         self.left_arrow = Button(0, 0, button_colour=self.game.BG_COL,
                                   hover_colour=self.game.TILE_COL, image = 
@@ -419,34 +504,59 @@ class Char_Creating(State):
 
         self.new_piece_button = Button(0, 0, button_colour=self.game.BG_COL,
                                         width=200, height=50)
+        
+        self.copy_selected_button = Button(0, 0, button_colour=self.game.BG_COL,
+                                        width=200, height=50)
+        
+        self.reset_button = Button(0, 0, button_colour=self.game.BG_COL,
+                                        image=self.game.assets['reset_img'])
 
+    def load_coordinates(self):
         # calculate locations for buttons
         # 1 arrow
-        self.left_arrow_x = self.game.GAME_W / 6 - self.left_arrow.rect.width / 2
-        self.left_arrow_y = self.game.GAME_H / 2 - self.left_arrow.rect.height / 2
+        self.left_arrow_x = self.game.GAME_W / 2 
+        self.left_arrow_y = self.game.GAME_H / 4
         # 2 arrow
-        self.right_arrow_x = self.game.GAME_W * 5 / 6 - self.right_arrow.rect.width / 2
-        self.right_arrow_y = self.game.GAME_H / 2 - self.right_arrow.rect.height / 2
+        self.right_arrow_x = self.game.GAME_W - self.right_arrow.rect.width - 10
+        self.right_arrow_y = self.left_arrow_y
         # Done
         self.done_button_x = self.game.GAME_W - self.done_button.rect.width - 10
         self.done_button_y = self.game.GAME_H - self.done_button.rect.height - 10
 
-        
-        padding = self.new_piece_button.rect.width * 0.5
-        self.new_piece_button_x = (self.game.GAME_W - 
-            self.new_piece_button.rect.width - padding)
+        # new piece
+        self.new_piece_button_x = (self.game.GAME_W / 2 - 10)
         self.new_piece_button_y = (self.game.GAME_H * 2 / 3 -
             self.new_piece_button.rect.height / 2)
         
+        padding = 15
 
-        # centered text
+        # copy selected
+        self.copy_selected_button_x = self.new_piece_button_x + padding + self.new_piece_button.width
+        self.copy_selected_button_y = (self.game.GAME_H * 2 / 3 -
+            self.new_piece_button.rect.height / 2)
+        
+        # reset 
+        self.reset_button_x = self.copy_selected_button_x + padding + self.copy_selected_button.width
+        self.reset_button_y = (self.game.GAME_H * 2 / 3 -
+            self.new_piece_button.rect.height / 2)
+
+    def load_text_coordinates(self):
+        # TEXT
+        # done
         self.done_text_x = self.done_button_x + self.done_button.width / 2
         self.done_text_y = self.done_button_y + self.done_button.height / 2
 
+        # new piece
         self.new_piece_text_x = (self.new_piece_button_x 
             + self.new_piece_button.width / 2)
         self.new_piece_text_y = (self.new_piece_button_y 
             + self.new_piece_button.height / 2)
+        
+        # copy selected
+        self.copy_selected_text_x = (self.copy_selected_button_x 
+            + self.copy_selected_button.width / 2)
+        self.copy_selected_text_y = (self.copy_selected_button_y 
+            + self.copy_selected_button.height / 2)
 
     def load_hitbox(self):
         '''
@@ -484,21 +594,21 @@ class Char_Creating(State):
         height *= 0.2
         y -= height - 4
         x -= width / 1.5 * 0.25
-        print(f'x: {x}, y: {y}')
+        # print(f'x: {x}, y: {y}')
         colour = (209, 31, 4)
         self.spawn_part(x, y, width, height, colour)
         # top part
         width *= 0.5
         y -= height - 4
         x += width * 0.5
-        print(f'x: {x}, y: {y}')
+        # print(f'x: {x}, y: {y}')
         colour = (209, 31, 4)
         self.spawn_part(x, y, width, height, colour)
 
         # eyes and smile
         # left eye
         y += height * 3
-        width = 8
+        width = 12
         height = width
         colour = self.game.BLACK
         
@@ -563,6 +673,26 @@ class Char_Creating(State):
         layer = len(self.character_parts)
         new_part = Part(x, y, W, H, colour, layer, self, main)
         self.character_parts.append(new_part)
+
+    def reset_parts(self):
+        '''
+        resets back to default
+        '''
+        self.character_parts.clear()
+        self.load_hitbox()
+
+    def update_colour(self, colour, value):
+        print(f'Updating {colour} to {value}!~')
+        setattr(self, colour, value)
+        self.selected_colour = (self.red, self.green, self.blue)
+        self.selected_part.colour = self.selected_colour
+
+    def update_sliders(self):
+        self.red_slider.current_value = self.red
+        self.green_slider.current_value = self.green
+        self.blue_slider.current_value = self.blue
+        for slider in self.sliders:
+            slider.update_pos()
 
 
 
