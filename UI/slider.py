@@ -57,20 +57,23 @@ class Slider:
             return
 
         x_move = actions['mouse_pos'][0] - self.old_mouse_pos[0]
-        self.current_value += x_move
-        # cap
-        if self.current_value < 0:
-            self.current_value = 0
-            self.update_pos()
-        elif self.current_value > self.max_value:
-            self.current_value = self.max_value
-            self.update_pos()
-        else:
-            self.pointer.x += x_move
-        # update old pos
-        self.old_mouse_pos = actions['mouse_pos']
-        # callback
-        self.on_change(self.name, self.current_value)
+        # if mouse moved
+        if x_move != 0:
+
+            self.current_value += x_move
+            # cap
+            if self.current_value < 0:
+                self.current_value = 0
+                self.update_pos()
+            elif self.current_value > self.max_value:
+                self.current_value = self.max_value
+                self.update_pos()
+            else:
+                self.pointer.x += x_move
+            # update old pos
+            self.old_mouse_pos = actions['mouse_pos']
+            # callback
+            self.on_change(self.name, self.current_value)
         
 
     def render(self, surface):

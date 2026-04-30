@@ -53,6 +53,7 @@ class Char_Creating(State):
         self.new_piece = False
         self.duplicate = False
         self.reset = False
+        self.lock_colour = False
 
         # changes with regard to which rect has been last clicked
         self.selected_part = None
@@ -187,9 +188,8 @@ class Char_Creating(State):
                         self.colour_id -= 1
                     self.selected_colour = self.game.team_colours[self.colour_id]
 
-            self.selected_part.colour = self.selected_colour
-            self.red, self.green, self.blue = self.selected_colour
-            self.update_sliders()   
+            self.handle_colour_change()
+
 
     def change_col_right(self):
         '''
@@ -215,11 +215,14 @@ class Char_Creating(State):
                         self.colour_id += 1
                     self.selected_colour = self.game.team_colours[self.colour_id]
 
+            self.handle_colour_change()          
+                
+    def handle_colour_change(self):
             self.selected_part.colour = self.selected_colour
             self.red, self.green, self.blue = self.selected_colour
-            self.update_sliders()            
-                
-
+            self.update_sliders()   
+            self.update_buttons()
+            
 
     def update_parts(self, dt, actions):
         for part in self.character_parts:
@@ -309,11 +312,21 @@ class Char_Creating(State):
             self.copy_selected_button_x, self.copy_selected_button_y,
             surface, self.game.actions
         )
-
+        # reset
         self.reset = self.reset_button.action_on_button(
             self.reset_button_x, self.reset_button_y,
             surface, self.game.actions
         )
+        # lock colour
+        if self.btn_lock_colour.action_on_button(
+            self.btn_lock_colour_x, self.btn_lock_colour_y,
+            surface, self.game.actions
+        ):
+            self.lock_colour = not self.lock_colour
+
+        if self.lock_colour: 
+            draw_shading_for_rect((255, 255, 255), self.btn_lock_colour.rect,
+                                  surface, shading_W=3)
 
         self.game.draw_text(surface,
             'Done', self.game.TILE_COL,
@@ -510,6 +523,9 @@ class Char_Creating(State):
         
         self.reset_button = Button(0, 0, button_colour=self.game.BG_COL,
                                         image=self.game.assets['reset_img'])
+        
+        self.btn_lock_colour = Button(0, 0, self.selected_colour, self.selected_colour,
+                                  width=self.left_arrow.width, height=100)
 
     def load_coordinates(self):
         # calculate locations for buttons
@@ -539,6 +555,11 @@ class Char_Creating(State):
         self.reset_button_x = self.copy_selected_button_x + padding + self.copy_selected_button.width
         self.reset_button_y = (self.game.GAME_H * 2 / 3 -
             self.new_piece_button.rect.height / 2)
+        
+        # lock colour
+        self.btn_lock_colour_x = self.left_arrow_x
+        self.btn_lock_colour_y = self.left_arrow_y + self.left_arrow.height + 10
+
 
     def load_text_coordinates(self):
         # TEXT
@@ -682,10 +703,13 @@ class Char_Creating(State):
         self.load_hitbox()
 
     def update_colour(self, colour, value):
-        print(f'Updating {colour} to {value}!~')
         setattr(self, colour, value)
         self.selected_colour = (self.red, self.green, self.blue)
+
+        if self.selected_part is None:
+            self.selected_part = self.character_parts[0]
         self.selected_part.colour = self.selected_colour
+        self.update_buttons()
 
     def update_sliders(self):
         self.red_slider.current_value = self.red
@@ -694,5 +718,28 @@ class Char_Creating(State):
         for slider in self.sliders:
             slider.update_pos()
 
+    def update_buttons(self):
+        self.btn_lock_colour.button_col = self.selected_colour
+        self.btn_lock_colour.hover_col = self.selected_colour
 
+    def set_selection(self, part):
+        self.selected_part = part
 
+        if not self.lock_colour:
+            self.selected_colour = part.colour
+
+            # set colour id to match parts colour
+            if self.selected_colour in self.game.team_colours:
+                for i, colour in enumerate(self.game.team_colours):
+                    if colour == self.selected_colour:
+                        self.colour_id = i
+                        print(f'Colour id: {self.colour_id}')
+
+            # update ui
+            self.update_sliders()   
+            self.update_buttons()
+        
+        # colour lock button has been pressed
+        else: 
+            self.selected_part.colour = self.selected_colour
+        

@@ -49,7 +49,7 @@ class Part():
         self.min_size = 12
         self.min_edge = self.min_size / 4
         self.edge_buffer_W = max(self.min_edge, self.W / 12)
-        self.edge_buffer_H = max(self.min_edge / 2, self.H / 12)
+        self.edge_buffer_H = max(self.min_edge, self.H / 12)
 
 
 
@@ -88,7 +88,7 @@ class Part():
                 
                 if not self.state['selected']:
                     self.state['selected'] = True
-                    self.char_creating.selected_part = self
+                    self.char_creating.set_selection(self)
 
             else:
                 # print('it should reset')
@@ -237,7 +237,6 @@ class Part():
         self.old_mouse_pos = actions['mouse_pos']
 
         self.edge_buffer_W = max(self.min_edge, self.W / 12)
-        
 
     def resize_right(self, actions):
         '''
@@ -265,8 +264,6 @@ class Part():
 
         # update edge buffer
         self.edge_buffer_W = max(self.min_edge, self.W / 12)
-        
-
 
     def resize_top(self, actions):
         '''
@@ -297,7 +294,7 @@ class Part():
         self.old_mouse_pos = actions['mouse_pos']
 
         # update edge buffer
-        self.edge_buffer_H = max(self.min_edge, self.W / 12)
+        self.edge_buffer_H = max(self.min_edge, self.H / 12)
 
     def resize_bottom(self, actions):
         '''
@@ -325,7 +322,7 @@ class Part():
         self.old_mouse_pos = actions['mouse_pos']
 
         # update edge buffer
-        self.edge_buffer_H = max(self.min_edge, self.W / 12)
+        self.edge_buffer_H = max(self.min_edge, self.H / 12)
 
     # Colour
       
