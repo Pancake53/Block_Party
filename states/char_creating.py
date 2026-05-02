@@ -54,6 +54,8 @@ class Char_Creating(State):
         self.duplicate = False
         self.reset = False
         self.lock_colour = False
+        self.save = False
+        self.load_from_file = False
 
         # changes with regard to which rect has been last clicked
         self.selected_part = None
@@ -162,7 +164,8 @@ class Char_Creating(State):
                                 self.selected_part.y - 12, 
                                 self.selected_part.W,
                                 self.selected_part.H,
-                                self.selected_part.colour)
+                                self.selected_part.colour,
+                                selected=True)
                 
         if self.reset:
             self.reset_parts()
@@ -345,6 +348,18 @@ class Char_Creating(State):
         if self.lock_colour: 
             draw_shading_for_rect((255, 255, 255), self.btn_lock_colour.rect,
                                   surface, shading_W=3)
+            
+        # save
+        self.save = self.btn_save.action_on_button(
+            self.btn_save_x, self.btn_save_y,
+            surface, self.game.actions
+        )
+
+        # load
+        self.load_from_file = self.btn_save.action_on_button(
+            self.btn_load_x, self.btn_load_y,
+            surface, self.game.actions
+        )
 
         # Text for buttons
 
@@ -369,10 +384,25 @@ class Char_Creating(State):
             size='Small'
         ) 
 
+        self.game.draw_text(surface,
+            'Save', self.game.TILE_COL,
+            self.save_text_x,
+            self.save_text_y,
+            size='Small'
+        ) 
+        self.game.draw_text(surface,
+            'Load', self.game.TILE_COL,
+            self.load_text_x,
+            self.load_text_y,
+            size='Small'
+        ) 
+
         # images
         surface.blit(self.bucket_img, self.bucket_rect)
-
-        
+        surface.blit(self.add_img, self.add_rect)
+        surface.blit(self.copy_img, self.copy_rect) 
+        surface.blit(self.save_img, self.save_rect) 
+        surface.blit(self.load_img, self.load_rect)      
         
     def render_slicers(self, surface):
 
@@ -562,9 +592,30 @@ class Char_Creating(State):
         self.btn_lock_colour = Button(0, 0, self.selected_colour, self.selected_colour,
                                   width=self.left_arrow.width, height=100)
         
+        self.btn_save = Button(0, 0, button_colour=self.game.BG_COL,
+                                  width=150, height=50)
+        
+        self.btn_load = Button(0, 0, button_colour=self.game.BG_COL,
+                                  width=150, height=50)
+        
+        
         # bucket
         self.bucket_img = self.game.assets['bucket_img']
         self.bucket_rect = self.bucket_img.get_rect()
+        # add
+        self.add_img = self.game.assets['add_img']
+        self.add_rect = self.add_img.get_rect()
+        # copy
+        self.copy_img = self.game.assets['copy_img']
+        self.copy_rect = self.copy_img.get_rect()
+        # save
+        self.save_img = self.game.assets['save_img']
+        self.save_rect = self.save_img.get_rect()
+        # load
+        self.load_img = self.game.assets['load_img']
+        self.load_rect = self.load_img.get_rect()
+
+
 
     def load_helpers(self):
         '''
@@ -622,7 +673,7 @@ class Char_Creating(State):
             'rect': right_blue})
 
     def load_coordinates(self):
-        # calculate locations for buttons
+        # BUTTONS
         # 1 arrow
         self.left_arrow_x = self.game.GAME_W / 2 
         self.left_arrow_y = self.game.GAME_H / 4
@@ -649,7 +700,16 @@ class Char_Creating(State):
         self.reset_button_x = self.copy_selected_button_x + padding + self.copy_selected_button.width
         self.reset_button_y = (self.game.GAME_H * 2 / 3 -
             self.new_piece_button.rect.height / 2)
-        
+        # save
+        self.btn_save_x = self.new_piece_button_x
+        self.btn_save_y = self.done_button_y
+        # load
+        self.btn_load_x = self.btn_save_x + self.btn_save.width + padding
+        self.btn_load_y = self.btn_save_y
+
+
+        # IMAGES
+
         # lock colour
         self.btn_lock_colour_x = self.left_arrow_x
         self.btn_lock_colour_y = self.left_arrow_y + self.left_arrow.height + 10
@@ -657,6 +717,22 @@ class Char_Creating(State):
         # bucket
         self.bucket_rect.x = self.btn_lock_colour_x + 12
         self.bucket_rect.y = self.btn_lock_colour_y + 12
+
+        # add
+        self.add_rect.x = self.new_piece_button_x + self.new_piece_button.width - self.add_rect.width - 3
+        self.add_rect.y = self.new_piece_button_y + 2
+
+        # copy
+        self.copy_rect.x = self.copy_selected_button_x + self.copy_selected_button.width - self.copy_rect.width - 3
+        self.copy_rect.y = self.copy_selected_button_y + 2
+
+        # save
+        self.save_rect.x = self.btn_save_x + self.btn_save.width - self.save_rect.width - 3
+        self.save_rect.y = self.btn_save_y
+
+        # load
+        self.load_rect.x = self.btn_load_x + self.btn_load.width - self.load_rect.width - 3
+        self.load_rect.y = self.btn_load_y
 
     def load_text_coordinates(self):
         # TEXT
@@ -666,15 +742,27 @@ class Char_Creating(State):
 
         # new piece
         self.new_piece_text_x = (self.new_piece_button_x 
-            + self.new_piece_button.width / 2)
+            + self.new_piece_button.width / 3) + 12
         self.new_piece_text_y = (self.new_piece_button_y 
             + self.new_piece_button.height / 2)
         
         # copy selected
         self.copy_selected_text_x = (self.copy_selected_button_x 
-            + self.copy_selected_button.width / 2)
+            + self.copy_selected_button.width / 3) + 12
         self.copy_selected_text_y = (self.copy_selected_button_y 
             + self.copy_selected_button.height / 2)
+        
+        # save
+        self.save_text_x = (self.btn_save_x 
+            + self.btn_save.width / 3) + 12
+        self.save_text_y = (self.btn_save_y 
+            + self.btn_save.height / 2)
+        
+        # load
+        self.load_text_x = (self.btn_load_x 
+            + self.btn_load.width / 3) + 12
+        self.load_text_y = (self.btn_load_y 
+            + self.btn_load.height / 2)
 
     def load_hitbox(self):
         '''
@@ -768,7 +856,7 @@ class Char_Creating(State):
                     }
                 )     
                         
-    def spawn_part(self, x = None, y = None, W = None, H = None, colour = None, main = False):
+    def spawn_part(self, x = None, y = None, W = None, H = None, colour = None, main = False, selected = False):
         '''
         creates new Part obj and adds it character parts
         '''
@@ -791,6 +879,9 @@ class Char_Creating(State):
         layer = len(self.character_parts)
         new_part = Part(x, y, W, H, colour, layer, self, main)
         self.character_parts.append(new_part)
+        if selected:
+            self.selected_part = new_part
+            new_part.state['selected'] = True
 
     def reset_parts(self):
         '''

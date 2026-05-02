@@ -295,6 +295,10 @@ class Game():
         self.assets['reset_img'] = pygame.image.load(os.path.join(self.image_dir, "reset.png")).convert_alpha()
         self.assets['bucket_img'] = pygame.image.load(os.path.join(self.image_dir, "bucket.png")).convert_alpha()
         self.assets['credits_img'] = pygame.image.load(os.path.join(self.image_dir, "credits.png")).convert_alpha()
+        self.assets['add_img'] = pygame.image.load(os.path.join(self.image_dir, "add.png")).convert_alpha()
+        self.assets['copy_img'] = pygame.image.load(os.path.join(self.image_dir, "copy.png")).convert_alpha()
+        self.assets['save_img'] = pygame.image.load(os.path.join(self.image_dir, "save.png")).convert_alpha()
+        self.assets['load_img'] = pygame.image.load(os.path.join(self.image_dir, "load.png")).convert_alpha()
 
         # cursors
         self.assets['move_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "move4.png")).convert_alpha() 
