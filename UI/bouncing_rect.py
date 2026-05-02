@@ -12,10 +12,19 @@ class BouncingRect:
         self.game_W = game_W
         self.game_H = game_H
         self.colours = cols
+        self.transparancy = 150
+        colour = [i for i in random.choice(self.colours)]
+        colour.append(self.transparancy)
+        self.colour = tuple(colour)
 
-        self.colour = random.choice(self.colours)
+        self.rect = pygame.Rect(0, 0, self.W, self.H)
+        self.update_surface()
 
-        self.rect = pygame.Rect(self.x, self.y, self.W, self.H)
+        self.left_wall = game_W * 2 / 3
+
+        self.corners_hit = 0
+
+
 
     def update(self):
         '''
@@ -38,8 +47,8 @@ class BouncingRect:
             x_hit = True
 
         # left side
-        elif self.x < 0:
-            self.x = 0
+        elif self.x < self.left_wall:
+            self.x = self.left_wall
             self.x_speed *= -1
             self.change_col()
             x_hit = True
@@ -60,14 +69,12 @@ class BouncingRect:
             self.change_col()
             y_hit = True
 
-        self.rect.x = self.x
-        self.rect.y = self.y
-
         if x_hit and y_hit:
-            self.corner_hit()
+            if self.corners_hit < 3:
+                self.corner_hit()
 
     def render(self, surface):
-        pygame.draw.rect(surface, self.colour, self.rect)
+        surface.blit(self.rect_surface, (self.x, self.y))
 
     def change_col(self):
         '''
@@ -77,16 +84,29 @@ class BouncingRect:
         while self.colour == new_col:
             new_col = random.choice(self.colours)
 
-        self.colour = new_col
+        colour = [i for i in new_col]
+        colour.append(self.transparancy)
+        self.colour = tuple(colour)
+        self.update_surface()
 
     def corner_hit(self):
         '''
         react to hitting the corner WOAHH
         '''
+        self.corners_hit += 1
+
         self.W *= 2
         self.H *= 2
         self.x_speed *= 2
         self.y_speed *= 2
-        self.x = self.game_W / 2 - self.W / 2
+        self.x = self.left_wall + 10
         self.y = self.game_H / 2 - self.H / 2
         self.rect = pygame.Rect(self.x, self.y, self.W, self.H)
+        self.update_surface()
+
+    def update_surface(self):
+        '''
+        creates new surface and draws rect on it
+        '''
+        self.rect_surface = pygame.Surface((self.W, self.H), pygame.SRCALPHA)
+        pygame.draw.rect(self.rect_surface, self.colour, self.rect)

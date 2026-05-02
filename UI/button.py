@@ -10,7 +10,8 @@ class Button():
     handels rendering and actions on button
     '''
     def __init__(self, x, y, button_colour=(255, 255, 255),
-                  hover_colour=(139, 139, 139), width=0, height=0, image=None):
+                hover_colour=(139, 139, 139), width=0, height=0,
+                image=None):
         
         '''
         Docstring for __init__
@@ -38,6 +39,7 @@ class Button():
         self.BLACK = (0, 0, 0)
         self.click_col = self.BLACK
         self.image = image
+
         
         # print an error if we are missing the image or width and height
         if (not self.image) and (self.width == 0 or self.height == 0):
@@ -104,5 +106,8 @@ class Button():
             pygame.draw.rect(surface, col, self.rect)
 
         draw_shading_for_rect(self.WHITE, self.rect,
-                               surface, right_color = self.BLACK)    
+                               surface, right_color = self.BLACK)
+        
+
+
         

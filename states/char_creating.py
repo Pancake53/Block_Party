@@ -90,11 +90,14 @@ class Char_Creating(State):
         self.handle_buttons()
         for slider in self.sliders:
             slider.update(actions)
+        self.update_helpers()
 
         self.update_parts(delta_time, actions)
 
         if self.selected:
             self.change_state()
+
+
 
     def handle_actions(self, actions):
         '''
@@ -222,7 +225,19 @@ class Char_Creating(State):
             self.red, self.green, self.blue = self.selected_colour
             self.update_sliders()   
             self.update_buttons()
-            
+
+    def update_helpers(self):
+        '''
+        updates helper rect for choosing colour
+        '''    
+        for helper in self.helpers:
+            colour = [i for i in self.selected_colour]
+            if helper['side'] == -1: # left side
+                extreme_value = 0
+            elif helper['side'] == 1: # right side
+                extreme_value = 255
+            colour[helper['colour_id']] = extreme_value
+            helper['rgb'] = tuple(colour)
 
     def update_parts(self, dt, actions):
         for part in self.character_parts:
@@ -258,15 +273,17 @@ class Char_Creating(State):
         
         surface: surface to render on
         '''
-        surface.fill((self.game.BLACK))
+        surface.fill((self.game.UI_BG_COL))
 
         pygame.draw.rect(surface, self.game.BG_COL, self.bg_char_creating)
         draw_shading_for_rect(self.game.TILE_COL,
             self.bg_char_creating, surface, shading_W=5)
 
         self.game.draw_text(surface, "Create palikka",
-                             self.game.WHITE, self.game.GAME_W / 2,
-                               self.game.GAME_H / 8)
+                            self.game.WHITE, 
+                            self.red_slider.x + self.red_slider.width / 2 - 10,
+                            self.game.GAME_H / 8 - 10,
+                            size="H1")
         
         # self.game.draw_text(surface, f"Player {self.player_id + 1}",
         #                     self.game.WHITE, self.game.GAME_W * 0.25,
@@ -276,6 +293,7 @@ class Char_Creating(State):
         
         self.render_buttons(surface)
         self.render_slicers(surface)
+        self.render_helpers(surface)
         self.render_parts(surface)
         if self.player_id > 0:
             self.render_created_characters(surface)
@@ -328,31 +346,42 @@ class Char_Creating(State):
             draw_shading_for_rect((255, 255, 255), self.btn_lock_colour.rect,
                                   surface, shading_W=3)
 
+        # Text for buttons
+
         self.game.draw_text(surface,
             'Done', self.game.TILE_COL,
             self.done_text_x,
             self.done_text_y,
-            size='Medium'
+            size='Small'
         ) 
 
         self.game.draw_text(surface,
             'New piece', self.game.TILE_COL,
             self.new_piece_text_x,
             self.new_piece_text_y,
-            size='Medium'
+            size='Small'
         ) 
 
         self.game.draw_text(surface,
             'Duplicate', self.game.TILE_COL,
             self.copy_selected_text_x,
             self.copy_selected_text_y,
-            size='Medium'
+            size='Small'
         ) 
         
     def render_slicers(self, surface):
 
         for slider in self.sliders:
             slider.render(surface)
+
+    def render_helpers(self, surface):
+        '''
+        render rects that help w colour choosing
+        '''
+        for helper in self.helpers:
+            pygame.draw.rect(surface, helper['rgb'], helper['rect'])
+            draw_shading_for_rect(self.game.BLACK, helper['rect'],
+                                surface, shading_W=2)
 
     def render_parts(self, surface):
         '''
@@ -472,6 +501,7 @@ class Char_Creating(State):
         self.load_coordinates()
         self.load_text_coordinates()
         self.load_sliders()
+        self.load_helpers()
         
 
 
@@ -527,6 +557,61 @@ class Char_Creating(State):
         self.btn_lock_colour = Button(0, 0, self.selected_colour, self.selected_colour,
                                   width=self.left_arrow.width, height=100)
 
+    def load_helpers(self):
+        '''
+        loads rects that help w colour choosing
+        '''
+        w = 16
+        h = 24
+        left_value = 0
+        right_value = 255
+        padding = 10
+        self.helpers = []
+
+        # red
+        x_left = self.red_slider.x - padding - w
+        y_red = self.red_slider.y - h / 2
+        left_red = pygame.Rect(x_left, y_red, w, h)
+        self.helpers.append({
+            'side' : -1, 'colour_id': 0,
+            'rgb' : (255, 120, 120),
+            'rect': left_red})
+
+        x_right = self.red_slider.x + self.red_slider.width + padding
+        right_red = pygame.Rect(x_right, y_red, w, h)
+        self.helpers.append({
+            'side' : 1, 'colour_id': 0,
+            'rgb' : (255, 120, 120),
+            'rect': right_red})
+
+        # green
+        y_green = self.green_slider.y - h / 2
+        left_green = pygame.Rect(x_left, y_green, w, h)
+        self.helpers.append({
+            'side' : -1, 'colour_id': 1,
+            'rgb' : (255, 120, 120),
+            'rect': left_green})
+
+        right_green = pygame.Rect(x_right, y_green, w, h)
+        self.helpers.append({
+            'side' : 1, 'colour_id': 1,
+            'rgb' : (255, 120, 120),
+            'rect': right_green})
+
+        # blue
+        y_blue = self.blue_slider.y - h / 2
+        left_blue = pygame.Rect(x_left, y_blue, w, h)
+        self.helpers.append({
+            'side' : -1, 'colour_id': 2,
+            'rgb' : (255, 120, 120),
+            'rect': left_blue})
+
+        right_blue = pygame.Rect(x_right, y_blue, w, h)
+        self.helpers.append({
+            'side' : 1, 'colour_id': 2,
+            'rgb' : (255, 120, 120),
+            'rect': right_blue})
+
     def load_coordinates(self):
         # calculate locations for buttons
         # 1 arrow
@@ -559,7 +644,6 @@ class Char_Creating(State):
         # lock colour
         self.btn_lock_colour_x = self.left_arrow_x
         self.btn_lock_colour_y = self.left_arrow_y + self.left_arrow.height + 10
-
 
     def load_text_coordinates(self):
         # TEXT

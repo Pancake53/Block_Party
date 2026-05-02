@@ -29,14 +29,16 @@ class Game():
         self.scale_multiplier_y = self.GAME_H / self.WINDOW_H
 
         # colours
+        self.UI_BG_COL = (41, 186, 162)
         self.BG_COL = (0, 153, 136)
         self.TILE_COL = (181, 67, 0)
-        self.BLACK, self.WHITE = (0, 0, 0), (255, 255, 255)
+        self.BLACK, self.WHITE, self.GREY = (0, 0, 0), (255, 255, 255), (139, 139, 139)
 
         # fonts
-        self.FONT_TITLE = 50
-        self.FONT_MEDIUM = 20
-        self.FONT_SMALL = 15
+        self.FONT_TITLE = 40
+        self.FONT_H1 = 32
+        self.FONT_MEDIUM = 24
+        self.FONT_SMALL = 16
 
         # surface / character size
         self.CHARACTER_SIZE = 24                
@@ -245,6 +247,9 @@ class Game():
             case "Title":
                 text_surface = self.font_title.render(text,
                                                 True, colour)
+            case "H1":
+                text_surface = self.font_h1.render(text,
+                                                True, colour)
             case "Medium":
                 text_surface = self.font_medium.render(text,
                                                 True, colour)
@@ -274,6 +279,7 @@ class Game():
         # Assets themselves
         # fonts
         self.font_title = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_TITLE)
+        self.font_h1 = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_H1)
         self.font_medium = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_MEDIUM)
         self.font_small = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_SMALL)
         # assets
@@ -319,7 +325,7 @@ class Game():
     
         '''
         need I explain this
-        updates fullscreen values
+        updates fullscreen values, scaling values
         '''
         self.is_fullscreen = not self.is_fullscreen
 
@@ -330,12 +336,14 @@ class Game():
             # scaling for new H and W
             self.scale_multiplier_x = self.GAME_W / self.SCREEN_W
             self.scale_multiplier_y = self.GAME_H / self.SCREEN_H
+            # print(f'x scaler: {self.scale_multiplier_x}, y scaler: {self.scale_multiplier_y}, fullscreen')
 
         else:
             self.window = pygame.display.set_mode((self.WINDOW_W, self.WINDOW_H))
             # scaling for new H and W
             self.scale_multiplier_x = self.GAME_W / self.WINDOW_W
             self.scale_multiplier_y = self.GAME_H / self.WINDOW_H
+            # print(f'x scaler: {self.scale_multiplier_x}, y scaler: {self.scale_multiplier_y}')
 
 
     def play_music(self, audio_context, loops=-1):

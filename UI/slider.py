@@ -60,16 +60,13 @@ class Slider:
         # if mouse moved
         if x_move != 0:
 
-            self.current_value += x_move
+            self.current_value_float += x_move
             # cap
-            if self.current_value < 0:
-                self.current_value = 0
-                self.update_pos()
-            elif self.current_value > self.max_value:
-                self.current_value = self.max_value
-                self.update_pos()
-            else:
-                self.pointer.x += x_move
+            self.current_value_float = max(min(self.current_value_float, self.max_value), 0)
+            
+            self.update_pos()
+            
+            print(f'float: {self.current_value_float}, int: {self.current_value}')
             # update old pos
             self.old_mouse_pos = actions['mouse_pos']
             # callback
@@ -100,6 +97,7 @@ class Slider:
         self.W = 7
         self.side_lenght = self.height
         self.slider_colour = (255, 255, 255)
+        self.current_value_float = float(self.current_value)
         pointer_H = self.height * 1.5
         pointer_W = 10
 
@@ -127,5 +125,6 @@ class Slider:
         
     def update_pos(self):
         # updating sliders
+        self.current_value = round(self.current_value_float)
         self.pointer_x = self.x + self.current_value - self.pointer.width / 2
         self.pointer.x = self.pointer_x
