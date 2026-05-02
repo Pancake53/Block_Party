@@ -368,6 +368,11 @@ class Char_Creating(State):
             self.copy_selected_text_y,
             size='Small'
         ) 
+
+        # images
+        surface.blit(self.bucket_img, self.bucket_rect)
+
+        
         
     def render_slicers(self, surface):
 
@@ -556,6 +561,10 @@ class Char_Creating(State):
         
         self.btn_lock_colour = Button(0, 0, self.selected_colour, self.selected_colour,
                                   width=self.left_arrow.width, height=100)
+        
+        # bucket
+        self.bucket_img = self.game.assets['bucket_img']
+        self.bucket_rect = self.bucket_img.get_rect()
 
     def load_helpers(self):
         '''
@@ -644,6 +653,10 @@ class Char_Creating(State):
         # lock colour
         self.btn_lock_colour_x = self.left_arrow_x
         self.btn_lock_colour_y = self.left_arrow_y + self.left_arrow.height + 10
+
+        # bucket
+        self.bucket_rect.x = self.btn_lock_colour_x + 12
+        self.bucket_rect.y = self.btn_lock_colour_y + 12
 
     def load_text_coordinates(self):
         # TEXT
@@ -796,9 +809,10 @@ class Char_Creating(State):
         self.update_buttons()
 
     def update_sliders(self):
-        self.red_slider.current_value = self.red
-        self.green_slider.current_value = self.green
-        self.blue_slider.current_value = self.blue
+        self.red, self.green, self.blue = self.selected_colour
+        self.red_slider.current_value_float = self.red
+        self.green_slider.current_value_float = self.green
+        self.blue_slider.current_value_float = self.blue
         for slider in self.sliders:
             slider.update_pos()
 

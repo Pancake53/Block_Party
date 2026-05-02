@@ -33,7 +33,7 @@ class Game():
         self.BG_COL = (0, 153, 136)
         self.TILE_COL = (181, 67, 0)
         self.BLACK, self.WHITE, self.GREY = (0, 0, 0), (255, 255, 255), (139, 139, 139)
-
+        self.LIGHT_GREY = (200, 200, 200)
         # fonts
         self.FONT_TITLE = 40
         self.FONT_H1 = 32
@@ -293,6 +293,8 @@ class Game():
         self.assets["arrowleft_img"] = pygame.image.load(os.path.join(self.image_dir, "arrowleft.png")).convert_alpha()
         self.assets["arrowright_img"] = pygame.image.load(os.path.join(self.image_dir, "arrowright.png")).convert_alpha()
         self.assets['reset_img'] = pygame.image.load(os.path.join(self.image_dir, "reset.png")).convert_alpha()
+        self.assets['bucket_img'] = pygame.image.load(os.path.join(self.image_dir, "bucket.png")).convert_alpha()
+        self.assets['credits_img'] = pygame.image.load(os.path.join(self.image_dir, "credits.png")).convert_alpha()
 
         # cursors
         self.assets['move_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "move4.png")).convert_alpha() 

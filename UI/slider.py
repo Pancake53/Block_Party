@@ -128,3 +128,5 @@ class Slider:
         self.current_value = round(self.current_value_float)
         self.pointer_x = self.x + self.current_value - self.pointer.width / 2
         self.pointer.x = self.pointer_x
+
+

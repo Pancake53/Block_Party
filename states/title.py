@@ -26,8 +26,10 @@ class Title(State):
         self.rects = []
         self.play = False
         self.quit = False
+        self.show_credits = False
 
         self.load()
+        self.load_rect()
 
         
 
@@ -50,6 +52,9 @@ class Title(State):
         if self.play:
             new_state = Player_Menu(self.game)
             new_state.enter_state()
+
+        if self.show_credits:
+            pass
 
         if actions["esc"] or self.quit:
             self.game.playing = False
@@ -100,7 +105,7 @@ class Title(State):
         '''
         surface.fill((self.game.WHITE))
         pygame.draw.rect(surface, self.game.UI_BG_COL, self.menu_bg)
-        # pygame.draw.rect(surface, self.game.GREY, self.div_rect)
+        pygame.draw.rect(surface, self.game.LIGHT_GREY, self.bouncing_bg)
         draw_shading_for_rect(self.game.BLACK, self.bouncing_bg, surface, shading_W=7)
         pygame.draw.rect(surface, self.game.GREY, self.div_rect)
 
@@ -116,6 +121,7 @@ class Title(State):
         
         self.render_buttons(surface)
         self.render_text(surface)
+        self.render_images(surface)
         
     def render_buttons(self, surface):
         '''
@@ -128,6 +134,11 @@ class Title(State):
 
         self.quit = self.btn_quit.action_on_button(
             self.btn_quit.x, self.btn_quit.y,
+            surface, self.game.actions
+        )
+
+        self.show_credits = self.btn_credits.action_on_button(
+            self.btn_credits.x, self.btn_credits.y,
             surface, self.game.actions
         )
 
@@ -147,14 +158,34 @@ class Title(State):
         self.game.draw_text(surface, "Quit",
             self.game.TILE_COL, self.quit_text_x,
             self.quit_text_y, size="Medium"
-        )       
+        )
 
+        self.game.draw_text(surface, "Credits",
+            self.game.TILE_COL, self.credits_text_x,
+            self.credits_text_y, size="Medium"
+        )       
+       
+    def render_images(self, surface):
+
+        surface.blit(self.credit_img, self.credit_rect)
+        surface.blit(self.flag_img, self.flag_rect)
+        surface.blit(self.bomb_img, self.bomb_rect)
+        surface.blit(self.bomb_img, self.bomb_rect2)
+        surface.blit(self.bomb_img, self.bomb_rect3)
 
 
     def load(self):
         '''
         loads buttons and inits rects at init
         '''
+        self.load_bg()
+
+        self.load_buttons()
+
+        self.load_images()
+
+    def load_bg(self):
+
         # titles center coordinates
         self.title_x = self.game.GAME_W * 4 / 16
         self.title_y = self.game.GAME_H / 3
@@ -187,26 +218,19 @@ class Title(State):
         # title bg
 
         w = self.game.GAME_W * 2 / 3 - self.game.GAME_W / 16
-        h = self.game.GAME_H / 6 + 10
+        h = self.game.GAME_H / 6 + 15
         x = - 2
-        y = self.game.GAME_H / 4
+        y = self.game.GAME_H / 4 - 5
         self.title_rect = pygame.Rect(x, y, w, h)
 
-       
-
-
-
-        # buttons
-
-        self.load_buttons()
 
     def load_buttons(self):
         '''
         loads buttons
         '''
         # play btn
-        w = 120
-        h = w/2
+        w = 400
+        h = 60
 
         x = 25
         y = self.game.GAME_H / 2
@@ -214,7 +238,7 @@ class Title(State):
         self.btn_play = Button(x, y,
             button_colour=self.game.BG_COL, width=w, height=h)
         # text
-        self.play_text_x = self.btn_play.x + self.btn_play.width / 2
+        self.play_text_x = self.btn_play.x + self.btn_play.width / 4 - 30
         self.play_text_y = self.btn_play.y + self.btn_play.height / 2
 
         # quit
@@ -222,5 +246,61 @@ class Title(State):
         self.btn_quit = Button(x, y,
             button_colour=self.game.BG_COL, width=w, height=h)
         # text
-        self.quit_text_x = self.btn_quit.x + self.btn_quit.width / 2
+        self.quit_text_x = self.btn_quit.x + self.btn_quit.width / 4 - 36
         self.quit_text_y = self.btn_quit.y + self.btn_quit.height / 2
+
+        # credits
+        y += h * 1.5
+        self.btn_credits = Button(x, y,
+            button_colour=self.game.BG_COL, width=w, height=h)
+        # text
+        self.credits_text_x = self.btn_credits.x + self.btn_credits.width / 3 - 34
+        self.credits_text_y = self.btn_credits.y + self.btn_credits.height / 2
+
+    def load_images(self):
+        '''
+        images and their coordinates
+        '''
+        x_offset = 180
+        y_offset = self.btn_play.height * -1
+        scale_factor = 2
+
+        # play
+        img = self.game.assets['bomb_img']
+        w, h = img.get_size()
+        self.bomb_img = pygame.transform.scale(img,
+                (w * scale_factor, h * scale_factor))
+
+        self.bomb_rect = self.bomb_img.get_rect()
+
+        self.bomb_rect.x = self.play_text_x + x_offset
+        self.bomb_rect.y = self.play_text_y + y_offset
+
+        self.bomb_rect2 = self.bomb_rect.copy()
+        self.bomb_rect2.x -= self.bomb_rect2.width / 3 + 10
+        self.bomb_rect2.y += self.bomb_rect2.height / 3 
+
+        self.bomb_rect3 = self.bomb_rect.copy()
+        self.bomb_rect3.x += self.bomb_rect2.width / 2
+        self.bomb_rect3.y += self.bomb_rect2.height / 3 + 5
+
+
+
+        # quit
+        scale_factor = 3
+        img = self.game.assets["flag_img"]
+        w, h = img.get_size()
+        self.flag_img = pygame.transform.scale(img,
+                (w * scale_factor, h * scale_factor))
+        
+        self.flag_rect = self.flag_img.get_rect()
+
+        self.flag_rect.x = self.quit_text_x + x_offset
+        self.flag_rect.y = self.quit_text_y + y_offset
+
+        # credits
+        self.credit_img = self.game.assets['credits_img']
+        self.credit_rect = self.credit_img.get_rect()
+
+        self.credit_rect.x = self.credits_text_x + x_offset
+        self.credit_rect.y = self.credits_text_y + y_offset

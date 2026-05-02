@@ -70,7 +70,7 @@ class BouncingRect:
             y_hit = True
 
         if x_hit and y_hit:
-            if self.corners_hit < 3:
+            if self.corners_hit < 1:
                 self.corner_hit()
 
     def render(self, surface):
@@ -93,16 +93,18 @@ class BouncingRect:
         '''
         react to hitting the corner WOAHH
         '''
+        # print("corner hit")
         self.corners_hit += 1
 
         self.W *= 2
         self.H *= 2
         self.x_speed *= 2
         self.y_speed *= 2
-        self.x = self.left_wall + 10
+        self.x = self.left_wall + 20
         self.y = self.game_H / 2 - self.H / 2
-        self.rect = pygame.Rect(self.x, self.y, self.W, self.H)
+        self.rect = pygame.Rect(0, 0, self.W, self.H)
         self.update_surface()
+        # print(f'new x: {self.x}, y: {self.y}, w: {self.W}, h: {self.H}')
 
     def update_surface(self):
         '''
