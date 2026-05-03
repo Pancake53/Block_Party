@@ -74,6 +74,7 @@ class Char_Creating(State):
 
         # sliders
         self.sliders = []
+        self.lines = []
 
         self.load() # Buttons / UI elements / coordinates
 
@@ -284,22 +285,28 @@ class Char_Creating(State):
 
         self.game.draw_text(surface, "Create palikka",
                             self.game.WHITE, 
-                            self.red_slider.x + self.red_slider.width / 2 - 10,
-                            self.game.GAME_H / 8 - 10,
+                            self.title_x,
+                            self.title_y,
                             size="H1")
         
         # self.game.draw_text(surface, f"Player {self.player_id + 1}",
         #                     self.game.WHITE, self.game.GAME_W * 0.25,
         #                       self.game.GAME_H * 0.25)
         
-        
+        for line in self.lines:
+            pygame.draw.line(surface, 
+                            self.game.LIGHT_GREY, 
+                            line[0], line[1], 
+                            width=7)
         
         self.render_buttons(surface)
         self.render_slicers(surface)
         self.render_helpers(surface)
-        self.render_parts(surface)
+        
         if self.player_id > 0:
             self.render_created_characters(surface)
+
+        self.render_parts(surface)
 
         self.render_cursor(surface)
 
@@ -533,12 +540,35 @@ class Char_Creating(State):
         '''
         
         self.load_buttons()
+        self.load_images()
         self.load_coordinates()
-        self.load_text_coordinates()
         self.load_sliders()
-        self.load_helpers()
-        
 
+        self.load_text_coordinates()
+        self.load_helpers()
+        self.load_lines()
+        
+    def load_images(self):
+        # bucket
+        self.bucket_img = self.game.assets['bucket_img']
+        self.bucket_rect = self.bucket_img.get_rect()
+        # add
+        self.add_img = self.game.assets['add_img']
+        self.add_rect = self.add_img.get_rect()
+        # copy
+        self.copy_img = self.game.assets['copy_img']
+        self.copy_rect = self.copy_img.get_rect()
+        # save
+        self.save_img = self.game.assets['save_img']
+        self.save_rect = self.save_img.get_rect()
+        # load
+        self.load_img = self.game.assets['load_img']
+        self.load_rect = self.load_img.get_rect()
+        # trash_closed
+        self.trash_closed_img = self.game.assets['trash_closed_img']
+        self.trash_rect = self.trash_closed_img.get_rect()
+        # trash_open
+        self.trash_open_img = self.game.assets['trash_open_img']
 
     def load_sliders(self):
         '''
@@ -598,24 +628,6 @@ class Char_Creating(State):
         self.btn_load = Button(0, 0, button_colour=self.game.BG_COL,
                                   width=150, height=50)
         
-        
-        # bucket
-        self.bucket_img = self.game.assets['bucket_img']
-        self.bucket_rect = self.bucket_img.get_rect()
-        # add
-        self.add_img = self.game.assets['add_img']
-        self.add_rect = self.add_img.get_rect()
-        # copy
-        self.copy_img = self.game.assets['copy_img']
-        self.copy_rect = self.copy_img.get_rect()
-        # save
-        self.save_img = self.game.assets['save_img']
-        self.save_rect = self.save_img.get_rect()
-        # load
-        self.load_img = self.game.assets['load_img']
-        self.load_rect = self.load_img.get_rect()
-
-
 
     def load_helpers(self):
         '''
@@ -734,8 +746,27 @@ class Char_Creating(State):
         self.load_rect.x = self.btn_load_x + self.btn_load.width - self.load_rect.width - 3
         self.load_rect.y = self.btn_load_y
 
+    def load_lines(self):
+        # LINES / DIVIDERS
+
+        # title
+        w = 460
+        y = self.title_y + 40
+        x = self.title_x - w / 2
+        line_start = (x, y)
+
+        x += w
+        line_end = (x, y)
+        self.lines.append([line_start, line_end])   
+
     def load_text_coordinates(self):
         # TEXT
+
+        # title
+        self.title_x = self.red_slider.x + self.red_slider.width / 2 - 10
+        self.title_y = self.game.GAME_H / 8 - 10
+        # print(f'title x : {self.title_x}, title y : {self.title_y}')
+
         # done
         self.done_text_x = self.done_button_x + self.done_button.width / 2
         self.done_text_y = self.done_button_y + self.done_button.height / 2
