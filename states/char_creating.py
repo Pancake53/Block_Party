@@ -750,14 +750,18 @@ class Char_Creating(State):
         # LINES / DIVIDERS
 
         # title
-        w = 460
         y = self.title_y + 40
-        x = self.title_x - w / 2
-        line_start = (x, y)
+        x_left = self.new_piece_button_x - 5
+        line_start = (x_left, y)
 
-        x += w
-        line_end = (x, y)
-        self.lines.append([line_start, line_end])   
+        x_right = self.game.GAME_W - 5
+        line_end = (x_right, y)
+        self.lines.append([line_start, line_end])
+
+        y = self.btn_save_y - 20
+        line_start = (x_left, y)
+        line_end = (x_right, y)
+        self.lines.append([line_start, line_end])  
 
     def load_text_coordinates(self):
         # TEXT

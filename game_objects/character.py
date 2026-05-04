@@ -76,8 +76,83 @@ class Character(GameObject):
         if not self.state['eliminated']:
             self.update_chosen(dt, actions, tiles)
             self.health_bar.update()
+    
+    def collision_test(self, tiles):
+        '''
+        tests if gameObject has overlapping with collision tiles
 
+        tiles: game levels collision tiles
+
+        Returns:
+        collisions: list of overlapping tiles
+        '''
+        collisions = []
+        for tile in tiles:
+            if self.rect.colliderect(tile.rect):
+                collisions.append(tile.rect)
         
+        for team in self.game_world.teams_not_eliminated.values():
+            for char in team:
+                if char != self:
+                    if self.rect.colliderect(char.rect):
+                        self.character_collision(char)
+                        collisions.append(char.rect)
+
+        return collisions
+    
+    
+    def character_collision(self, bumped_char):
+        '''
+        handels reacting to bumping another 
+        character and giving it momentum
+
+        bumped_char: Character that was bumped into
+        '''
+        print('Characters collided')
+        momentum_loss = 0.75
+        min_angle = 40
+        max_angle = 75
+        grace_for_stacking = 30
+
+        move_vec = Vector2(self.x_speed, 
+                           self.y_speed)  * momentum_loss
+        
+        # angle with regard to the sky so up
+        angle = move_vec.angle_to((0, -1))
+        if angle < 0:
+            angle = 360 + angle
+        print(f'Angle vec {angle}')
+        
+
+        # coming from left side
+        if 180 < angle < 360 - grace_for_stacking:
+            print('tackle from left')
+            old_min = min_angle
+            min_angle = 360 - max_angle
+            max_angle = 360 - old_min
+            capped_angle = max(min(angle, max_angle), min_angle) 
+            angle_change = angle - capped_angle
+            print(f'Angle change {angle_change}')
+            move_vec.rotate_ip(angle_change)
+
+        # coming from right side
+        elif grace_for_stacking < angle < 180:
+            print('tackle from right')
+            capped_angle = max(min(angle, max_angle), min_angle) 
+            angle_change = angle - capped_angle
+            print(f'Angle change {angle_change}')
+            move_vec.rotate_ip(angle_change)
+
+        # allow THE STACK
+        else:
+            print(f'WE DO THE STACK')
+        
+        bumped_char.x_speed = move_vec[0]
+        bumped_char.y_speed = move_vec[1]
+
+
+
+
     def collision_x_axis(self, collisions):
         '''
         reaction to collision on x axis
@@ -125,6 +200,9 @@ class Character(GameObject):
             self.rect.bottom = tile.top
             self.y_screen = self.rect.y
             self.y_speed = 0
+
+    def react_to_tackle(self, movement_vec):
+        pass
 
     def clicking(self, actions):
         '''

@@ -273,6 +273,7 @@ class Game():
         self.image_dir = os.path.join(self.assets_dir, "images")
         self.font_dir = os.path.join(self.assets_dir, "font")
         self.audio_dir = os.path.join(self.assets_dir, "audio")
+        self.sound_fx_dir = os.path.join(self.audio_dir, "sound_fx")
         self.level_dir = os.path.join("levels")
         self.cursor_dir = os.path.join(self.image_dir, "cursors")
         # self.tilemap_dir = os.path.join("tilemap") NOT IN USE
@@ -299,17 +300,23 @@ class Game():
         self.assets['copy_img'] = pygame.image.load(os.path.join(self.image_dir, "copy.png")).convert_alpha()
         self.assets['save_img'] = pygame.image.load(os.path.join(self.image_dir, "save.png")).convert_alpha()
         self.assets['load_img'] = pygame.image.load(os.path.join(self.image_dir, "load.png")).convert_alpha()
+        self.assets['trash_open_img'] = pygame.image.load(os.path.join(self.image_dir, "trash_open.png")).convert_alpha()
+        self.assets['trash_closed_img'] = pygame.image.load(os.path.join(self.image_dir, "trash_closed.png")).convert_alpha()
+
 
         # cursors
         self.assets['move_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "move4.png")).convert_alpha() 
         self.assets['resize_width_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "resize_width.png")).convert_alpha()
         self.assets['resize_height_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "resize_height.png")).convert_alpha()
+
         # audio
         self.audio['main_theme'] = os.path.join(self.audio_dir, 'main_music.ogg')
         self.audio['sea_ambiance'] = os.path.join(self.audio_dir, 'sea_ambiance.ogg')
         self.audio['smile'] = os.path.join(self.audio_dir, 'smile.ogg')
         self.audio['middle_ages'] = os.path.join(self.audio_dir, 'middle_ages.ogg')
         self.audio['mystical_forest'] = os.path.join(self.audio_dir, 'mystical_forest.ogg')
+        # sound fx
+        self.audio['explosion'] = os.path.join(self.sound_fx_dir, 'explosion.wav')
 
 
     def reset_keys(self):
@@ -388,7 +395,8 @@ class Game():
             case _:
                 print('Invalid type input in change_volume')
 
-    def toggle_music (self):
+    def toggle_music(self):
+
         self.music_muted = not self.music_muted
 
         if self.music_muted:
@@ -396,3 +404,14 @@ class Game():
 
         else: # music unmuted
             self.change_volume('music')
+
+    def play_sound_effect(self, sound):
+        '''
+        playes sound effect
+
+        
+        sound: pygame.mixer.Sound(effect_name)
+        
+        '''
+        sound.play()
+        sound.set_volume(self.settings.master_volume * self.settings.sfx_vol)

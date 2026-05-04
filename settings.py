@@ -6,7 +6,7 @@ class Settings():
         # Audio
         self.master_volume = 0.5
         self.music_vol = 0.5
-        self.sfx_vol = 0.8
+        self.sfx_vol = 0.6
         self.dialogue_vol = 0.8
 
         self.mute = False

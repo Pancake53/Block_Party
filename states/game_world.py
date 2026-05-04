@@ -75,6 +75,8 @@ class Game_World(State):
         # needed classes --> bomb, explosion, buttons
         self.load_entities()
 
+        self.load_effects()
+
         # Game State
         self.state = {'turn': 0, 'selecting_locked': False, 'game_over': False}
         self.current_turn = 0
@@ -377,9 +379,7 @@ class Game_World(State):
         self.explosion = Explosion(self.game.assets['explosion_img'])
         self.jump_button = Button(0, 0, image=self.game.assets['jump_img'])
         self.bomb_button = Button(0, 0, image=self.game.assets['bomb_img'])
-        self.flag_button = Button(0, 0, image=self.game.assets['flag_img'])    
-
-        
+        self.flag_button = Button(0, 0, image=self.game.assets['flag_img'])         
 
     def load_level(self, level_name):
         '''
@@ -454,6 +454,13 @@ class Game_World(State):
                         self)
             )
 
+    def load_effects(self):
+        '''
+        '''
+
+        self.sfx_explosion = pygame.mixer.Sound(self.game.audio['explosion'])
+        
+
     # bomb / explosion
 
     def spawn_bomb(self, x_pos, y_pos):
@@ -502,6 +509,8 @@ class Game_World(State):
 
         if hit_characters:
             self.explosion_calculations(x_pos, y_pos, hit_characters)
+
+        self.game.play_sound_effect(self.sfx_explosion)
 
     def explosion_calculations(self, x_pos, y_pos, hit_characters):
         '''
