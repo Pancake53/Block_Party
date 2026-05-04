@@ -34,6 +34,7 @@ class Game():
         self.TILE_COL = (181, 67, 0)
         self.BLACK, self.WHITE, self.GREY = (0, 0, 0), (255, 255, 255), (139, 139, 139)
         self.LIGHT_GREY = (200, 200, 200)
+        self.RED = (255, 0, 0)
         # fonts
         self.FONT_TITLE = 40
         self.FONT_H1 = 32
@@ -317,6 +318,7 @@ class Game():
         self.audio['mystical_forest'] = os.path.join(self.audio_dir, 'mystical_forest.ogg')
         # sound fx
         self.audio['explosion'] = os.path.join(self.sound_fx_dir, 'explosion.wav')
+        self.audio['jump'] = os.path.join(self.sound_fx_dir, 'jump.flac')
 
 
     def reset_keys(self):
@@ -405,7 +407,7 @@ class Game():
         else: # music unmuted
             self.change_volume('music')
 
-    def play_sound_effect(self, sound):
+    def play_sfx(self, sound):
         '''
         playes sound effect
 

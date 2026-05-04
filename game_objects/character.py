@@ -1,7 +1,9 @@
 import pygame
 from game_objects.gameObject import GameObject
 from UI.healthBar import HealthBar
+from UI.floating_fade import FloatingFade
 from pygame.math import Vector2
+
 
 class Character(GameObject):
     '''
@@ -25,8 +27,7 @@ class Character(GameObject):
         
 
         # Team Colour
-        self.colour = self.game_world.created_chars[team_id]['main_colour']
-        self.colour = (0, 0, 0)
+        self.main_colour = self.game_world.created_chars[team_id]['main_colour']
         # Team Skin
         self.skin_surface = self.game_world.created_chars[team_id]['char_surface']
         
@@ -53,7 +54,7 @@ class Character(GameObject):
         surface: game canvas
         '''
         if not self.state['eliminated']:
-            pygame.draw.rect(surface, self.colour, self.rect)
+            # pygame.draw.rect(surface, self.colour, self.rect)
             surface.blit(self.skin_surface, (
                 self.rect.x + self.skin_offset_x,
                 self.rect.y + self.skin_offset_y
@@ -108,47 +109,60 @@ class Character(GameObject):
 
         bumped_char: Character that was bumped into
         '''
+        # bumping from top
+        # does nothing to the one being bumped
+        if (self.y_speed > 0 and # moving down
+            # overlap on y axis, which is updated before x
+            self.y_screen + self.HEIGHT > bumped_char.y_screen and 
+            # overlap on x axis
+            (self.x_screen < bumped_char.x_screen < self.x_screen + self.WIDTH
+                or
+            self.x_screen < bumped_char.x_screen + bumped_char.WIDTH < self.x_screen + self.WIDTH)
+            ):
+            return
+
+        # works well for sides but not so well for
+        # stacking so when x overlaps
         print('Characters collided')
         momentum_loss = 0.75
         min_angle = 40
         max_angle = 75
         grace_for_stacking = 30
+        min_speed = 2
 
         move_vec = Vector2(self.x_speed, 
                            self.y_speed)  * momentum_loss
         
-        # angle with regard to the sky so up
-        angle = move_vec.angle_to((0, -1))
-        if angle < 0:
-            angle = 360 + angle
-        print(f'Angle vec {angle}')
-        
+        if move_vec.length() > min_speed:
 
-        # coming from left side
-        if 180 < angle < 360 - grace_for_stacking:
-            print('tackle from left')
-            old_min = min_angle
-            min_angle = 360 - max_angle
-            max_angle = 360 - old_min
-            capped_angle = max(min(angle, max_angle), min_angle) 
+            # angle with regard to the sky so up
+            angle = move_vec.angle_to((0, -1))
+            if angle < 0:
+                angle = 360 + angle
+            print(f'Angle vec {angle}')
+            
+
+            # coming from left side
+            if 180 < angle < 360:
+                print('tackle from left')
+                old_min = min_angle
+                min_angle = 360 - max_angle
+                max_angle = 360 - old_min
+                capped_angle = max(min(angle, max_angle), min_angle) 
+
+            # coming from right side
+            elif 0 < angle < 180:
+                print('tackle from right')
+                capped_angle = max(min(angle, max_angle), min_angle)    
+
+            else:
+                return
+
             angle_change = angle - capped_angle
             print(f'Angle change {angle_change}')
             move_vec.rotate_ip(angle_change)
-
-        # coming from right side
-        elif grace_for_stacking < angle < 180:
-            print('tackle from right')
-            capped_angle = max(min(angle, max_angle), min_angle) 
-            angle_change = angle - capped_angle
-            print(f'Angle change {angle_change}')
-            move_vec.rotate_ip(angle_change)
-
-        # allow THE STACK
-        else:
-            print(f'WE DO THE STACK')
-        
-        bumped_char.x_speed = move_vec[0]
-        bumped_char.y_speed = move_vec[1]
+            bumped_char.x_speed = move_vec[0]
+            bumped_char.y_speed = move_vec[1]
 
 
 
@@ -201,8 +215,7 @@ class Character(GameObject):
             self.y_screen = self.rect.y
             self.y_speed = 0
 
-    def react_to_tackle(self, movement_vec):
-        pass
+
 
     def clicking(self, actions):
         '''
@@ -240,7 +253,11 @@ class Character(GameObject):
                 self.throwing_list = []
                 self.state["drag"] = True
 
-
+    def play_jump_fx(self):
+        '''
+        jump --> bloop
+        '''
+        self.game_world.game.play_sfx(self.game_world.sfx_jump)
         
     def throw_bomb(self):
         '''
@@ -277,13 +294,50 @@ class Character(GameObject):
 
         damage: force of bomb
         '''
+        dmg_scale = 2.5
+
         damage = min(50, # max
-            max(int(damage * 1.8), # scale
+            max(int(damage * dmg_scale), # scale
             10)) # min
         
-        if self.game_world.round >= 3:
-            if damage == 50:
+        
+
+        if damage == 50:
+            if self.game_world.round >= 3:
                 self.game_world.grant_another_turn()
+
+            dmg_number = FloatingFade(
+                self.x_screen, self.y_screen,
+                str(damage),
+                self.game_world.game.font_medium,
+                self.game_world.game.BLACK)
+    
+            self.game_world.sprites.add(dmg_number)
+
+            dmg_number = FloatingFade(
+                self.x_screen, self.y_screen + 4,
+                str(damage),
+                self.game_world.game.font_medium,
+                self.game_world.game.RED)
+    
+            self.game_world.sprites.add(dmg_number)
+
+        else:
+            dmg_number = FloatingFade(
+                self.x_screen, self.y_screen,
+                str(damage),
+                self.game_world.game.font_small,
+                self.game_world.game.BLACK)
+        
+            self.game_world.sprites.add(dmg_number)
+
+            dmg_number = FloatingFade(
+                self.x_screen, self.y_screen + 3,
+                str(damage),
+                self.game_world.game.font_small,
+                self.main_colour)
+        
+            self.game_world.sprites.add(dmg_number)
 
         self.current_hp -= damage
         if self.current_hp <= 0:

@@ -393,6 +393,7 @@ class GameObject():
                 self.state['locked'] = True
             else:
                 self.reset_state()
+            self.play_jump_fx()
 
         # else reset
         else:
@@ -400,6 +401,9 @@ class GameObject():
             self.reset_state()
             if self.__class__.__name__ == 'Bomb':
                 self.reset_pos()
+
+    def play_jump_fx(self):
+        pass
 
     def throw_bomb(self):
         pass

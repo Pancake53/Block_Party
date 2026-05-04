@@ -5,9 +5,12 @@ from states.state import State
 from game_objects.character import Character
 from game_objects.bomb import Bomb
 from game_objects.explosion import Explosion
-from UI.button import Button
 from game_objects.tile import Tile
+
+from UI.button import Button
 from UI.camera import Camera
+from UI.floating_fade import FloatingFade
+
 from physics import Physics
 
 
@@ -24,6 +27,11 @@ class Game_World(State):
         self.tiles = []
         self.temp_tiles = []
         
+        # About created_chars
+        # all characters created by players so far
+        # dictionary with player id as the first key
+        # value is dict, which 
+        # contain keys main_colour and char_surface
 
         self.player_count = len(created_chars)
         self.created_chars = created_chars
@@ -47,11 +55,10 @@ class Game_World(State):
                             'claimed\nvictory royale',
                             '\nis better', 
                             'has\nclapped cheeks',
-                            'brought\nthe paintrain',
-                            'sealed\ntheir enemies fate',
-                            '\nreigned supreme',
+                            'gooned\nin Romania',
+                            '\nfarted',
+                            "doesn't\nwash hands",
                             'delivered\nthe final blow(job)',
-                            '\nis the lash',
                             'is\nvery special']
 
        
@@ -74,7 +81,7 @@ class Game_World(State):
         
         # needed classes --> bomb, explosion, buttons
         self.load_entities()
-
+        self.sprites = pygame.sprite.Group()
         self.load_effects()
 
         # Game State
@@ -122,7 +129,8 @@ class Game_World(State):
         self.explosion.update()
         self.handle_actions(actions)
         # print(self.game_state)
-        
+        # sprites
+        self.sprites.update(delta_time)
 
         if self.state['game_over']:
             self.update_winning()    
@@ -238,6 +246,8 @@ class Game_World(State):
         self.render_turn(surface)
         # explosion
         self.explosion.render(surface)
+        # floating sprites
+        self.sprites.draw(surface)
 
         # arrow
         if self.draw_arrow:
@@ -459,6 +469,7 @@ class Game_World(State):
         '''
 
         self.sfx_explosion = pygame.mixer.Sound(self.game.audio['explosion'])
+        self.sfx_jump = pygame.mixer.Sound(self.game.audio['jump'])
         
 
     # bomb / explosion
@@ -510,7 +521,7 @@ class Game_World(State):
         if hit_characters:
             self.explosion_calculations(x_pos, y_pos, hit_characters)
 
-        self.game.play_sound_effect(self.sfx_explosion)
+        self.game.play_sfx(self.sfx_explosion)
 
     def explosion_calculations(self, x_pos, y_pos, hit_characters):
         '''
@@ -733,11 +744,14 @@ class Game_World(State):
         player_id: id of player who pressed the surrender button
         '''
         # change character states
-        for char in self.teams[player_id]:
-            char.state['eliminated'] = True
-            char.x_speed = 0
-            char.y_speed = 0
-            char.state['moving'] = False
+        for id, team in self.teams_not_eliminated.items():
+            if id == player_id:
+                for char in team:
+                    char.state['eliminated'] = True
+                    char.x_speed = 0
+                    char.y_speed = 0
+                    char.state['moving'] = False
+                self.temp_teams_not_eliminated.pop(player_id, None)
         # remove from alive
         self.players_alive.remove(player_id)
         # check for win
