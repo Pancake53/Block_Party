@@ -1,7 +1,9 @@
 import pygame
 from game_objects.gameObject import GameObject
 from UI.healthBar import HealthBar
+from UI.floating_fade import FloatingFade
 from pygame.math import Vector2
+
 
 class Character(GameObject):
     '''
@@ -201,8 +203,7 @@ class Character(GameObject):
             self.y_screen = self.rect.y
             self.y_speed = 0
 
-    def react_to_tackle(self, movement_vec):
-        pass
+
 
     def clicking(self, actions):
         '''
@@ -281,6 +282,13 @@ class Character(GameObject):
             max(int(damage * 1.8), # scale
             10)) # min
         
+        dmg_number = FloatingFade(
+            self.x, self.y,
+            0.5, str(damage),
+            self.game_world.game.font_small,
+            self.game_world.game.BLACK)
+        self.game_world.sprites.add(dmg_number)
+
         if self.game_world.round >= 3:
             if damage == 50:
                 self.game_world.grant_another_turn()

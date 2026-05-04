@@ -5,9 +5,12 @@ from states.state import State
 from game_objects.character import Character
 from game_objects.bomb import Bomb
 from game_objects.explosion import Explosion
-from UI.button import Button
 from game_objects.tile import Tile
+
+from UI.button import Button
 from UI.camera import Camera
+from UI.floating_fade import FloatingFade
+
 from physics import Physics
 
 
@@ -74,7 +77,7 @@ class Game_World(State):
         
         # needed classes --> bomb, explosion, buttons
         self.load_entities()
-
+        self.sprites = pygame.sprite.Group()
         self.load_effects()
 
         # Game State
@@ -122,7 +125,8 @@ class Game_World(State):
         self.explosion.update()
         self.handle_actions(actions)
         # print(self.game_state)
-        
+        # sprites
+        self.sprites.update(delta_time)
 
         if self.state['game_over']:
             self.update_winning()    
@@ -238,6 +242,8 @@ class Game_World(State):
         self.render_turn(surface)
         # explosion
         self.explosion.render(surface)
+        # floating sprites
+        self.sprites.draw(surface)
 
         # arrow
         if self.draw_arrow:
