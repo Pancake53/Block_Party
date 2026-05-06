@@ -364,18 +364,18 @@ class Game_World(State):
         
         arrow_point = self.rect_center + self.diff_vector * 0.5
         # from mouse to rect center
-        pygame.draw.line(surface, self.arrow_colour, self.end_point, self.rect_center, self.arrow_W)
+        pygame.draw.aaline(surface, self.arrow_colour, self.end_point, self.rect_center, self.arrow_W)
         # center to arrowpoint
-        pygame.draw.line(surface, self.arrow_colour, self.rect_center, arrow_point, self.arrow_W)
+        pygame.draw.aaline(surface, self.arrow_colour, self.rect_center, arrow_point, self.arrow_W)
 
         # sides of the arrow
         # left
         sides = self.diff_vector * 0.55
         end = sides.rotate(155) + arrow_point
-        pygame.draw.line(surface, self.arrow_colour, end, arrow_point, self.arrow_W)
+        pygame.draw.aaline(surface, self.arrow_colour, end, arrow_point, self.arrow_W)
         # right
         end = sides.rotate(205) + arrow_point
-        pygame.draw.line(surface, self.arrow_colour, end, arrow_point, self.arrow_W)
+        pygame.draw.aaline(surface, self.arrow_colour, end, arrow_point, self.arrow_W)
 
     # load functions
 

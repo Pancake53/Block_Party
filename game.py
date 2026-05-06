@@ -1,7 +1,8 @@
-import os, pygame
+import json, os, pygame
 
 from states.title import Title
 from settings import Settings
+from pygame import Vector2
 
 class Game():
     def __init__(self):
@@ -18,7 +19,7 @@ class Game():
         # window and game canvas
         self.GAME_W, self.GAME_H = 960, 540
         self.WINDOW_W, self.WINDOW_H = 960, 540
-        self.SCREEN_H, self.SCREEN_W = 0, 0 # updates on fullscreen toggle
+        self.SCREEN_W, self.SCREEN_H = self.WINDOW_W, self.WINDOW_H # updates on fullscreen toggle
 
         self.game_canvas = pygame.Surface((self.GAME_W, self.GAME_H))
         self.window = pygame.display.set_mode((self.WINDOW_W, self.WINDOW_H))
@@ -84,6 +85,8 @@ class Game():
         self.state_stack = []
         self.load_states()
 
+        self.load_controller()
+
         # audio
         # music and volume control
         self.music_muted = False
@@ -104,7 +107,14 @@ class Game():
 
         self.play_music('menu')
 
-        # sounds
+        # cursors
+        self.cursor_half = 25
+        self.cursor = None
+        self.cursor_pos = list(pygame.mouse.get_pos())
+        self.last_input = None
+
+
+
         
         
 
@@ -124,6 +134,9 @@ class Game():
         update actions dictionary based on user input
         '''
         
+        # reset
+        self.actions["mouse_click"] = False
+        self.actions['m3_click'] = False
         
         # event loop
         for event in pygame.event.get():
@@ -179,9 +192,12 @@ class Game():
             # Mouse events
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # print("mousebuttonDOWN")
+                self.last_input = 'mouse'
                 if event.button == 1:
+                    self.actions["mouse_click"] = True 
                     self.actions["m1"] = True
                 if event.button == 3:
+                    self.actions['m3_click'] = True
                     self.actions["m3"] = True
 
             if event.type == pygame.MOUSEBUTTONUP:
@@ -190,26 +206,79 @@ class Game():
                     self.actions["m1"] = False
                 if event.button == 3:
                     self.actions["m3"] = False
-                
-        # print(f"mouse_click: {self.actions["mouse_click"]}") 
 
-        if pygame.mouse.get_just_pressed()[0]:
-            # for clicking only interaction
-            self.actions["mouse_click"] = True 
-        else:
-            # reset
-            self.actions["mouse_click"] = False  
+            if event.type == pygame.MOUSEMOTION:
+                # if actual mouse input, catch controller logic
+                if self.last_input == 'mouse':
+                    self.cursor_pos = list(event.pos)
+                    print(f"Updating with MUUSE: {self.cursor_pos}")
+
+        # CONTROLLER  
+
+            if event.type == pygame.JOYDEVICEADDED:
+                self.load_controller()
+
+            if self.joysticks:
+                self.check_controller_events(event)
+       
+        # OUTSIDE OF EVENT LOOP   
+        # UPDATE MOUSE POS BASED ON ANALOG INPUT
+        if self.last_input == 'controller':
+            self.update_mouse_pos(self.dt) 
+        self.actions["mouse_pos"] = (self.cursor_pos[0] * self.scale_multiplier_x,
+                                      self.cursor_pos[1] * self.scale_multiplier_y)
+
+
         
-        unscaled_mouse_pos = pygame.mouse.get_pos()
-        self.actions["mouse_pos"] = (unscaled_mouse_pos[0] * self.scale_multiplier_x,
-                                      unscaled_mouse_pos[1] * self.scale_multiplier_y)
         
+        
+    def check_controller_events(self, event):
+        '''
+        handels controller input
+
+        event: pygame event object
+        '''
+        # BUTTONS
+
+        if event.type == pygame.JOYBUTTONDOWN:
+            print(f'event button: {event.button}')
+            self.last_input = 'controller'
+
+            if event.button == self.button_keys['a']:
+                self.actions['mouse_click'] = True
+                self.actions['m1'] = True
+            if event.button == self.button_keys['R1']:
+                self.actions['m3_click'] = True
+                self.actions['m3'] = True
+
+        if event.type == pygame.JOYBUTTONUP:
+            print(f'event button up: {event.button}')  
+
+            if event.button == self.button_keys['a']:
+                self.actions['m1'] = False
+            if event.button == self.button_keys['R1']:
+                self.actions['m3'] = False
+
+        # ANALOG INPUTS
+
+        if event.type == pygame.JOYAXISMOTION:
+            self.last_input = 'controller'
+            self.analog_keys[event.axis] = event.value
+
+
 
     def update(self):
         '''
         calls the update function from the top of the stack
         '''
+        self.cursor = None
+
         self.state_stack[-1].update(self.dt, self.actions)
+
+        if self.cursor is None:
+            if self.actions['mouse_click']:
+                self.cursor = 'click'
+
 
     def render(self):
         '''
@@ -218,6 +287,12 @@ class Game():
         draws the canvas on users screen
         '''
         self.state_stack[-1].render(self.game_canvas)
+        # render cursor
+        if self.cursor:
+            self.render_cursor(self.game_canvas, cursor=self.cursor)
+        else:
+            self.render_cursor(self.game_canvas)
+
         if self.is_fullscreen:
             self.window.blit(pygame.transform.scale(self.game_canvas,
                                                  (self.SCREEN_W, self.SCREEN_H)),
@@ -309,7 +384,9 @@ class Game():
         self.assets['move_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "move4.png")).convert_alpha() 
         self.assets['resize_width_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "resize_width.png")).convert_alpha()
         self.assets['resize_height_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "resize_height.png")).convert_alpha()
-
+        self.assets['default_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "default5.png")).convert_alpha()
+        self.assets['click_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "click5.png")).convert_alpha()
+        
         # audio
         self.audio['main_theme'] = os.path.join(self.audio_dir, 'main_music.ogg')
         self.audio['sea_ambiance'] = os.path.join(self.audio_dir, 'sea_ambiance.ogg')
@@ -336,6 +413,31 @@ class Game():
         self.title_screen = Title(self)
         self.state_stack.append(self.title_screen)
 
+    def load_controller(self):
+        '''
+        loads controllers
+        '''
+        self.joysticks = []
+        self.controller_moved = False
+        
+
+        for i in range(pygame.joystick.get_count()):
+            self.joysticks.append(pygame.joystick.Joystick(i))
+
+        for joystick in self.joysticks:
+            joystick.init()
+            print(joystick.get_name())
+
+        with open(os.path.join('ps4_keys.json'), 'r+') as file:
+            self.button_keys = json.load(file)
+
+        self.analog_keys = {0: 0, # left_x
+                            1: 0, # left_y
+                            2: 0, # right_x
+                            3: 0, # right_y
+                            4: -1, # left_trigger
+                            5: -1} # right_trigger
+
     def toggle_fullscreen(self):
     
         '''
@@ -355,6 +457,7 @@ class Game():
 
         else:
             self.window = pygame.display.set_mode((self.WINDOW_W, self.WINDOW_H))
+            self.SCREEN_W, self.SCREEN_H = self.WINDOW_W, self.WINDOW_H
             # scaling for new H and W
             self.scale_multiplier_x = self.GAME_W / self.WINDOW_W
             self.scale_multiplier_y = self.GAME_H / self.WINDOW_H
@@ -408,6 +511,7 @@ class Game():
             self.change_volume('music')
 
     def play_sfx(self, sound):
+
         '''
         playes sound effect
 
@@ -417,3 +521,70 @@ class Game():
         '''
         sound.play()
         sound.set_volume(self.settings.master_volume * self.settings.sfx_vol)
+
+    def render_cursor(self, surface, cursor='default'):
+        '''
+        render custom cursor based on mouse pos
+        '''
+        cursor += "_cursor"
+        # print(self.cursor)
+        if cursor in self.assets.keys():
+
+            pygame.mouse.set_visible(False)
+            surface.blit(self.assets[cursor],
+                        self.center_cursor())
+
+        else:
+            pygame.mouse.set_visible(True)
+
+    def center_cursor(self):
+
+        x, y =  self.actions['mouse_pos']
+        return (x - self.cursor_half, y - self.cursor_half)    
+
+    def update_mouse_pos(self, dt):
+        '''
+        updates the mouse pos based on controllers stick movement
+
+        dt: delta time
+        '''
+        print(f'x: {self.analog_keys[0]}, y: {self.analog_keys[1]}')        
+        self.controller_moved = False
+
+        # some movement
+        if abs(self.analog_keys[0]) > self.settings.deadzone:
+            # print(f'cursor x before: {self.cursor_pos[0]}')
+            # print(f'analog x: {self.analog_keys[0]}, dt: {dt}, speed: {self.settings.stick_speed}')
+            movement = self.analog_keys[0] * dt * self.settings.stick_speed / self.scale_multiplier_x
+            if abs(self.analog_keys[0]) > self.settings.high_speed_deadzone:
+                movement *= 2
+            elif abs(self.analog_keys[0]) < self.settings.low_speed_deadzone:
+                movement /= 2
+            # print(f'cursor x after: {self.cursor_pos[0]}')
+            self.cursor_pos[0] = max(min(self.cursor_pos[0] + movement, self.SCREEN_W), 0)
+            # print(f'cursor x after CAPING: {self.cursor_pos[0]}\n')
+            # print(f'stick x value {self.analog_keys[0]}') 
+            
+            self.controller_moved = True
+            
+
+        if abs(self.analog_keys[1]) > self.settings.deadzone:
+            movement = self.analog_keys[1] * dt * self.settings.stick_speed / self.scale_multiplier_y
+            if abs(self.analog_keys[1]) > self.settings.high_speed_deadzone:
+                movement *= 2
+            elif abs(self.analog_keys[0]) < self.settings.low_speed_deadzone:
+                movement /= 2
+            self.cursor_pos[1] = max(min(self.cursor_pos[1] + movement, self.SCREEN_H), 0)
+            # print(f'stick y value {self.analog_keys[1]}') 
+            # print(f'cursor y: {self.cursor_pos[1]}\n')
+            self.controller_moved = True
+            
+        
+        if self.controller_moved:
+            print(f"Updating with Controller: {self.cursor_pos}\n")
+            pygame.mouse.set_pos((round(self.cursor_pos[0]), round(self.cursor_pos[1])))
+
+
+
+
+

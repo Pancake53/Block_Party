@@ -71,6 +71,7 @@ class Part():
         make part react to mouse actions
         '''
         self.mouse_actions(dt, actions)
+        
 
     def mouse_actions(self, dt, actions):
 
@@ -81,7 +82,7 @@ class Part():
         if actions['mouse_click']:
             # print('mouse clicked now this shit should reset right')
             # part is selected and resizing out size of its hovered
-            if (self.char_creating.cursor in ('resize_width', 'resize_height')):
+            if (self.char_creating.game.cursor in ('resize_width', 'resize_height')):
                 pass
 
             elif self.state['top']:

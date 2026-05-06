@@ -130,7 +130,7 @@ class Character(GameObject):
         min_angle = 40
         max_angle = 75
         grace_for_stacking = 30
-        min_speed = 2
+        min_speed = 0.5
 
         move_vec = Vector2(self.x_speed, 
                            self.y_speed)  * momentum_loss

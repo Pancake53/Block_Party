@@ -65,12 +65,9 @@ class Char_Creating(State):
         self.character_parts = []
         
 
-        # cursor assets easier
+        # cursor 
         self.cursor = None
-        self.cursor_half = 25
-        self.move_cursor = self.game.assets['move_cursor']
-        self.resize_width_cursor = self.game.assets['resize_width_cursor']
-        self.resize_height_cursor = self.game.assets['resize_height_cursor']
+
 
         # sliders
         self.sliders = []
@@ -96,6 +93,7 @@ class Char_Creating(State):
         self.update_helpers()
 
         self.update_parts(delta_time, actions)
+        self.game.cursor = self.cursor
 
         if self.selected:
             self.change_state()
@@ -308,7 +306,7 @@ class Char_Creating(State):
 
         self.render_parts(surface)
 
-        self.render_cursor(surface)
+        
 
     def render_buttons(self, surface):
         '''
@@ -445,31 +443,6 @@ class Char_Creating(State):
             draw_shading_for_rect(self.game.TILE_COL,
                 char_dict['rect'], surface)
 
-    def render_cursor(self, surface):
-        '''
-        render custom cursor based on mouse pos
-        '''
-        # print(self.cursor)
-        if self.cursor == 'move':
-            pygame.mouse.set_visible(False)
-            surface.blit(self.move_cursor, self.center_cursor())
-
-        elif self.cursor == 'resize_width':
-            pygame.mouse.set_visible(False)
-            surface.blit(self.resize_width_cursor, self.center_cursor())
-
-
-        elif self.cursor == 'resize_height':
-            pygame.mouse.set_visible(False)
-            surface.blit(self.resize_height_cursor, self.center_cursor())
-
-        else:
-            pygame.mouse.set_visible(True)
-
-    def center_cursor(self):
-
-        x, y =  self.game.actions['mouse_pos']
-        return (x - self.cursor_half, y - self.cursor_half)    
 
     def create_surface_from_created_char(self):
         '''
