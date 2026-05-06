@@ -2,7 +2,9 @@ import pygame
 from game_objects.gameObject import GameObject
 from UI.healthBar import HealthBar
 from UI.floating_fade import FloatingFade
+from UI.floating_fade import FloatingFade
 from pygame.math import Vector2
+
 
 
 class Character(GameObject):
