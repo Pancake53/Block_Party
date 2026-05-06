@@ -113,19 +113,11 @@ class Character(GameObject):
         '''
         # bumping from top
         # does nothing to the one being bumped
-        if (self.y_speed > 0 and # moving down
-            # overlap on y axis, which is updated before x
-            self.y_screen + self.HEIGHT > bumped_char.y_screen and 
-            # overlap on x axis
-            (self.x_screen < bumped_char.x_screen < self.x_screen + self.WIDTH
-                or
-            self.x_screen < bumped_char.x_screen + bumped_char.WIDTH < self.x_screen + self.WIDTH)
-            ):
+        if (self.pos_updating == 'y' and self.y_speed > 0):
             return
 
         # works well for sides but not so well for
         # stacking so when x overlaps
-        print('Characters collided')
         momentum_loss = 0.75
         min_angle = 40
         max_angle = 75
@@ -161,7 +153,7 @@ class Character(GameObject):
                 return
 
             angle_change = angle - capped_angle
-            print(f'Angle change {angle_change}')
+            # print(f'Angle change {angle_change}')
             move_vec.rotate_ip(angle_change)
             bumped_char.x_speed = move_vec[0]
             bumped_char.y_speed = move_vec[1]

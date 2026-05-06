@@ -224,6 +224,7 @@ class GameObject():
         dt: delta time 
         tiles: game levels collision tiles
         '''
+        self.pos_updating = 'y'
         self.y_screen += self.y_speed * dt # for calculations
         self.rect.y = int(self.y_screen) # update rect w calculated pos
         collisions = self.collision_test(tiles)
@@ -248,6 +249,7 @@ class GameObject():
         dt: delta time 
         tiles: game levels collision tiles
         '''
+        self.pos_updating = 'x'
         # x movement
         self.x_screen += self.x_speed * dt # x_pos is used for calculations
         self.rect.x = int(self.x_screen) # update rect position for collision_test
@@ -394,6 +396,7 @@ class GameObject():
             else:
                 self.reset_state()
             self.play_jump_fx()
+            print('New Jump \n')
 
         # else reset
         else:

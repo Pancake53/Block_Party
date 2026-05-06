@@ -82,8 +82,8 @@ class Part():
         if actions['mouse_click']:
             # print('mouse clicked now this shit should reset right')
             # part is selected and resizing out size of its hovered
-            if (self.char_creating.game.cursor in ('resize_width', 'resize_height')):
-                pass
+            if (self.char_creating.cursor in ('resize_width', 'resize_height')):
+                print('moving on')
 
             elif self.state['top']:
                 
@@ -97,7 +97,7 @@ class Part():
 
         # after the part is selected
         if self.state['selected']:
-            
+            print(self.state)
             # print(f'States: {self.state}')
             if self.state['move']:
                 self.move(actions)
@@ -128,7 +128,7 @@ class Part():
         self.y + self.edge_buffer_H < 
         y < self.y + self.rect.height - self.edge_buffer_H):
             self.char_creating.cursor = 'move'
-            if actions['m1']:
+            if actions['mouse_click']:
                 self.state['move'] = True
             return
 
@@ -140,7 +140,7 @@ class Part():
                 and  
         self.y < y < self.y + self.rect.height):
             self.char_creating.cursor = 'resize_width'
-            if actions['m1']:
+            if actions['mouse_click']:
                 self.state['resize_right'] = True
             return
         
@@ -151,7 +151,7 @@ class Part():
                 and  
         self.y < y < self.y + self.rect.height):
             self.char_creating.cursor = 'resize_width'
-            if actions['m1']:
+            if actions['mouse_click']:
                 self.state['resize_left'] = True
             return
         
@@ -161,7 +161,7 @@ class Part():
                 and  
         top_edge - self.edge_buffer_H <= y <= top_edge + self.edge_buffer_H):
             self.char_creating.cursor = 'resize_height'
-            if actions['m1']:
+            if actions['mouse_click']:
                 self.state['resize_top'] = True
             return
         
@@ -171,12 +171,12 @@ class Part():
                 and  
         bottom_edge - self.edge_buffer_H <= y <= bottom_edge + self.edge_buffer_H):
             self.char_creating.cursor = 'resize_height'
-            if actions['m1']:
+            if actions['mouse_click']:
                 self.state['resize_bottom'] = True
             return
         
-        else:
-            self.char_creating.cursor = None
+        # none of the return fired
+        self.char_creating.cursor = 'default'
 
     def move(self, actions):
         '''
@@ -223,7 +223,7 @@ class Part():
         if self.old_mouse_pos is None:
             self.old_mouse_pos = actions['mouse_pos']
             return
-        
+        print('resizing left of a piece')
         width_change =  self.old_mouse_pos[0] - actions['mouse_pos'][0]
         
         self.W += width_change

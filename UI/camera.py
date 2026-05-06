@@ -77,12 +77,17 @@ class Camera():
             
             # negative so things float up
             y_offset = - self.camera_speed * delta_time
+             # change cursor
+            self.game_world.cursor = ('x1', 270)
 
             if y > self.bottom_edge_2x:
                 y_offset *= 2
+                self.game_world.cursor = ('x2', 270)
 
             y_offset = round(y_offset)
             self.total_offset_y += y_offset # negative
+
+            
             
             return y_offset
 
@@ -92,12 +97,15 @@ class Camera():
 
             # positive so things going down
             y_offset = self.camera_speed * delta_time
-
+            # change cursor
+            self.game_world.cursor = ('x1', 90)
             if y < self.edge_buffer_2x:
                 y_offset *= 2
+                self.game_world.cursor = ('x2', 90)
 
             y_offset = round(y_offset)
             self.total_offset_y += y_offset
+            
             
             return y_offset
         
@@ -121,12 +129,16 @@ class Camera():
 
             # negative so obj move left
             x_offset = - self.camera_speed * delta_time
-
+            # change cursor
+            self.game_world.cursor = ('x1', 0)
             if x > self.right_edge_2x:
                 x_offset *= 2
+                self.game_world.cursor = ('x2', 0)
 
             x_offset = round(x_offset)
             self.total_offset_x += x_offset # negative
+
+            
             
             return x_offset
 
@@ -136,13 +148,16 @@ class Camera():
 
             # positive so obj move right
             x_offset = self.camera_speed * delta_time
-
+            # change cursor
+            self.game_world.cursor = ('x1', 180)
             if x < self.edge_buffer_2x:
                 x_offset *= 2
+                self.game_world.cursor = ('x2', 180)
 
             x_offset = round(x_offset)
 
             self.total_offset_x += x_offset
+            
             
             return x_offset
         
@@ -165,9 +180,11 @@ class Camera():
 
             # negative so obj move left
             x_offset = - self.camera_speed * delta_time
-
+            # change cursor
+            self.game_world.cursor = ('x1', 0)
             if x > self.right_edge_2x:
                 x_offset *= 2
+                self.game_world.cursor = ('x2', 0)
 
             x_offset = round(x_offset)
             self.total_offset_x += x_offset # negative
@@ -180,9 +197,11 @@ class Camera():
 
             # positive so obj move right
             x_offset = self.camera_speed * delta_time
-
+            # change cursor
+            self.game_world.cursor = ('x1', 180)
             if x < self.edge_buffer_2x:
                 x_offset *= 2
+                self.game_world.cursor = ('x2', 180)
 
             x_offset = round(x_offset)
 

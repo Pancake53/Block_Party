@@ -117,6 +117,7 @@ class Game_World(State):
         # reset variables
         self.draw_arrow = False
         self.camera_moved = False
+        self.cursor = None
         # update view based on mouse movement 
         # around level edges, on_camera_move and 
         # update tiles
@@ -131,9 +132,12 @@ class Game_World(State):
         # print(self.game_state)
         # sprites
         self.sprites.update(delta_time)
+        
 
         if self.state['game_over']:
-            self.update_winning()    
+            self.update_winning()
+
+        self.game.cursor = self.cursor    
 
     def update_characters(self, delta_time, actions):
         '''
@@ -176,12 +180,14 @@ class Game_World(State):
             self.diff_vector = self.physics.max_arrow_len * normalized
             self.end_point = rect_center - self.diff_vector
             self.draw_arrow = True
+            self.cursor = 'drag'
             # print(f'Difference vector: {self.diff_vector}, end point: {self.end_point}')
             return
 
         self.rect_center = rect_center
         self.end_point = mouse_pos
         self.draw_arrow = True
+        self.cursor = 'drag'
         # print(f'Difference vector: {self.diff_vector}, end point: {self.end_point}')
     
     # only for wrapping levels

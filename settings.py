@@ -18,4 +18,7 @@ class Settings():
         self.SCREEN_H = 540
 
         # 
-        
+        self.stick_speed = 500
+        self.deadzone = 0.05
+        self.low_speed_deadzone = .3
+        self.high_speed_deadzone = .9

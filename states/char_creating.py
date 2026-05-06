@@ -10,7 +10,7 @@ from helpers import draw_shading_for_rect
 
 class Char_Creating(State):
     def __init__(self, game, players_left, created_chars=None):
-        self.game = game
+        super().__init__(game)
         # how many players havent created their characters yet
         self.players_left = players_left - 1
 
@@ -63,10 +63,6 @@ class Char_Creating(State):
         self.top_part = None
         self.top_part_pos = 0
         self.character_parts = []
-        
-
-        # cursor 
-        self.cursor = None
 
 
         # sliders
@@ -85,6 +81,7 @@ class Char_Creating(State):
         delta_time: dt
         actions: user inputs dictionary
         '''
+        
         # print(self.created_chars)
         self.handle_actions(actions)
         self.handle_buttons()

@@ -10,6 +10,7 @@ class State():
         
         game: game class
         '''
+        self.cursor = 'default'
         self.game = game
         self.prev_state = None
 

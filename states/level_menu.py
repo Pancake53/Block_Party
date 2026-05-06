@@ -87,7 +87,7 @@ class Level_Menu(State):
 
         self.render_buttons(surface)
 
-        self.game.draw_text(surface, "Play", self.game.TILE_COL, self.game.GAME_W / 2, self.game.GAME_H - 100, size='Medium')
+        self.game.draw_text(surface, "Play", self.game.TILE_COL, self.game.GAME_W / 2, self.game.GAME_H - 100, size='Small')
         
     def render_selected_level(self, surface):
         '''

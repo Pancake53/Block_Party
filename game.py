@@ -111,7 +111,7 @@ class Game():
         self.cursor_half = 25
         self.cursor = None
         self.cursor_pos = list(pygame.mouse.get_pos())
-        self.last_input = None
+        self.last_input = 'mouse'
 
 
 
@@ -211,7 +211,7 @@ class Game():
                 # if actual mouse input, catch controller logic
                 if self.last_input == 'mouse':
                     self.cursor_pos = list(event.pos)
-                    print(f"Updating with MUUSE: {self.cursor_pos}")
+                    # print(f"Updating with MUUSE: {self.cursor_pos}")
 
         # CONTROLLER  
 
@@ -289,7 +289,7 @@ class Game():
         self.state_stack[-1].render(self.game_canvas)
         # render cursor
         if self.cursor:
-            self.render_cursor(self.game_canvas, cursor=self.cursor)
+            self.render_cursor(self.game_canvas, cursor_input=self.cursor)
         else:
             self.render_cursor(self.game_canvas)
 
@@ -379,14 +379,10 @@ class Game():
         self.assets['trash_open_img'] = pygame.image.load(os.path.join(self.image_dir, "trash_open.png")).convert_alpha()
         self.assets['trash_closed_img'] = pygame.image.load(os.path.join(self.image_dir, "trash_closed.png")).convert_alpha()
 
-
+        self.load_cursors()
         # cursors
-        self.assets['move_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "move4.png")).convert_alpha() 
-        self.assets['resize_width_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "resize_width.png")).convert_alpha()
-        self.assets['resize_height_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "resize_height.png")).convert_alpha()
-        self.assets['default_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "default5.png")).convert_alpha()
-        self.assets['click_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "click5.png")).convert_alpha()
-        
+
+
         # audio
         self.audio['main_theme'] = os.path.join(self.audio_dir, 'main_music.ogg')
         self.audio['sea_ambiance'] = os.path.join(self.audio_dir, 'sea_ambiance.ogg')
@@ -397,6 +393,31 @@ class Game():
         self.audio['explosion'] = os.path.join(self.sound_fx_dir, 'explosion.wav')
         self.audio['jump'] = os.path.join(self.sound_fx_dir, 'jump.flac')
 
+    def load_cursors(self):
+        self.assets['move_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "move4.png")).convert_alpha() 
+        self.assets['resize_width_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "resize_width.png")).convert_alpha()
+        self.assets['resize_height_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "resize_height.png")).convert_alpha()
+        self.assets['default_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "default5.png")).convert_alpha()
+        self.assets['click_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "click5.png")).convert_alpha()
+        self.assets['drag_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "drag.png")).convert_alpha()
+
+        self.assets['x1_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "1x.png")).convert_alpha()
+        x1_cursor = {
+            0: self.assets['x1_cursor'],
+            90: pygame.transform.rotate(self.assets['x1_cursor'], 90),
+            180: pygame.transform.rotate(self.assets['x1_cursor'], 180),
+            270: pygame.transform.rotate(self.assets['x1_cursor'], 270),
+        }
+        self.assets['x2_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "2x.png")).convert_alpha()
+        x2_cursor = {
+            0: self.assets['x2_cursor'],
+            90: pygame.transform.rotate(self.assets['x2_cursor'], 90),
+            180: pygame.transform.rotate(self.assets['x2_cursor'], 180),
+            270: pygame.transform.rotate(self.assets['x2_cursor'], 270),
+        }
+
+        self.rotated_cursors = {'x1_cursor' : x1_cursor,
+                                'x2_cursor' : x2_cursor}
 
     def reset_keys(self):
         '''
@@ -522,18 +543,32 @@ class Game():
         sound.play()
         sound.set_volume(self.settings.master_volume * self.settings.sfx_vol)
 
-    def render_cursor(self, surface, cursor='default'):
+    def render_cursor(self, surface, cursor_input='default'):
         '''
         render custom cursor based on mouse pos
+
+        cursor_input: either tuple or a string
+        if tuple then second value indicates the rotation
         '''
+        if isinstance(cursor_input, tuple):
+            cursor, rotation = cursor_input
+        else:
+            cursor = cursor_input
+            rotation = 0
+
         cursor += "_cursor"
         # print(self.cursor)
         if cursor in self.assets.keys():
+            if rotation == 0:
+                pygame.mouse.set_visible(False)
+                surface.blit(self.assets[cursor],
+                            self.center_cursor())
 
-            pygame.mouse.set_visible(False)
-            surface.blit(self.assets[cursor],
-                        self.center_cursor())
-
+            else:
+                image = self.rotated_cursors[cursor][rotation]
+                pygame.mouse.set_visible(False)
+                surface.blit(image,
+                            self.center_cursor())
         else:
             pygame.mouse.set_visible(True)
 
@@ -581,7 +616,7 @@ class Game():
             
         
         if self.controller_moved:
-            print(f"Updating with Controller: {self.cursor_pos}\n")
+            # print(f"Updating with Controller: {self.cursor_pos}\n")
             pygame.mouse.set_pos((round(self.cursor_pos[0]), round(self.cursor_pos[1])))
 
 
