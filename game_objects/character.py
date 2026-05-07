@@ -92,12 +92,14 @@ class Character(GameObject):
         collisions = []
         for tile in tiles:
             if self.rect.colliderect(tile.rect):
+                self.game_world.game.play_sfx(self.game_world.sfx_bump)
                 collisions.append(tile.rect)
         
         for team in self.game_world.teams_not_eliminated.values():
             for char in team:
                 if char != self:
                     if self.rect.colliderect(char.rect):
+                        self.game_world.game.play_sfx(self.game_world.sfx_tackle)
                         self.character_collision(char)
                         collisions.append(char.rect)
 
@@ -111,6 +113,10 @@ class Character(GameObject):
 
         bumped_char: Character that was bumped into
         '''
+        # sound fx
+        
+
+
         # bumping from top
         # does nothing to the one being bumped
         if (self.pos_updating == 'y' and self.y_speed > 0):

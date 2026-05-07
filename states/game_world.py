@@ -476,6 +476,8 @@ class Game_World(State):
 
         self.sfx_explosion = pygame.mixer.Sound(self.game.audio['explosion'])
         self.sfx_jump = pygame.mixer.Sound(self.game.audio['jump'])
+        self.sfx_bump = pygame.mixer.Sound(self.game.audio['bump'])
+        self.sfx_tackle = pygame.mixer.Sound(self.game.audio['tackle'])
         
 
     # bomb / explosion

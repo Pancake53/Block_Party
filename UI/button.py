@@ -11,7 +11,7 @@ class Button():
     '''
     def __init__(self, x, y, button_colour=(255, 255, 255),
                 hover_colour=(139, 139, 139), width=0, height=0,
-                image=None):
+                image=None, click_sound=None):
         
         '''
         Docstring for __init__
@@ -35,11 +35,14 @@ class Button():
         self.width = width
         self.height = height
 
+        self.click_sound = click_sound
+
         self.WHITE = (255, 255, 255)
         self.BLACK = (0, 0, 0)
         self.click_col = self.BLACK
         self.image = image
 
+        
         
         # print an error if we are missing the image or width and height
         if (not self.image) and (self.width == 0 or self.height == 0):
@@ -82,6 +85,8 @@ class Button():
             self.draw_button(self.hover_col, surface)
             # click button
             if actions["mouse_click"]:
+                if self.click_sound:
+                    self.click_sound.play()
                 self.draw_button(self.click_col, surface)
                 # pressed button
                 pressed = True

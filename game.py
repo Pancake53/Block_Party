@@ -73,9 +73,7 @@ class Game():
         self.clock = pygame.time.Clock()
         self.dt = self.clock.tick(60) / 1000
 
-        # music 
-        pygame.mixer.init()
-        self.audio = {}
+
 
         # load assets
         self.assets = {}
@@ -90,22 +88,6 @@ class Game():
         # audio
         # music and volume control
         self.music_muted = False
-        self.MUSIC = {
-            'menu' : 
-                {'track' : self.audio['main_theme'], 'volume': 0.5},
-           'ship.tmj' : 
-                {'track' : self.audio['sea_ambiance'], 'volume':  1.5},
-           'shipwreck.tmj' : 
-                {'track' : self.audio['sea_ambiance'], 'volume':  1.5},
-           'smily.tmj' : 
-                {'track' : self.audio['smile'], 'volume':  0.7},
-           'swords.tmj' :
-                {'track' : self.audio['middle_ages'], 'volume':  1.2},
-           'tree of life.tmj' :
-                {'track' : self.audio['mystical_forest'], 'volume':  0.8}
-        }
-
-        self.play_music('menu')
 
         # cursors
         self.cursor_half = 25
@@ -247,17 +229,23 @@ class Game():
             if event.button == self.button_keys['a']:
                 self.actions['mouse_click'] = True
                 self.actions['m1'] = True
-            if event.button == self.button_keys['R1']:
+            if event.button == self.button_keys['RB']:
                 self.actions['m3_click'] = True
                 self.actions['m3'] = True
+
+            if event.button == self.button_keys['options']:
+                self.actions['esc'] = True
 
         if event.type == pygame.JOYBUTTONUP:
             print(f'event button up: {event.button}')  
 
             if event.button == self.button_keys['a']:
                 self.actions['m1'] = False
-            if event.button == self.button_keys['R1']:
+            if event.button == self.button_keys['RB']:
                 self.actions['m3'] = False
+
+            if event.button == self.button_keys['options']:
+                self.actions['esc'] = False
 
         # ANALOG INPUTS
 
@@ -274,6 +262,9 @@ class Game():
         self.cursor = None
 
         self.state_stack[-1].update(self.dt, self.actions)
+
+        if self.actions['mouse_click']:
+            self.play_sfx(self.sfx_menu_click)
 
         if self.cursor is None:
             if self.actions['mouse_click']:
@@ -383,6 +374,13 @@ class Game():
         # cursors
 
 
+        self.load_audio()
+    
+    def load_audio(self):
+
+        # music 
+        pygame.mixer.init()
+        self.audio = {}
         # audio
         self.audio['main_theme'] = os.path.join(self.audio_dir, 'main_music.ogg')
         self.audio['sea_ambiance'] = os.path.join(self.audio_dir, 'sea_ambiance.ogg')
@@ -391,7 +389,29 @@ class Game():
         self.audio['mystical_forest'] = os.path.join(self.audio_dir, 'mystical_forest.ogg')
         # sound fx
         self.audio['explosion'] = os.path.join(self.sound_fx_dir, 'explosion.wav')
-        self.audio['jump'] = os.path.join(self.sound_fx_dir, 'jump.flac')
+        self.audio['jump'] = os.path.join(self.sound_fx_dir, 'jump.aiff')
+        self.audio['bump'] = os.path.join(self.sound_fx_dir, 'bump.aiff')
+        self.audio['tackle'] = os.path.join(self.sound_fx_dir, 'tackle.wav')
+        self.audio['menu_click'] = os.path.join(self.sound_fx_dir, 'menu_click.wav')
+        self.sfx_menu_click = pygame.mixer.Sound(self.audio['menu_click'])
+
+        self.MUSIC = {
+            'menu' : 
+                {'track' : self.audio['main_theme'], 'volume': 0.5},
+           'ship.tmj' : 
+                {'track' : self.audio['sea_ambiance'], 'volume':  1.5},
+           'shipwreck.tmj' : 
+                {'track' : self.audio['sea_ambiance'], 'volume':  1.5},
+           'smily.tmj' : 
+                {'track' : self.audio['smile'], 'volume':  0.7},
+           'swords.tmj' :
+                {'track' : self.audio['middle_ages'], 'volume':  1.2},
+           'tree of life.tmj' :
+                {'track' : self.audio['mystical_forest'], 'volume':  0.8}
+        }
+
+        self.play_music('menu')
+
 
     def load_cursors(self):
         self.assets['move_cursor'] = pygame.image.load(os.path.join(self.cursor_dir, "move4.png")).convert_alpha() 
@@ -583,7 +603,7 @@ class Game():
 
         dt: delta time
         '''
-        print(f'x: {self.analog_keys[0]}, y: {self.analog_keys[1]}')        
+        # print(f'x: {self.analog_keys[0]}, y: {self.analog_keys[1]}')        
         self.controller_moved = False
 
         # some movement
