@@ -2,7 +2,9 @@ import pygame
 import random
 
 from states.state import State
+from states.credits import Credits
 from states.player_menu import Player_Menu
+from states.settings_menu import SettingsMenu
 from settings import Settings
 from UI.bouncing_rect import BouncingRect
 from UI.button import Button
@@ -54,11 +56,17 @@ class Title(State):
             new_state.enter_state()
 
         if self.show_credits:
-            pass
+            new_state = Credits(self.game, 500, 300, 'credits')
+            new_state.enter_state()
+
 
         if actions["esc"] or self.quit:
             self.game.playing = False
             self.game.running = False
+
+        if actions['start']:
+            new_state = SettingsMenu(self.game, 500, 300, 'settings')
+            new_state.enter_state()
 
     def load_rect(self):
         '''

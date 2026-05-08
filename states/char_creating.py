@@ -549,22 +549,25 @@ class Char_Creating(State):
         x = (self.left_arrow_x + self.left_arrow.width + self.right_arrow_x) / 2 - w / 2
         y = self.left_arrow_y + self.left_arrow.height / 2 - h * 2
         self.red_slider = Slider("red",
-                            x, y, w, h, 
-                            0, 255, self.red, 
+                            x, y, w,
+                            0, 255, self.red,
+                            height = h, 
                             on_change=self.update_colour, colour=(255, 0, 0))
 
         y += h * 2
         self.green_slider = Slider("green",
-                            x, y, w, h, 
+                            x, y, w,  
                             0, 255, 
                             self.green, 
+                            height = h, 
                             on_change=self.update_colour, colour=(0, 255, 0))
 
         y += h * 2
         self.blue_slider = Slider("blue", 
-                            x, y, w, h, 
+                            x, y, w,
                             0, 255, 
                             self.blue, 
+                            height = h, 
                             on_change=self.update_colour, colour=(0, 0, 255))
 
         self.sliders.extend([self.red_slider, self.green_slider, self.blue_slider])

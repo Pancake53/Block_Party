@@ -12,12 +12,12 @@ class Slider:
     x: int
     y: int
     width: int # total width of line
-    height: int # height of indicator
     min_value: int
     max_value: int
     current_value: int
     on_change: Callable[[str, int], None]
-    colour: tuple = (0, 0, 0)
+    height: int = 20 # height of indicator
+    colour: tuple = (181, 67, 0)
 
     def __post_init__(self):
         '''

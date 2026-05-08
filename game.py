@@ -30,7 +30,7 @@ class Game():
         self.scale_multiplier_y = self.GAME_H / self.WINDOW_H
 
         # colours
-        self.UI_BG_COL = (41, 186, 162)
+        self.UI_BG_COL = (41, 186, 162) # brighter
         self.BG_COL = (0, 153, 136)
         self.TILE_COL = (181, 67, 0)
         self.BLACK, self.WHITE, self.GREY = (0, 0, 0), (255, 255, 255), (139, 139, 139)
@@ -329,6 +329,37 @@ class Game():
                 print(f"Draw text input error, size: {size} is not in Title, Medium, Small")
         text_rect = text_surface.get_rect()
         text_rect.center = (x, y)
+        surface.blit(text_surface, text_rect)
+
+    def draw_text_topleft(self, surface, text, colour, x, y, size="Title"):
+        '''
+        helper function for drawing text
+
+        surface: game canvas
+        text: written message
+        colour: colour of text
+        x & y: center coordinates of text rect
+        size: Title, Medium or Small
+        '''
+        match size:
+            case "Title":
+                text_surface = self.font_title.render(text,
+                                                True, colour)
+            case "H1":
+                text_surface = self.font_h1.render(text,
+                                                True, colour)
+            case "Medium":
+                text_surface = self.font_medium.render(text,
+                                                True, colour)
+            case "Small":
+                text_surface = self.font_small.render(text,
+                                                True, colour)
+            case _:
+                text_surface = self.font_medium.render(text,
+                                                True, colour)
+                print(f"Draw text input error, size: {size} is not in Title, Medium, Small")
+        text_rect = text_surface.get_rect()
+        text_rect.topleft = (x, y)
         surface.blit(text_surface, text_rect)
 
     def load_assets(self):
