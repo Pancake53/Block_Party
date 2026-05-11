@@ -2,7 +2,7 @@ import pygame
 
 from states.state import State
 from states.char_creating import Char_Creating
-from UI.button import Button
+from UI.button_stationary import ButtonStationary
 from helpers import draw_shading_for_rect
 
 class Player_Menu(State):
@@ -12,24 +12,8 @@ class Player_Menu(State):
     def __init__(self, game):
         super().__init__(game)
 
-        # variables for buttons
-        self.BG_COL = self.game.BG_COL
-        self.HOVER_COL = (0, 130, 120)
-        self.button_W = self.game.GAME_W / 4
-        self.button_H = self.game.GAME_H / 2
-        self.padding = 20 # px
 
-        # calculations for positions of buttons
-        self.y = self.game.GAME_H / 2 - self.button_H / 2
-        # if more buttons add to button_W multiplier
-        self.x_two = self.game.GAME_W / 2 - self.button_W * 1.5 - self.padding
-        self.x_three = self.x_two + self.button_W + self.padding
-        self.x_four = self.x_three + self.button_W + self.padding
 
-        # button classes
-        self.four_players_button = None
-        self.three_players_button = None
-        self.two_players_button = None
         # count (int)
         self.player_count = None
 
@@ -54,6 +38,8 @@ class Player_Menu(State):
         delta_time: dt
         actions: user inputs dictionary
         '''
+        for button in self.buttons:
+            button.update(actions)
 
         self.handle_actions(actions)
 
@@ -68,13 +54,26 @@ class Player_Menu(State):
         if actions["esc"]:
             self.exit_state()
 
+    def handle_clicks(self, name):
+
+        try:
+            name = int(name)
+            self.player_count = int(name)
+            self.selected = True
+
+        except ValueError:
+            match name:
+                case _:
+                    print('Invalid input')
+            
+
     def render(self, surface):
         '''
         renders background and character amount to choose from
         
         surface: surface to render on
         '''
-        surface.fill((self.game.BLACK))
+        surface.fill((self.game.UI_BG_COL))
         self.game.draw_text(surface, "Select Player Count",
                              self.game.WHITE, self.game.GAME_W / 2,
                                self.game.GAME_H / 8)
@@ -89,20 +88,9 @@ class Player_Menu(State):
         
         surface: surface to render on
         '''
-        if self.two_players_button.action_on_button(
-            self.x_two, self.y, surface, self.game.actions):
-            self.player_count = 2
-            self.selected = True
+        for button in self.buttons:
+            button.render(surface)
 
-        if self.three_players_button.action_on_button(
-            self.x_three, self.y, surface, self.game.actions):
-            self.player_count = 3
-            self.selected = True
-
-        if self.four_players_button.action_on_button(
-            self.x_four, self.y, surface, self.game.actions):
-            self.player_count = 4
-            self.selected = True
 
     def render_characters(self, surface):
         '''
@@ -126,22 +114,52 @@ class Player_Menu(State):
         '''
         loads Buttons and rects for menu
         '''
+
+        # variables for buttons
+        
+        self.button_W = self.game.GAME_W / 4
+        self.button_H = self.game.GAME_H / 2
+        self.padding = 20 # px
+
+        # calculations for positions of buttons
+        self.y = self.game.GAME_H / 2 - self.button_H / 2
+        # if more buttons add to button_W multiplier
+        self.x_two = self.game.GAME_W / 2 - self.button_W * 1.5 - self.padding
+        self.x_three = self.x_two + self.button_W + self.padding
+        self.x_four = self.x_three + self.button_W + self.padding
         # Buttons
-        self.two_players_button = Button(self.x_two, self.y,
-                button_colour=self.BG_COL,
-                hover_colour=self.HOVER_COL,
-                width=self.button_W, height=self.button_H)
+        self.buttons = []
+        button = ButtonStationary(
+                '2',
+                self.x_two, self.y,
+                button_colour=self.game.BG_COL,
+                hover_colour=self.game.GREY,
+                width=self.button_W, height=self.button_H,
+                on_click=self.handle_clicks)
         
-        self.three_players_button = Button(self.x_two, self.y,
-                button_colour=self.BG_COL,
-                hover_colour=self.HOVER_COL,
-                width=self.button_W, height=self.button_H)
+        self.buttons.append(button)
         
-        self.four_players_button = Button(self.x_two, self.y,
-                button_colour=self.BG_COL,
-                hover_colour=self.HOVER_COL,
-                width=self.button_W, height=self.button_H)
+        button = ButtonStationary(
+                '3',
+                self.x_three, self.y,
+                button_colour=self.game.BG_COL,
+                hover_colour=self.game.GREY,
+                width=self.button_W, height=self.button_H,
+                on_click=self.handle_clicks)
         
+        self.buttons.append(button)
+
+
+        button = ButtonStationary(
+                '4',
+                self.x_four, self.y,
+                button_colour=self.game.BG_COL,
+                hover_colour=self.game.GREY,
+                width=self.button_W, height=self.button_H,
+                on_click=self.handle_clicks)
+        
+        self.buttons.append(button)
+
         # Rects
         colours = self.game.team_colours
         

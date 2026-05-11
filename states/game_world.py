@@ -2,6 +2,8 @@ import pygame, json, os, random
 from pygame.math import Vector2
 
 from states.state import State
+from states.pause_menu import PauseMenu
+
 from game_objects.character import Character
 from game_objects.bomb import Bomb
 from game_objects.explosion import Explosion
@@ -564,8 +566,11 @@ class Game_World(State):
             self.reset_level()
         
         if actions["esc"]:
-            self.exit_state()
-            self.game.reset_keys()
+            new_state = PauseMenu(self.game)
+            new_state.enter_state()
+        if actions["start"]:
+            new_state = PauseMenu(self.game)
+            new_state.enter_state()
 
     def reset_level(self):
         # reset characters to their original position and states

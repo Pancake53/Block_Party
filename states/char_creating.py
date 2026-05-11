@@ -4,7 +4,7 @@ import pygame
 from part import Part
 from states.state import State
 from states.level_menu import Level_Menu
-from UI.button import Button
+from UI.button_stationary import ButtonStationary
 from UI.slider import Slider
 from helpers import draw_shading_for_rect
 
@@ -84,7 +84,9 @@ class Char_Creating(State):
         
         # print(self.created_chars)
         self.handle_actions(actions)
-        self.handle_buttons()
+        for button in self.buttons:
+            button.update(actions)
+
         for slider in self.sliders:
             slider.update(actions)
         self.update_helpers()
@@ -95,7 +97,40 @@ class Char_Creating(State):
         if self.selected:
             self.change_state()
 
+    def handle_clicks(self, name):
 
+        match name:
+            case 'left_arrow':
+                self.change_col_left()
+            case 'right_arrow':
+                self.change_col_right()
+
+            case 'bucket':
+                self.lock_colour = not self.lock_colour
+
+            case 'new_piece':
+                self.spawn_part()
+
+            case 'duplicate':
+                if self.selected_part:
+                    self.spawn_part(self.selected_part.x + 12, 
+                                self.selected_part.y - 12, 
+                                self.selected_part.W,
+                                self.selected_part.H,
+                                self.selected_part.colour,
+                                selected=True)
+
+            case 'reset':
+                self.reset_parts()
+
+            case 'save':
+                pass
+
+            case 'load':
+                pass
+
+            case 'done':
+                self.change_state()
 
     def handle_actions(self, actions):
         '''
@@ -143,54 +178,33 @@ class Char_Creating(State):
                 part.state['top'] = False    
 
 
-    def handle_buttons(self):
-        '''
-        handels colour change
-        '''
-        self.change_col_left()
 
-        self.change_col_right()
-
-        if self.create_part:
-            self.spawn_part()
-
-        if self.duplicate:
-            if self.selected_part:
-                self.spawn_part(self.selected_part.x + 12, 
-                                self.selected_part.y - 12, 
-                                self.selected_part.W,
-                                self.selected_part.H,
-                                self.selected_part.colour,
-                                selected=True)
-                
-        if self.reset:
-            self.reset_parts()
 
     def change_col_left(self):
         '''
         handle left button colour change logic
         wrap around and assignment
         '''
-        if self.left_clicked:
-            if self.colour_id == 0:
-                self.colour_id = len(self.game.team_colours) - 1
-            else:
-                self.colour_id -= 1
+        
+        if self.colour_id == 0:
+            self.colour_id = len(self.game.team_colours) - 1
+        else:
+            self.colour_id -= 1
 
-            self.selected_colour = self.game.team_colours[self.colour_id]
+        self.selected_colour = self.game.team_colours[self.colour_id]
 
-            if self.selected_part is None:
-                self.selected_part = self.character_parts[0]
+        if self.selected_part is None:
+            self.selected_part = self.character_parts[0]
 
-            if self.selected_part.main:
-                while self.selected_colour in self.taken_colours:
-                    if self.colour_id == 0:
-                        self.colour_id = len(self.game.team_colours) - 1
-                    else:
-                        self.colour_id -= 1
-                    self.selected_colour = self.game.team_colours[self.colour_id]
+        if self.selected_part.main:
+            while self.selected_colour in self.taken_colours:
+                if self.colour_id == 0:
+                    self.colour_id = len(self.game.team_colours) - 1
+                else:
+                    self.colour_id -= 1
+                self.selected_colour = self.game.team_colours[self.colour_id]
 
-            self.handle_colour_change()
+        self.handle_colour_change()
 
 
     def change_col_right(self):
@@ -198,27 +212,27 @@ class Char_Creating(State):
         handle right button colour change logic
         wrap around and assignment
         '''
-        if self.right_clicked:
-            if self.colour_id == len(self.game.team_colours) - 1:
-                self.colour_id = 0
-            else:
-                self.colour_id += 1
+        
+        if self.colour_id == len(self.game.team_colours) - 1:
+            self.colour_id = 0
+        else:
+            self.colour_id += 1
 
-            self.selected_colour = self.game.team_colours[self.colour_id]
+        self.selected_colour = self.game.team_colours[self.colour_id]
 
-            if self.selected_part is None:
-                self.selected_part = self.character_parts[0]
+        if self.selected_part is None:
+            self.selected_part = self.character_parts[0]
 
-            if self.selected_part.main:
-                while self.selected_colour in self.taken_colours:
-                    if self.colour_id == len(self.game.team_colours) - 1:
-                        self.colour_id = 0
-                    else:
-                        self.colour_id += 1
-                    self.selected_colour = self.game.team_colours[self.colour_id]
+        if self.selected_part.main:
+            while self.selected_colour in self.taken_colours:
+                if self.colour_id == len(self.game.team_colours) - 1:
+                    self.colour_id = 0
+                else:
+                    self.colour_id += 1
+                self.selected_colour = self.game.team_colours[self.colour_id]
 
-            self.handle_colour_change()          
-                
+        self.handle_colour_change()          
+            
     def handle_colour_change(self):
             self.selected_part.colour = self.selected_colour
             self.red, self.green, self.blue = self.selected_colour
@@ -277,16 +291,6 @@ class Char_Creating(State):
         pygame.draw.rect(surface, self.game.BG_COL, self.bg_char_creating)
         draw_shading_for_rect(self.game.TILE_COL,
             self.bg_char_creating, surface, shading_W=5)
-
-        self.game.draw_text(surface, "Create palikka",
-                            self.game.WHITE, 
-                            self.title_x,
-                            self.title_y,
-                            size="H1")
-        
-        # self.game.draw_text(surface, f"Player {self.player_id + 1}",
-        #                     self.game.WHITE, self.game.GAME_W * 0.25,
-        #                       self.game.GAME_H * 0.25)
         
         for line in self.lines:
             pygame.draw.line(surface, 
@@ -311,100 +315,28 @@ class Char_Creating(State):
         triggered by them
         '''
         # switch colours between presets
-        self.left_clicked = self.left_arrow.action_on_button(
-            self.left_arrow_x, self.left_arrow_y, 
-            surface, self.game.actions)
-        
-        self.right_clicked = self.right_arrow.action_on_button(
-            self.right_arrow_x, self.right_arrow_y,
-            surface, self.game.actions)
-        
-        # done button
-        self.selected = self.done_button.action_on_button(
-            self.done_button_x, self.done_button_y,
-            surface, self.game.actions
-        )
+        for button in self.buttons:
+            button.render(surface)
 
-        # new part
-        self.create_part = self.new_piece_button.action_on_button(
-            self.new_piece_button_x, self.new_piece_button_y,
-            surface, self.game.actions
-        )
-        # duplicate selected
-        self.duplicate = self.copy_selected_button.action_on_button(
-            self.copy_selected_button_x, self.copy_selected_button_y,
-            surface, self.game.actions
-        )
-        # reset
-        self.reset = self.reset_button.action_on_button(
-            self.reset_button_x, self.reset_button_y,
-            surface, self.game.actions
-        )
-        # lock colour
-        if self.btn_lock_colour.action_on_button(
-            self.btn_lock_colour_x, self.btn_lock_colour_y,
-            surface, self.game.actions
-        ):
-            self.lock_colour = not self.lock_colour
-
-        if self.lock_colour: 
-            draw_shading_for_rect((255, 255, 255), self.btn_lock_colour.rect,
-                                  surface, shading_W=3)
-            
-        # save
-        self.save = self.btn_save.action_on_button(
-            self.btn_save_x, self.btn_save_y,
-            surface, self.game.actions
-        )
-
-        # load
-        self.load_from_file = self.btn_save.action_on_button(
-            self.btn_load_x, self.btn_load_y,
-            surface, self.game.actions
-        )
 
         # Text for buttons
 
-        self.game.draw_text(surface,
-            'Done', self.game.TILE_COL,
-            self.done_text_x,
-            self.done_text_y,
-            size='Small'
-        ) 
-
-        self.game.draw_text(surface,
-            'New piece', self.game.TILE_COL,
-            self.new_piece_text_x,
-            self.new_piece_text_y,
-            size='Small'
-        ) 
-
-        self.game.draw_text(surface,
-            'Duplicate', self.game.TILE_COL,
-            self.copy_selected_text_x,
-            self.copy_selected_text_y,
-            size='Small'
-        ) 
-
-        self.game.draw_text(surface,
-            'Save', self.game.TILE_COL,
-            self.save_text_x,
-            self.save_text_y,
-            size='Small'
-        ) 
-        self.game.draw_text(surface,
-            'Load', self.game.TILE_COL,
-            self.load_text_x,
-            self.load_text_y,
-            size='Small'
-        ) 
+        for text in self.texts:
+            self.game.draw_text(
+                surface,
+                text['str'],
+                self.game.TILE_COL,
+                text['x'], text['y'],
+                size=text['size']
+            )
 
         # images
-        surface.blit(self.bucket_img, self.bucket_rect)
-        surface.blit(self.add_img, self.add_rect)
-        surface.blit(self.copy_img, self.copy_rect) 
-        surface.blit(self.save_img, self.save_rect) 
-        surface.blit(self.load_img, self.load_rect)      
+        for image in self.images:
+            surface.blit(image['img'], image['rect'])  
+
+        # to show that is selected
+        if self.lock_colour:
+            pygame.draw.rect(surface, self.game.BLACK, self.btn_lock_colour.rect, width=3) 
         
     def render_slicers(self, surface):
 
@@ -508,13 +440,23 @@ class Char_Creating(State):
         '''
         load needed buttons for the view
         '''
+
+
+
+        self.buttons = []
+        self.texts = []
+        self.images = []
         
-        self.load_buttons()
+        
         self.load_images()
-        self.load_coordinates()
+
+        self.load_buttons()
         self.load_sliders()
 
-        self.load_text_coordinates()
+        self.title_x = self.red_slider.x + self.red_slider.width / 2 - 10
+        self.title_y = self.game.GAME_H / 8 - 10
+        self.add_text('create your character', self.title_x, self.title_y, size='H1')
+
         self.load_helpers()
         self.load_lines()
         
@@ -522,23 +464,229 @@ class Char_Creating(State):
         # bucket
         self.bucket_img = self.game.assets['bucket_img']
         self.bucket_rect = self.bucket_img.get_rect()
+        self.add_image(self.bucket_img, self.bucket_rect)
         # add
         self.add_img = self.game.assets['add_img']
         self.add_rect = self.add_img.get_rect()
+        self.add_image(self.add_img, self.add_rect)
         # copy
-        self.copy_img = self.game.assets['copy_img']
-        self.copy_rect = self.copy_img.get_rect()
+        self.duplicate_img = self.game.assets['copy_img']
+        self.duplicate_rect = self.duplicate_img.get_rect()
+        self.add_image(self.duplicate_img, self.duplicate_rect)
         # save
         self.save_img = self.game.assets['save_img']
         self.save_rect = self.save_img.get_rect()
+        self.add_image(self.save_img, self.save_rect)
+
         # load
         self.load_img = self.game.assets['load_img']
         self.load_rect = self.load_img.get_rect()
+        self.add_image(self.load_img, self.load_rect)
         # trash_closed
         self.trash_closed_img = self.game.assets['trash_closed_img']
         self.trash_rect = self.trash_closed_img.get_rect()
+        self.add_image(self.trash_closed_img, self.trash_rect)
         # trash_open
         self.trash_open_img = self.game.assets['trash_open_img']
+
+
+    def load_buttons(self):
+        
+        padding = 15
+        
+        # 1 arrow
+        name = 'left_arrow'
+        self.left_arrow_x = self.game.GAME_W / 2 
+        self.left_arrow_y = self.game.GAME_H / 4
+        self.arrow_W, self.arrow_H = self.game.assets["arrowleft_img"].get_size()
+
+        button = ButtonStationary(
+            name,
+            self.left_arrow_x, self.left_arrow_y, 
+            image = self.game.assets["arrowleft_img"],
+            on_click=self.handle_clicks
+        )
+        self.buttons.append(button)
+
+        # 2 arrow
+        name = 'right_arrow'    
+        self.right_arrow_x = self.game.GAME_W - self.arrow_W - padding
+        self.right_arrow_y = self.left_arrow_y
+
+        button = ButtonStationary(
+            name,
+            self.right_arrow_x, self.right_arrow_y, 
+            image = self.game.assets["arrowright_img"],
+            on_click=self.handle_clicks
+        )
+        self.buttons.append(button)
+
+        
+        
+        # New piece
+        name = 'new_piece'
+
+        w = 200
+        h = 50
+
+        # new piece
+        x = (self.game.GAME_W / 2 - 10)
+        y = (self.game.GAME_H * 2 / 3 -
+            h / 2)
+
+        button = ButtonStationary(
+            name,
+            x, y, 
+            width=w, height=h, 
+            button_colour=self.game.BG_COL,
+            on_click=self.handle_clicks
+        )
+
+        self.buttons.append(button)
+
+        text_x = x + w / 3 + 12
+        text_y = y + h / 2
+
+        self.add_text('new piece', text_x, text_y)
+
+        self.add_rect.x = x + w - self.add_rect.width - 3
+        self.add_rect.y = y + 2
+
+
+
+        # duplicate
+        name = 'duplicate'
+
+        x += padding + w
+
+        button = ButtonStationary(
+            name,
+            x, y, 
+            width=w, height=h, 
+            button_colour=self.game.BG_COL,
+            on_click=self.handle_clicks
+        )
+
+        self.buttons.append(button)
+
+        text_x = x + w / 3 + 12
+        text_y = y + h / 2
+
+        self.add_text(name, text_x, text_y)
+
+        self.duplicate_rect.x = x + w - self.duplicate_rect.width - 3
+        self.duplicate_rect.y = y + 2
+
+        # reset
+        name = 'reset'
+ 
+        x += padding + w 
+
+        
+        button = ButtonStationary(
+            name,
+            x, y,  
+            button_colour=self.game.BG_COL,
+            image=self.game.assets["reset_img"],
+            on_click=self.handle_clicks
+        )
+
+        self.buttons.append(button)
+
+
+
+        # lock colour
+        name = 'bucket'
+
+        h = 100
+        w = 70
+
+        x = self.left_arrow_x
+        y = self.left_arrow_y + self.arrow_H + padding
+
+        self.btn_lock_colour = ButtonStationary(
+            name,
+            x, y, 
+            width=w, height=h, 
+            button_colour=self.selected_colour,
+            hover_colour=self.selected_colour,
+            on_click=self.handle_clicks
+        )
+
+        self.buttons.append(self.btn_lock_colour)
+
+        self.bucket_rect.x = x + 12
+        self.bucket_rect.y = y + 12
+
+        # BOTTOM ROW
+
+        # Done
+        name = 'done'
+
+        w = 100
+        h = 50
+
+        x = self.game.GAME_W - w - 10
+        y = self.game.GAME_H - h - 10
+        self.y_bottom = y
+
+        button = ButtonStationary(
+            name,
+            x, y, 
+            width=w, height=h, 
+            button_colour=self.game.BG_COL,
+            on_click=self.handle_clicks)
+        
+        self.buttons.append(button)
+
+        text_x = x + w / 2
+        text_y = y + h / 2
+        self.add_text(name, text_x, text_y)
+        
+        # load
+        name = 'load'
+
+        w = 150
+        x -= w + padding
+        
+        button = ButtonStationary(
+            name,
+            x, y, 
+            width=w, height=h, 
+            button_colour=self.game.BG_COL,
+            on_click=self.handle_clicks
+        )
+
+        self.buttons.append(button)
+
+        text_x = x + w / 3 + 4
+        text_y = y + h / 2
+        self.add_text(name, text_x, text_y)
+
+        self.load_rect.x = x + w - self.load_rect.width - 3
+        self.load_rect.y = y
+
+        # save
+        name = 'save'
+
+        x -= w + padding
+
+        button = ButtonStationary(
+            name,
+            x, y, 
+            width=w, height=h, 
+            button_colour=self.game.BG_COL,
+            on_click=self.handle_clicks
+        )
+
+        self.buttons.append(button)
+
+        text_x = x + w / 3 + 4
+        text_y = y + h / 2
+        self.add_text(name, text_x, text_y)
+
+        self.save_rect.x = x + w - self.save_rect.width - 3
+        self.save_rect.y = y
 
     def load_sliders(self):
         '''
@@ -546,8 +694,8 @@ class Char_Creating(State):
         '''
         w = 255
         h = 20
-        x = (self.left_arrow_x + self.left_arrow.width + self.right_arrow_x) / 2 - w / 2
-        y = self.left_arrow_y + self.left_arrow.height / 2 - h * 2
+        x = (self.left_arrow_x + self.arrow_W + self.right_arrow_x) / 2 - w / 2
+        y = self.left_arrow_y + self.arrow_H / 2 - h * 2
         self.red_slider = Slider("red",
                             x, y, w,
                             0, 255, self.red,
@@ -572,34 +720,6 @@ class Char_Creating(State):
 
         self.sliders.extend([self.red_slider, self.green_slider, self.blue_slider])
 
-    def load_buttons(self):
-
-        self.left_arrow = Button(0, 0, button_colour=self.game.BG_COL,
-                                  hover_colour=self.game.TILE_COL, image = 
-                                 self.game.assets["arrowleft_img"])
-        self.right_arrow = Button(0, 0, button_colour=self.game.BG_COL,
-                                  hover_colour=self.game.TILE_COL, image =
-                                  self.game.assets["arrowright_img"])
-        
-        self.done_button = Button(0, 0, width=100, height=50, button_colour=self.game.BG_COL)
-
-        self.new_piece_button = Button(0, 0, button_colour=self.game.BG_COL,
-                                        width=200, height=50)
-        
-        self.copy_selected_button = Button(0, 0, button_colour=self.game.BG_COL,
-                                        width=200, height=50)
-        
-        self.reset_button = Button(0, 0, button_colour=self.game.BG_COL,
-                                        image=self.game.assets['reset_img'])
-        
-        self.btn_lock_colour = Button(0, 0, self.selected_colour, self.selected_colour,
-                                  width=self.left_arrow.width, height=100)
-        
-        self.btn_save = Button(0, 0, button_colour=self.game.BG_COL,
-                                  width=150, height=50)
-        
-        self.btn_load = Button(0, 0, button_colour=self.game.BG_COL,
-                                  width=150, height=50)
         
 
     def load_helpers(self):
@@ -657,120 +777,25 @@ class Char_Creating(State):
             'rgb' : (255, 120, 120),
             'rect': right_blue})
 
-    def load_coordinates(self):
-        # BUTTONS
-        # 1 arrow
-        self.left_arrow_x = self.game.GAME_W / 2 
-        self.left_arrow_y = self.game.GAME_H / 4
-        # 2 arrow
-        self.right_arrow_x = self.game.GAME_W - self.right_arrow.rect.width - 10
-        self.right_arrow_y = self.left_arrow_y
-        # Done
-        self.done_button_x = self.game.GAME_W - self.done_button.rect.width - 10
-        self.done_button_y = self.game.GAME_H - self.done_button.rect.height - 10
-
-        # new piece
-        self.new_piece_button_x = (self.game.GAME_W / 2 - 10)
-        self.new_piece_button_y = (self.game.GAME_H * 2 / 3 -
-            self.new_piece_button.rect.height / 2)
         
-        padding = 15
-
-        # copy selected
-        self.copy_selected_button_x = self.new_piece_button_x + padding + self.new_piece_button.width
-        self.copy_selected_button_y = (self.game.GAME_H * 2 / 3 -
-            self.new_piece_button.rect.height / 2)
-        
-        # reset 
-        self.reset_button_x = self.copy_selected_button_x + padding + self.copy_selected_button.width
-        self.reset_button_y = (self.game.GAME_H * 2 / 3 -
-            self.new_piece_button.rect.height / 2)
-        # save
-        self.btn_save_x = self.new_piece_button_x
-        self.btn_save_y = self.done_button_y
-        # load
-        self.btn_load_x = self.btn_save_x + self.btn_save.width + padding
-        self.btn_load_y = self.btn_save_y
-
-
-        # IMAGES
-
-        # lock colour
-        self.btn_lock_colour_x = self.left_arrow_x
-        self.btn_lock_colour_y = self.left_arrow_y + self.left_arrow.height + 10
-
-        # bucket
-        self.bucket_rect.x = self.btn_lock_colour_x + 12
-        self.bucket_rect.y = self.btn_lock_colour_y + 12
-
-        # add
-        self.add_rect.x = self.new_piece_button_x + self.new_piece_button.width - self.add_rect.width - 3
-        self.add_rect.y = self.new_piece_button_y + 2
-
-        # copy
-        self.copy_rect.x = self.copy_selected_button_x + self.copy_selected_button.width - self.copy_rect.width - 3
-        self.copy_rect.y = self.copy_selected_button_y + 2
-
-        # save
-        self.save_rect.x = self.btn_save_x + self.btn_save.width - self.save_rect.width - 3
-        self.save_rect.y = self.btn_save_y
-
-        # load
-        self.load_rect.x = self.btn_load_x + self.btn_load.width - self.load_rect.width - 3
-        self.load_rect.y = self.btn_load_y
 
     def load_lines(self):
         # LINES / DIVIDERS
 
         # title
         y = self.title_y + 40
-        x_left = self.new_piece_button_x - 5
+        x_left = self.left_arrow_x - 5
         line_start = (x_left, y)
 
         x_right = self.game.GAME_W - 5
         line_end = (x_right, y)
         self.lines.append([line_start, line_end])
 
-        y = self.btn_save_y - 20
+        y = self.y_bottom - 20
         line_start = (x_left, y)
         line_end = (x_right, y)
         self.lines.append([line_start, line_end])  
 
-    def load_text_coordinates(self):
-        # TEXT
-
-        # title
-        self.title_x = self.red_slider.x + self.red_slider.width / 2 - 10
-        self.title_y = self.game.GAME_H / 8 - 10
-        # print(f'title x : {self.title_x}, title y : {self.title_y}')
-
-        # done
-        self.done_text_x = self.done_button_x + self.done_button.width / 2
-        self.done_text_y = self.done_button_y + self.done_button.height / 2
-
-        # new piece
-        self.new_piece_text_x = (self.new_piece_button_x 
-            + self.new_piece_button.width / 3) + 12
-        self.new_piece_text_y = (self.new_piece_button_y 
-            + self.new_piece_button.height / 2)
-        
-        # copy selected
-        self.copy_selected_text_x = (self.copy_selected_button_x 
-            + self.copy_selected_button.width / 3) + 12
-        self.copy_selected_text_y = (self.copy_selected_button_y 
-            + self.copy_selected_button.height / 2)
-        
-        # save
-        self.save_text_x = (self.btn_save_x 
-            + self.btn_save.width / 3) + 12
-        self.save_text_y = (self.btn_save_y 
-            + self.btn_save.height / 2)
-        
-        # load
-        self.load_text_x = (self.btn_load_x 
-            + self.btn_load.width / 3) + 12
-        self.load_text_y = (self.btn_load_y 
-            + self.btn_load.height / 2)
 
     def load_hitbox(self):
         '''
@@ -939,4 +964,12 @@ class Char_Creating(State):
         # colour lock button has been pressed
         else: 
             self.selected_part.colour = self.selected_colour
-        
+    
+
+    # helpers
+
+    def add_text(self, str, x, y, size='Small'):
+        self.texts.append({'str': str, 'x': x, 'y': y, 'size': size})
+
+    def add_image(self, asset, rect):
+        self.images.append({'img': asset, 'rect': rect})

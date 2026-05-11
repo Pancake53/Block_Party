@@ -470,13 +470,7 @@ class Game():
         self.rotated_cursors = {'x1_cursor' : x1_cursor,
                                 'x2_cursor' : x2_cursor}
 
-    def reset_keys(self):
-        '''
-        helper function for resetting actions dictionary
-        '''
-        for action in self.actions:
-            if action != "mouse_pos":
-                self.actions[action] = False
+
 
     def load_states(self):
         '''
@@ -547,13 +541,13 @@ class Game():
             print(f'Music context not found: {audio_context}')
             return
         
-        track = self.MUSIC[audio_context]['track']
-        custom_volume = self.MUSIC[audio_context]['volume']
+        self.current_track = self.MUSIC[audio_context]['track']
+        self.track_volume = self.MUSIC[audio_context]['volume']
 
         pygame.mixer.music.fadeout(500)
-        pygame.mixer.music.load(track)
+        pygame.mixer.music.load(self.current_track)
         pygame.mixer.music.play(loops)
-        self.change_volume('music', custom_volume)
+        self.change_volume('music', self.track_volume)
         
 
     def change_volume(self, type, custom_volume = 1.0):
@@ -565,7 +559,7 @@ class Game():
         match type:
             case 'music':
                 pygame.mixer.music.set_volume(
-                    self.settings.music_vol
+                    self.settings.music_volume
                     * self.settings.master_volume 
                     * custom_volume)
                 
@@ -592,7 +586,8 @@ class Game():
         
         '''
         sound.play()
-        sound.set_volume(self.settings.master_volume * self.settings.sfx_vol)
+        sound.set_volume(
+            self.settings.master_volume * self.settings.sfx_volume)
 
     def render_cursor(self, surface, cursor_input='default'):
         '''
@@ -670,7 +665,12 @@ class Game():
             # print(f"Updating with Controller: {self.cursor_pos}\n")
             pygame.mouse.set_pos((round(self.cursor_pos[0]), round(self.cursor_pos[1])))
 
-
-
+    def reset_keys(self):
+        '''
+        helper function for resetting actions dictionary
+        '''
+        for action in self.actions:
+            if action != "mouse_pos":
+                self.actions[action] = False
 
 

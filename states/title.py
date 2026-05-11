@@ -4,10 +4,11 @@ import random
 from states.state import State
 from states.credits import Credits
 from states.player_menu import Player_Menu
+from states.pause_menu import PauseMenu
 from states.settings_menu import SettingsMenu
 from settings import Settings
 from UI.bouncing_rect import BouncingRect
-from UI.button import Button
+from UI.button_stationary import ButtonStationary
 from helpers import draw_shading_for_rect
 
 class Title(State):
@@ -48,25 +49,36 @@ class Title(State):
 
         self.add_rects()
 
+        for button in self.buttons:
+            button.update(actions)
+
         for rect in self.rects:
             rect.update()
 
-        if self.play:
-            new_state = Player_Menu(self.game)
-            new_state.enter_state()
 
-        if self.show_credits:
-            new_state = Credits(self.game, 500, 300, 'credits')
-            new_state.enter_state()
-
-
-        if actions["esc"] or self.quit:
+        if actions["esc"]:
             self.game.playing = False
             self.game.running = False
 
         if actions['start']:
-            new_state = SettingsMenu(self.game, 500, 300, 'settings')
+            new_state = PauseMenu(self.game)
             new_state.enter_state()
+
+    def handle_clicks(self, name):
+
+        match name:
+            case 'play':
+                new_state = Player_Menu(self.game)
+                new_state.enter_state()
+            case 'quit':
+                self.game.playing = False
+                self.game.running = False
+            case 'credits':
+                new_state = Credits(self.game, 500, 300, 'credits')
+                new_state.enter_state()
+            case 'settings':
+                new_state = SettingsMenu(self.game, 500, 300, 'settings')
+                new_state.enter_state()
 
     def load_rect(self):
         '''
@@ -135,20 +147,8 @@ class Title(State):
         '''
         renders buttons
         '''
-        self.play = self.btn_play.action_on_button(
-            self.btn_play.x, self.btn_play.y,
-            surface, self.game.actions
-        )
-
-        self.quit = self.btn_quit.action_on_button(
-            self.btn_quit.x, self.btn_quit.y,
-            surface, self.game.actions
-        )
-
-        self.show_credits = self.btn_credits.action_on_button(
-            self.btn_credits.x, self.btn_credits.y,
-            surface, self.game.actions
-        )
+        for button in self.buttons:
+            button.render(surface)
 
 
 
@@ -236,41 +236,64 @@ class Title(State):
         '''
         loads buttons
         '''
+        
+        self.button_w = 400
+        self.button_h = 60
+        self.buttons = []
+
         # play btn
-        w = 400
-        h = 60
+        name = 'play'
 
         x = 25
         y = self.game.GAME_H / 2
 
-        self.btn_play = Button(x, y,
-            button_colour=self.game.BG_COL, width=w, height=h)
+        button = ButtonStationary(name,
+            x, y,
+            button_colour=self.game.BG_COL, 
+            width=self.button_w, height=self.button_h,
+            on_click=self.handle_clicks)
         # text
-        self.play_text_x = self.btn_play.x + self.btn_play.width / 4 - 30
-        self.play_text_y = self.btn_play.y + self.btn_play.height / 2
+        self.play_text_x = x + self.button_w / 4 - 30
+        self.play_text_y = y + self.button_h / 2
+
+        self.buttons.append(button)
 
         # quit
-        y += h * 1.5
-        self.btn_quit = Button(x, y,
-            button_colour=self.game.BG_COL, width=w, height=h)
+        name = 'quit'
+        y += self.button_h * 1.5
+        button = ButtonStationary(name,
+            x, y,
+            button_colour=self.game.BG_COL, 
+            width=self.button_w, height=self.button_h,
+            on_click=self.handle_clicks)
         # text
-        self.quit_text_x = self.btn_quit.x + self.btn_quit.width / 4 - 36
-        self.quit_text_y = self.btn_quit.y + self.btn_quit.height / 2
+        self.quit_text_x = x + self.button_w / 4 - 36
+        self.quit_text_y = y + self.button_h / 2
+
+        self.buttons.append(button)
+
 
         # credits
-        y += h * 1.5
-        self.btn_credits = Button(x, y,
-            button_colour=self.game.BG_COL, width=w, height=h)
+        name = 'credits'
+        y += self.button_h * 1.5
+        button = ButtonStationary(name,
+            x, y,
+            button_colour=self.game.BG_COL, 
+            width=self.button_w, height=self.button_h,
+            on_click=self.handle_clicks)
         # text
-        self.credits_text_x = self.btn_credits.x + self.btn_credits.width / 3 - 34
-        self.credits_text_y = self.btn_credits.y + self.btn_credits.height / 2
+        self.credits_text_x = x + self.button_w / 3 - 34
+        self.credits_text_y = y + self.button_h / 2
+
+        self.buttons.append(button)
+
 
     def load_images(self):
         '''
         images and their coordinates
         '''
         x_offset = 180
-        y_offset = self.btn_play.height * -1
+        y_offset = self.button_h * -1
         scale_factor = 2
 
         # play

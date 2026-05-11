@@ -59,7 +59,23 @@ class Button():
         
         
 
-    def action_on_button(self, x, y, surface, actions) -> bool:
+    def update(self, actions):
+
+        pressed = False
+        # mouse position
+        self.hovered = self.rect.collidepoint(actions["mouse_pos"])
+        # check for mouseover
+        if self.hovered:
+            if actions["mouse_click"]:
+                self.clicked = True
+                pressed = True
+            else:
+                self.clicked = False
+        
+        return pressed
+                
+
+    def render(self, x, y, surface):
         '''
         Handels user actions, mouseover and click 
         and calls draw_button
@@ -70,30 +86,15 @@ class Button():
 
         Return True when button is clicked
         '''
-        self.x = x
-        self.y = y
-        self.rect.x = self.x
-        self.rect.y = self.y
+        self.rect.x = x
+        self.rect.y = y
 
-        pressed = False
-        # mouse position
-        hovered = self.rect.collidepoint(actions["mouse_pos"])
-
-        # check for mouseover
-        if hovered:
-            # hover button
-            self.draw_button(self.hover_col, surface)
-            # click button
-            if actions["mouse_click"]:
-                if self.click_sound:
-                    self.click_sound.play()
-                self.draw_button(self.click_col, surface)
-                # pressed button
-                pressed = True
+        if self.clicked:
+            self.draw_button(self.click_colour, surface)
+        elif self.hovered:
+            self.draw_button(self.hover_colour, surface)
         else:
-            # default button
-            self.draw_button(self.button_col, surface)
-        return pressed
+            self.draw_button(self.button_colour, surface)
     
     def draw_button(self, col, surface):
         '''

@@ -41,13 +41,32 @@ class ButtonStationary():
             self.rect = self.image.get_rect()
             self.width = self.rect.width
             self.height = self.rect.height
+
+            self.rect.x = self.x
+            self.rect.y = self.y
+
         else:    
-            self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+            self.rect = pygame.Rect(self.x, self.y, 
+                                    self.width, self.height)
+            
+        self.hovered, self.clicked = False, False
 
         
-        
+    def update(self, actions):
+        # mouse position
+        self.hovered = self.rect.collidepoint(actions["mouse_pos"])
+        # check for mouseover
+        if self.hovered:
+            if actions["mouse_click"]:
+                self.clicked = True
+                self.on_click(self.name)
+            else:
+                self.clicked = False
+        else:
+            self.clicked = False
+                
 
-    def render(self, surface, actions):
+    def render(self, surface):
         '''
         Handels user actions, mouseover and click 
         and calls draw_button
@@ -59,22 +78,11 @@ class ButtonStationary():
         Return True when button is clicked
         '''
 
-        
-        # mouse position
-        hovered = self.rect.collidepoint(actions["mouse_pos"])
-
-        # check for mouseover
-        if hovered:
-            # hover button
+        if self.clicked:
+            self.draw_button(self.click_colour, surface)
+        elif self.hovered:
             self.draw_button(self.hover_colour, surface)
-            # click button
-            if actions["mouse_click"]:
-                self.draw_button(self.click_colour, surface)
-                # pressed button
-                self.on_click(self.name)
-                
         else:
-            # default button
             self.draw_button(self.button_colour, surface)
         
     
@@ -85,7 +93,7 @@ class ButtonStationary():
         col: button col, default, hover or click
         surface: surface for rendering
         '''
-        # draw rect
+        # draw rec
 
         if self.image:
             pygame.draw.rect(surface, col, self.rect)

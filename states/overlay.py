@@ -8,8 +8,8 @@ from dataclasses import dataclass
 @dataclass
 class Overlay(State):
     game: object
-    width: int
-    height: int
+    width: int = 500
+    height: int = 300
     title: str = None
     '''
     overlay class, previous state renders in the background
@@ -37,6 +37,7 @@ class Overlay(State):
         updates state
         '''
         self.handle_actions(actions)
+        self.child_spesific_update(delta_time, actions)
 
         if self.exit:
             self.exit_state()
@@ -58,6 +59,9 @@ class Overlay(State):
                                 size='H1')
             
         self.child_spesific_render(surface)
+
+    def child_spesific_update(self, actions):
+        pass
 
     def child_spesific_render(self, surface):
         pass
@@ -122,3 +126,12 @@ class Overlay(State):
 
     def load_else(self):
         pass
+
+
+    # HELPERS
+
+    def add_text(self, str, x, y):
+        '''
+        helper function for adding text to a list
+        '''
+        self.texts.append({'str': str, 'x': x, 'y': y}) 
