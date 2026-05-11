@@ -1,8 +1,10 @@
 import json, os, pygame
+from pygame import Vector2
 
 from states.title import Title
 from settings import Settings
-from pygame import Vector2
+from audio_manager import AudioManager
+
 
 class Game():
     def __init__(self):
@@ -15,6 +17,7 @@ class Game():
 
         # create needed classes
         self.settings = Settings()
+        print(self.settings)
 
         # window and game canvas
         self.GAME_W, self.GAME_H = 960, 540
@@ -85,9 +88,7 @@ class Game():
 
         self.load_controller()
 
-        # audio
-        # music and volume control
-        self.music_muted = False
+        self.audio = AudioManager(self.settings, self.audio_dir, self.sound_fx_dir)
 
         # cursors
         self.cursor_half = 25
@@ -264,7 +265,7 @@ class Game():
         self.state_stack[-1].update(self.dt, self.actions)
 
         if self.actions['mouse_click']:
-            self.play_sfx(self.sfx_menu_click)
+            self.audio.play_sfx('menu_click')
 
         if self.cursor is None:
             if self.actions['mouse_click']:
@@ -366,6 +367,8 @@ class Game():
         '''
         loads games assets
         '''
+
+        
         # Pointers for assets
         self.assets_dir = os.path.join("assets")
         self.image_dir = os.path.join(self.assets_dir, "images")
@@ -400,48 +403,17 @@ class Game():
         self.assets['load_img'] = pygame.image.load(os.path.join(self.image_dir, "load.png")).convert_alpha()
         self.assets['trash_open_img'] = pygame.image.load(os.path.join(self.image_dir, "trash_open.png")).convert_alpha()
         self.assets['trash_closed_img'] = pygame.image.load(os.path.join(self.image_dir, "trash_closed.png")).convert_alpha()
+        self.assets['pause_img'] = pygame.image.load(os.path.join(self.image_dir, "pause.png")).convert_alpha()
+        self.assets['sound_img'] = pygame.image.load(os.path.join(self.image_dir, "sound.png")).convert_alpha()
+        self.assets['mute_img'] = pygame.image.load(os.path.join(self.image_dir, "mute.png")).convert_alpha()
 
         self.load_cursors()
         # cursors
 
 
-        self.load_audio()
+        
     
-    def load_audio(self):
 
-        # music 
-        pygame.mixer.init()
-        self.audio = {}
-        # audio
-        self.audio['main_theme'] = os.path.join(self.audio_dir, 'main_music.ogg')
-        self.audio['sea_ambiance'] = os.path.join(self.audio_dir, 'sea_ambiance.ogg')
-        self.audio['smile'] = os.path.join(self.audio_dir, 'smile.ogg')
-        self.audio['middle_ages'] = os.path.join(self.audio_dir, 'middle_ages.ogg')
-        self.audio['mystical_forest'] = os.path.join(self.audio_dir, 'mystical_forest.ogg')
-        # sound fx
-        self.audio['explosion'] = os.path.join(self.sound_fx_dir, 'explosion.wav')
-        self.audio['jump'] = os.path.join(self.sound_fx_dir, 'jump.aiff')
-        self.audio['bump'] = os.path.join(self.sound_fx_dir, 'bump.aiff')
-        self.audio['tackle'] = os.path.join(self.sound_fx_dir, 'tackle.wav')
-        self.audio['menu_click'] = os.path.join(self.sound_fx_dir, 'menu_click.wav')
-        self.sfx_menu_click = pygame.mixer.Sound(self.audio['menu_click'])
-
-        self.MUSIC = {
-            'menu' : 
-                {'track' : self.audio['main_theme'], 'volume': 0.5},
-           'ship.tmj' : 
-                {'track' : self.audio['sea_ambiance'], 'volume':  1.5},
-           'shipwreck.tmj' : 
-                {'track' : self.audio['sea_ambiance'], 'volume':  1.5},
-           'smily.tmj' : 
-                {'track' : self.audio['smile'], 'volume':  0.7},
-           'swords.tmj' :
-                {'track' : self.audio['middle_ages'], 'volume':  1.2},
-           'tree of life.tmj' :
-                {'track' : self.audio['mystical_forest'], 'volume':  0.8}
-        }
-
-        self.play_music('menu')
 
 
     def load_cursors(self):
@@ -530,64 +502,6 @@ class Game():
             # print(f'x scaler: {self.scale_multiplier_x}, y scaler: {self.scale_multiplier_y}')
 
 
-    def play_music(self, audio_context, loops=-1):
-        '''
-        plays audio if audio exists in files
-
-        audio_name: filename of played audio
-        loops: looping mechanism (-1 = forever, 0 = once)
-        '''
-        if audio_context not in self.MUSIC:
-            print(f'Music context not found: {audio_context}')
-            return
-        
-        self.current_track = self.MUSIC[audio_context]['track']
-        self.track_volume = self.MUSIC[audio_context]['volume']
-
-        pygame.mixer.music.fadeout(500)
-        pygame.mixer.music.load(self.current_track)
-        pygame.mixer.music.play(loops)
-        self.change_volume('music', self.track_volume)
-        
-
-    def change_volume(self, type, custom_volume = 1.0):
-        '''
-        volume of audio
-
-        type: which audio type to change volume (music, sounds or narrating)
-        '''
-        match type:
-            case 'music':
-                pygame.mixer.music.set_volume(
-                    self.settings.music_volume
-                    * self.settings.master_volume 
-                    * custom_volume)
-                
-            case _:
-                print('Invalid type input in change_volume')
-
-    def toggle_music(self):
-
-        self.music_muted = not self.music_muted
-
-        if self.music_muted:
-            pygame.mixer.music.set_volume(0)
-
-        else: # music unmuted
-            self.change_volume('music')
-
-    def play_sfx(self, sound):
-
-        '''
-        playes sound effect
-
-        
-        sound: pygame.mixer.Sound(effect_name)
-        
-        '''
-        sound.play()
-        sound.set_volume(
-            self.settings.master_volume * self.settings.sfx_volume)
 
     def render_cursor(self, surface, cursor_input='default'):
         '''

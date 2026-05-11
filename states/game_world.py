@@ -36,6 +36,7 @@ class Game_World(State):
         # contain keys main_colour and char_surface
 
         self.player_count = len(created_chars)
+        self.level_name = level_name
         self.created_chars = created_chars
         self.players_alive = [i for i in range(self.player_count)]
         self.colours = [char['main_colour']
@@ -76,15 +77,9 @@ class Game_World(State):
         # camera
         self.camera = Camera(self)
         self.camera_moved = False
+
+        self.load()
         
-        # level data --> tiles and characters
-        self.load_level(level_name)
-       
-        
-        # needed classes --> bomb, explosion, buttons
-        self.load_entities()
-        self.sprites = pygame.sprite.Group()
-        self.load_effects()
 
         # Game State
         self.state = {'turn': 0, 'selecting_locked': False, 'game_over': False}
@@ -101,7 +96,7 @@ class Game_World(State):
         self.diff_vector = None  
 
         # music     
-        self.game.play_music(level_name)
+        self.game.audio.play_music(level_name)
         
 
 
@@ -134,6 +129,9 @@ class Game_World(State):
         # print(self.game_state)
         # sprites
         self.sprites.update(delta_time)
+
+        for button in self.buttons:
+            button.update(actions)
         
 
         if self.state['game_over']:
@@ -318,6 +316,9 @@ class Game_World(State):
         if self.draw_arrow:
             self.render_arrow(surface)
 
+        for button in self.buttons:
+            button.render(surface)
+
         if self.state['game_over']:
             self.render_winning(surface)
 
@@ -388,11 +389,21 @@ class Game_World(State):
 
     # load functions
 
+    def load(self):
+
+        # level data --> tiles and characters
+        self.load_level(self.level_name)
+        # needed classes --> bomb, explosion, buttons
+        self.load_entities()
+        self.sprites = pygame.sprite.Group()
+        self.load_ui()
+
+
     def load_entities(self):
         '''
         loads classes and pygame obj at the init of level
         '''
-        self.turn_rect = pygame.Rect(15, self.game.GAME_H - 45, 80, 30)
+        
 
         self.bomb = Bomb(-1000, -1000, self, self.game.assets["bomb_img"])
         self.explosion = Explosion(self.game.assets['explosion_img'])
@@ -494,16 +505,39 @@ class Game_World(State):
                         obj['y'], # y position
                         self)
             )
-
-    def load_effects(self):
-        '''
-        '''
-
-        self.sfx_explosion = pygame.mixer.Sound(self.game.audio['explosion'])
-        self.sfx_jump = pygame.mixer.Sound(self.game.audio['jump'])
-        self.sfx_bump = pygame.mixer.Sound(self.game.audio['bump'])
-        self.sfx_tackle = pygame.mixer.Sound(self.game.audio['tackle'])
         
+    def load_ui(self):
+
+        self.buttons = []
+        padding = 15
+
+        name = 'pause'
+        w, h = self.game.assets['pause_img'].get_size()
+        x = self.game.GAME_W - w - padding
+        y = self.game.GAME_H - h - padding
+
+        button = ButtonStationary(
+            name,
+            x, y,
+            on_click=self.handle_clicks,
+            image=self.game.assets['pause_img']
+        )
+        self.buttons.append(button)
+
+        name = 'toggle audio'
+        x -= w + padding
+
+        button = ButtonStationary(
+            name,
+            x, y,
+            on_click=self.handle_clicks,
+            image=self.game.assets['sound_img'],
+            toggled_image = self.game.assets['mute_img']
+        )
+        self.buttons.append(button)
+
+        self.turn_rect = pygame.Rect(padding, self.game.GAME_H - 45, 80, 30)
+
 
     # bomb / explosion
 
@@ -554,7 +588,7 @@ class Game_World(State):
         if hit_characters:
             self.explosion_calculations(x_pos, y_pos, hit_characters)
 
-        self.game.play_sfx(self.sfx_explosion)
+        self.game.audio.play_sfx('explosion')
 
     def explosion_calculations(self, x_pos, y_pos, hit_characters):
         '''
@@ -608,6 +642,13 @@ class Game_World(State):
                 self.choosing_char = None
 
             # UI
+
+            case 'pause':
+                new_state = PauseMenu(self.game)
+                new_state.enter_state()
+
+            case 'toggle audio':
+                self.game.audio.toggle_mute()
 
             case _:
                 print(f'Invalid click name in game world: {name}')

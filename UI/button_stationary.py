@@ -21,6 +21,7 @@ class ButtonStationary():
     width: int =0
     height: int =0
     image: object =None # asset
+    toggled_image: object =None
     
 
 
@@ -49,7 +50,7 @@ class ButtonStationary():
             self.rect = pygame.Rect(self.x, self.y, 
                                     self.width, self.height)
             
-        self.hovered, self.clicked = False, False
+        self.hovered, self.clicked, self.toggled = False, False, False
 
         
     def update(self, actions, position = None):
@@ -63,6 +64,7 @@ class ButtonStationary():
             if actions["mouse_click"]:
                 self.clicked = True
                 self.on_click(self.name)
+                self.toggled = not self.toggled
             else:
                 self.clicked = False
         else:
@@ -97,10 +99,20 @@ class ButtonStationary():
         surface: surface for rendering
         '''
         # draw rec
+        if self.toggled_image:
+            if self.toggled:
+                pygame.draw.rect(surface, col, self.rect)
+                surface.blit(self.toggled_image, self.rect)
+            else:
+                pygame.draw.rect(surface, col, self.rect)
+                surface.blit(self.image, self.rect)
 
-        if self.image:
+
+        elif self.image:
             pygame.draw.rect(surface, col, self.rect)
             surface.blit(self.image, self.rect)
+
+
         else:
             pygame.draw.rect(surface, col, self.rect)
 

@@ -94,14 +94,14 @@ class Character(GameObject):
         collisions = []
         for tile in tiles:
             if self.rect.colliderect(tile.rect):
-                self.game_world.game.play_sfx(self.game_world.sfx_bump)
+                self.game_world.game.audio.play_sfx('bump')
                 collisions.append(tile.rect)
         
         for team in self.game_world.teams_not_eliminated.values():
             for char in team:
                 if char != self:
                     if self.rect.colliderect(char.rect):
-                        self.game_world.game.play_sfx(self.game_world.sfx_tackle)
+                        self.game_world.game.audio.play_sfx('tackle')
                         self.character_collision(char)
                         collisions.append(char.rect)
 
@@ -259,7 +259,7 @@ class Character(GameObject):
         '''
         jump --> bloop
         '''
-        self.game_world.game.play_sfx(self.game_world.sfx_jump)
+        self.game_world.game.audio.play_sfx('jump')
         
     def throw_bomb(self):
         '''

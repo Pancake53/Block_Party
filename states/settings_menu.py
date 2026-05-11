@@ -10,9 +10,14 @@ from dataclasses import dataclass
 
 @dataclass
 class SettingsMenu(Overlay):
-    pass
+    bg_surface: pygame.surface.Surface = None
 
     def __post_init__(self):
+
+        self.width: int = self.game.GAME_W * 2 / 3
+        self.height: int = self.game.GAME_H * 2 / 3
+        self.title = 'settings'
+
         return super().__post_init__()
     
     def child_spesific_update(self, delta_time, actions):
@@ -64,9 +69,19 @@ class SettingsMenu(Overlay):
 
         # apply volume change to playing music
         if name in ['master_volume', 'music_volume']:
-            self.game.change_volume('music', self.game.track_volume)
+            self.game.audio.change_volume('music')
 
-        print(self.game.settings.master_volume)
+        # print(name, value)
+
+    def load_bg(self):
+        if self.bg_surface:
+            self.shaded_bg = self.bg_surface
+        else:
+            self.shaded_bg = pygame.Surface((self.game.GAME_W, self.game.GAME_H))
+            self.prev_state.render(self.shaded_bg)
+            self.shaded_bg.set_alpha(self.ALPHA)
+
+        self.rect_bg = pygame.Rect(0, 0, self.game.GAME_W, self.game.GAME_H)
 
     def load_buttons(self):
 
@@ -109,8 +124,6 @@ class SettingsMenu(Overlay):
         )
         self.buttons.append(btn_toggle_fullscreen)
         self.add_text(button_name, self.text_x, self.y_2)
-        
-
 
     def load_sliders(self):
 

@@ -75,7 +75,7 @@ class Player_Menu(State):
         '''
         surface.fill((self.game.UI_BG_COL))
         self.game.draw_text(surface, "Select Player Count",
-                             self.game.WHITE, self.game.GAME_W / 2,
+                             self.game.TILE_COL, self.game.GAME_W / 2,
                                self.game.GAME_H / 8)
         
         self.render_buttons(surface)

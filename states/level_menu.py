@@ -52,7 +52,7 @@ class Level_Menu(State):
         '''
         surface.fill((self.game.BLACK))
         self.game.draw_text(surface, "Select Level",
-                             self.game.WHITE, self.game.GAME_W / 2,
+                             self.game.TILE_COL, self.game.GAME_W / 2,
                                self.game.GAME_H / 8)
         
         pygame.draw.rect(surface, self.game.BG_COL, self.level_bg)

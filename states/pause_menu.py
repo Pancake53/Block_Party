@@ -28,7 +28,7 @@ class PauseMenu(Overlay):
             case 'continue':
                 self.exit_state()
             case 'settings':
-                new_state = SettingsMenu(self.game, title='settings')
+                new_state = SettingsMenu(self.game, bg_surface=self.shaded_bg)
                 new_state.enter_state()
             case _:
                 print(f'Invalid case in handle clicks: {name}')
