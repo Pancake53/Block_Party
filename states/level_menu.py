@@ -2,7 +2,7 @@ import pygame, json, os
 
 from states.state import State
 from states.game_world import Game_World
-from UI.button import Button
+from UI.button_stationary import ButtonStationary
 from helpers import draw_shading_for_rect
 
 class Level_Menu(State):
@@ -36,39 +36,14 @@ class Level_Menu(State):
         delta_time: dt
         actions: user inputs dictionary
         '''
-        
+        for button in self.buttons:
+            button.update(actions)
 
         self.handle_actions(actions)
 
-        if self.left_clicked:
-            # first level loop around to last
-            if self.current_level == 0:
-                self.current_level = self.level_count - 1
-            # continue normally if not first
-            else:
-                self.current_level -= 1
 
-        if self.right_clicked:
-            # at last level, loop to first
-            if self.current_level == self.level_count - 1:
-                self.current_level = 0
-            else:
-                self.current_level += 1
 
-        if self.play_button_clicked:
-            self.play = True
-
-    def handle_actions(self, actions):
-        if actions["start"] or self.play:
-            self.play = False
-            new_state = Game_World(self.game,
-                                    self.filenames[self.current_level],
-                                       self.created_chars)
-            new_state.enter_state()
-
-        if actions["esc"]:
-            self.exit_state()
-
+    
     def render(self, surface):
         '''
         renders background and levels to choose from
@@ -87,7 +62,52 @@ class Level_Menu(State):
 
         self.render_buttons(surface)
 
-        self.game.draw_text(surface, "Play", self.game.TILE_COL, self.game.GAME_W / 2, self.game.GAME_H - 100, size='Small')
+        self.game.draw_text(surface, "Play",
+                             self.game.TILE_COL, self.game.GAME_W / 2, 
+                             self.game.GAME_H - 100, size='Small')
+        
+    def handle_clicks(self, name):
+        '''
+        handels button clicks
+
+        name: name of the button clicked
+        '''
+        match name:
+
+            case 'left_arrow':
+                # first level loop around to last
+                if self.current_level == 0:
+                    self.current_level = self.level_count - 1
+                # continue normally if not first
+                else:
+                    self.current_level -= 1
+
+            case 'right_arrow':
+                # at last level, loop to first
+                if self.current_level == self.level_count - 1:
+                    self.current_level = 0
+                else:
+                    self.current_level += 1
+
+            case 'play':
+                self.play = True
+            
+            case _:
+                print(f'Incorrect click input in level menu: {name} !')
+
+
+    def handle_actions(self, actions):
+        if actions["start"] or self.play:
+            self.play = False
+            new_state = Game_World(self.game,
+                                    self.filenames[self.current_level],
+                                       self.created_chars)
+            new_state.enter_state()
+
+        if actions["esc"]:
+            self.exit_state()
+
+
         
     def render_selected_level(self, surface):
         '''
@@ -98,17 +118,8 @@ class Level_Menu(State):
             
     def render_buttons(self, surface):
 
-        self.left_clicked = self.left_arrow.action_on_button(
-            self.left_arrow_x,
-            self.left_arrow_y, surface, self.game.actions)
-        
-        self.right_clicked = self.right_arrow.action_on_button(
-            self.right_arrow_x,
-            self.right_arrow_y, surface, self.game.actions)
-        
-        self.play_button_clicked = self.play_button.action_on_button(
-            self.play_button_x, self.play_button_y, surface, self.game.actions
-        )
+        for button in self.buttons:
+            button.render(surface)
         
         # print(f'Left: {self.left_clicked}, Right: {self.right_clicked}')
 
@@ -117,27 +128,59 @@ class Level_Menu(State):
         '''
         init needed classes and coordination calculations
         '''
-        self.level_bg = pygame.Rect(self.game.GAME_W / 4, self.game.GAME_H / 4,
-                                                  self.game.GAME_W / 2, self.game.GAME_H / 2)
+        self.level_bg = pygame.Rect(
+            self.game.GAME_W / 4, self.game.GAME_H / 4,
+            self.game.GAME_W / 2, self.game.GAME_H / 2)
+        
+        self.buttons = []
 
-        self.left_arrow = Button(0, 0, button_colour=(139, 139, 139),
-                                  hover_colour=(50, 50, 50), image = 
-                                 self.game.assets["arrowleft_img"])
-        self.right_arrow = Button(0, 0, button_colour=(139, 139, 139),
-                                  hover_colour=(50, 50, 50), image =
-                                  self.game.assets["arrowright_img"])
+        name = 'left_arrow'
+        w, h = self.game.assets["arrowleft_img"].get_size()
+
+        x = self.game.GAME_W / 6 - w / 2
+        y = self.game.GAME_H / 2 - h / 2
+
+        button = ButtonStationary(
+            name,
+            x, y, 
+            image = self.game.assets["arrowleft_img"],
+            on_click=self.handle_clicks
+        )
+        self.buttons.append(button)
+
+        name = 'right_arrow'
+        x = self.game.GAME_W * 5 / 6 - w / 2
+
+        button = ButtonStationary(
+            name,
+            x, y, 
+            image = self.game.assets["arrowright_img"],
+            on_click=self.handle_clicks
+        )
+        self.buttons.append(button)
         
-        self.play_button = Button(0, 0, self.game.BG_COL, width=100, height=50)
+        name = 'play'
+        w, h = 100, 50
+
+        x = self.game.GAME_W / 2 - w / 2
+        y = self.game.GAME_H - h / 2 - 100
         
+        
+        
+        button = ButtonStationary(
+            name,
+            x, y,
+            width=w, height=h,
+            on_click=self.handle_clicks
+        )
+        self.buttons.append(button)
+
         # calculate locations for buttons
-        self.left_arrow_x = self.game.GAME_W / 6 - self.left_arrow.rect.width / 2
-        self.left_arrow_y = self.game.GAME_H / 2 - self.left_arrow.rect.height / 2
+        
 
-        self.right_arrow_x = self.game.GAME_W * 5 / 6 - self.right_arrow.rect.width / 2
-        self.right_arrow_y = self.game.GAME_H / 2 - self.right_arrow.rect.height / 2
+        
 
-        self.play_button_x = self.game.GAME_W / 2 - self.play_button.width / 2
-        self.play_button_y = self.game.GAME_H - self.play_button.height / 2 - 100
+        
         
 
     def load_levels(self):

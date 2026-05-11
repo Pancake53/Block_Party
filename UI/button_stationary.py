@@ -52,7 +52,10 @@ class ButtonStationary():
         self.hovered, self.clicked = False, False
 
         
-    def update(self, actions):
+    def update(self, actions, position = None):
+        if position:
+            self.rect.topleft = position
+
         # mouse position
         self.hovered = self.rect.collidepoint(actions["mouse_pos"])
         # check for mouseover

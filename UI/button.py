@@ -1,5 +1,6 @@
 import pygame
 from helpers import draw_shading_for_rect
+from typing import Callable
 
 # Button that can have optionally image or text
 class Button():
@@ -9,9 +10,10 @@ class Button():
 
     handels rendering and actions on button
     '''
-    def __init__(self, x, y, button_colour=(255, 255, 255),
+    def __init__(self, x, y, on_click: Callable[[str], None],
+                 button_colour=(255, 255, 255),
                 hover_colour=(139, 139, 139), width=0, height=0,
-                image=None, click_sound=None):
+                image=None ):
         
         '''
         Docstring for __init__
@@ -35,7 +37,7 @@ class Button():
         self.width = width
         self.height = height
 
-        self.click_sound = click_sound
+        self.on_click = on_click
 
         self.WHITE = (255, 255, 255)
         self.BLACK = (0, 0, 0)
