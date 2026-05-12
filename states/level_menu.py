@@ -1,7 +1,6 @@
 import pygame, json, os
 
 from states.state import State
-from states.game_world import Game_World
 from UI.button_stationary import ButtonStationary
 from helpers import draw_shading_for_rect
 
@@ -99,10 +98,9 @@ class Level_Menu(State):
     def handle_actions(self, actions):
         if actions["start"] or self.play:
             self.play = False
-            new_state = Game_World(self.game,
-                                    self.filenames[self.current_level],
-                                       self.created_chars)
-            new_state.enter_state()
+            self.game.state_m.enter_state('game_world',
+                                          level_name = self.filenames[self.current_level],
+                                          created_chars = self.created_chars)
 
         if actions["esc"]:
             self.exit_state()

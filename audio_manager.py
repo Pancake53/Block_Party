@@ -8,7 +8,7 @@ class AudioManager():
     sound_fx_dir: object
 
     def __post_init__(self):
-        print(self.settings)
+        
         self.audio_muted = False
         self.old_master_value = self.settings.master_volume
         self.music_muted = False
@@ -107,7 +107,10 @@ class AudioManager():
         self.audio['bump'] = os.path.join(self.sound_fx_dir, 'bump.aiff')
         self.audio['tackle'] = os.path.join(self.sound_fx_dir, 'tackle.wav')
         self.audio['menu_click'] = os.path.join(self.sound_fx_dir, 'menu_click.wav')
-        fxs = ['explosion', 'jump', 'bump', 'tackle', 'menu_click']
+        self.audio['max_hit'] = os.path.join(self.sound_fx_dir, 'max_hit_cheer.wav')
+
+        fxs = ['explosion', 'jump', 'bump', 'tackle', 'menu_click', 
+               'max_hit']
         for fx in fxs:
             self.add_sfx(fx)
 

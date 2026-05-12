@@ -1,7 +1,6 @@
 import pygame
 
 from states.state import State
-from states.char_creating import Char_Creating
 from UI.button_stationary import ButtonStationary
 from helpers import draw_shading_for_rect
 
@@ -44,10 +43,10 @@ class Player_Menu(State):
         self.handle_actions(actions)
 
         if self.selected:
-            new_state = Char_Creating(self.game, self.player_count)
-            new_state.enter_state()
-            # reset the selected state
             self.selected = False
+            self.game.state_m.enter_state('char_creating', 
+                                          player_count = self.player_count)
+            
 
     def handle_actions(self, actions):
 

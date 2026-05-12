@@ -13,6 +13,7 @@ class State():
         self.cursor = 'default'
         self.game = game
         self.prev_state = None
+        self.images = []
 
     def update(self, delta_time, actions):
         '''

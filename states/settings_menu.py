@@ -33,7 +33,7 @@ class SettingsMenu(Overlay):
             case 'toggle fullscreen':
                 self.game.toggle_fullscreen()
             case 'toggle music':
-                self.game.toggle_music()
+                self.game.audio.toggle_music()
             case _:
                 print(f'Invalid case in handle clicks: {name}')
 

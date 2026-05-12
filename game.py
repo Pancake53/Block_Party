@@ -1,9 +1,9 @@
 import json, os, pygame
 from pygame import Vector2
 
-from states.title import Title
 from settings import Settings
 from audio_manager import AudioManager
+from state_manager import StateManager
 
 
 class Game():
@@ -17,7 +17,7 @@ class Game():
 
         # create needed classes
         self.settings = Settings()
-        print(self.settings)
+        
 
         # window and game canvas
         self.GAME_W, self.GAME_H = 960, 540
@@ -82,19 +82,27 @@ class Game():
         self.assets = {}
         self.load_assets()
 
-        # state management
-        self.state_stack = []
-        self.load_states()
-
+        
         self.load_controller()
 
         self.audio = AudioManager(self.settings, self.audio_dir, self.sound_fx_dir)
+
 
         # cursors
         self.cursor_half = 25
         self.cursor = None
         self.cursor_pos = list(pygame.mouse.get_pos())
         self.last_input = 'mouse'
+
+        # SHARED DATA BETWEEN CLASSES
+
+        self.players = None
+        self.chars_created = None
+
+        # state management
+        self.state_stack = []
+        self.load_states()
+
 
 
 
@@ -150,7 +158,7 @@ class Game():
                     self.toggle_fullscreen()
                 # Toggle audio
                 if event.key == pygame.K_m:
-                    self.toggle_music()
+                    self.audio.toggle_mute()
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_ESCAPE:
@@ -301,6 +309,8 @@ class Game():
         '''
         self.dt = self.clock.tick(60) / 1000
 
+    # HELPERS
+
     def draw_text(self, surface, text, colour, x, y, size="Title"):
         '''
         helper function for drawing text
@@ -363,6 +373,15 @@ class Game():
         text_rect.topleft = (x, y)
         surface.blit(text_surface, text_rect)
 
+    def add_image(self, image_asset_name, x, y, list):
+
+        rect = self.assets[image_asset_name].get_rect()
+        rect.topleft = (x, y)
+        list.append({'img': self.assets[image_asset_name],
+                            'rect': rect})
+        
+
+
     def load_assets(self):
         '''
         loads games assets
@@ -406,6 +425,8 @@ class Game():
         self.assets['pause_img'] = pygame.image.load(os.path.join(self.image_dir, "pause.png")).convert_alpha()
         self.assets['sound_img'] = pygame.image.load(os.path.join(self.image_dir, "sound.png")).convert_alpha()
         self.assets['mute_img'] = pygame.image.load(os.path.join(self.image_dir, "mute.png")).convert_alpha()
+        self.assets['settings_img'] = pygame.image.load(os.path.join(self.image_dir, "settings2.png")).convert_alpha()
+        self.assets['continue_img'] = pygame.image.load(os.path.join(self.image_dir, "continue.png")).convert_alpha()
 
         self.load_cursors()
         # cursors
@@ -448,8 +469,8 @@ class Game():
         '''
         creates an instance of first state and appends it to state stack
         '''
-        self.title_screen = Title(self)
-        self.state_stack.append(self.title_screen)
+        self.state_m = StateManager(self)
+        self.state_m.enter_state('title')
 
     def load_controller(self):
         '''
@@ -586,5 +607,4 @@ class Game():
         for action in self.actions:
             if action != "mouse_pos":
                 self.actions[action] = False
-
 

@@ -2,7 +2,6 @@ import pygame, json, os, random
 from pygame.math import Vector2
 
 from states.state import State
-from states.pause_menu import PauseMenu
 
 from game_objects.character import Character
 from game_objects.bomb import Bomb
@@ -40,7 +39,7 @@ class Game_World(State):
         self.created_chars = created_chars
         self.players_alive = [i for i in range(self.player_count)]
         self.colours = [char['main_colour']
-                        for char in created_chars.values()
+                        for char in self.created_chars.values()
         ]
         
 
@@ -644,8 +643,7 @@ class Game_World(State):
             # UI
 
             case 'pause':
-                new_state = PauseMenu(self.game)
-                new_state.enter_state()
+                self.game.state_m.enter_state('pause_menu')
 
             case 'toggle audio':
                 self.game.audio.toggle_mute()

@@ -324,6 +324,8 @@ class Character(GameObject):
     
             self.game_world.sprites.add(dmg_number)
 
+            self.game_world.game.audio.play_sfx('max_hit')
+
         else:
             dmg_number = FloatingFade(
                 self.x_screen, self.y_screen,

@@ -2,10 +2,7 @@ import pygame
 import random
 
 from states.state import State
-from states.credits import Credits
-from states.player_menu import Player_Menu
-from states.pause_menu import PauseMenu
-from states.settings_menu import SettingsMenu
+
 from settings import Settings
 from UI.bouncing_rect import BouncingRect
 from UI.button_stationary import ButtonStationary
@@ -61,24 +58,20 @@ class Title(State):
             self.game.running = False
 
         if actions['start']:
-            new_state = PauseMenu(self.game)
-            new_state.enter_state()
+            self.game.state_m.enter_state('pause_menu')
 
     def handle_clicks(self, name):
 
         match name:
             case 'play':
-                new_state = Player_Menu(self.game)
-                new_state.enter_state()
+                self.game.state_m.enter_state('player_menu')
             case 'quit':
                 self.game.playing = False
                 self.game.running = False
             case 'credits':
-                new_state = Credits(self.game, 500, 300, 'credits')
-                new_state.enter_state()
+                self.game.state_m.enter_state('credits')
             case 'settings':
-                new_state = SettingsMenu(self.game, 500, 300, 'settings')
-                new_state.enter_state()
+                self.game.state_m.enter_state('settings')
 
     def load_rect(self):
         '''

@@ -9,7 +9,7 @@ from UI.slider import Slider
 from helpers import draw_shading_for_rect
 
 class Char_Creating(State):
-    def __init__(self, game, players_left, created_chars=None):
+    def __init__(self, game, players_left=1, created_chars=None):
         super().__init__(game)
         # how many players havent created their characters yet
         self.players_left = players_left - 1
@@ -19,7 +19,8 @@ class Char_Creating(State):
         # dictionary with player id as the first key
         # value is dict, which 
         # contain keys main_colour and char_surface
-        
+        print(created_chars)
+
         # selecting players id
         if created_chars:
             self.created_characters_for_render = []
@@ -264,21 +265,25 @@ class Char_Creating(State):
         or 
         to select selection screen
         '''
-        
+        # reset the selected state
+        self.selected = False
 
         self.created_chars[self.player_id] = self.create_surface_from_created_char()
 
         if self.players_left > 0:
             # more characters to be created
-            new_state = Char_Creating(self.game, self.players_left, self.created_chars)
+            self.game.state_m.enter_state('char_creating', 
+                                          player_count = self.players_left,
+                                          created_chars = self.created_chars 
+                                          )
             
         else:
             # all characters created, go to selecting level
-            new_state = Level_Menu(self.game, self.created_chars)
+            self.game.state_m.enter_state('level_menu', 
+                                   created_chars = self.created_chars)
             
-        new_state.enter_state()
-        # reset the selected state
-        self.selected = False
+        
+        
 
     def render(self, surface):
         '''
@@ -894,10 +899,10 @@ class Char_Creating(State):
         creates new Part obj and adds it character parts
         '''
         if x is None:
-            x = self.new_piece_button_x
+            x = self.left_arrow_x
         
         if y is None:
-            y = self.new_piece_button_y + self.new_piece_button.height * 1.5
+            y = self.y_bottom - 70
 
         if W is None:   
             W = 50
