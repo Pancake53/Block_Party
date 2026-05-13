@@ -51,7 +51,7 @@ class Player_Menu(State):
     def handle_actions(self, actions):
 
         if actions["esc"]:
-            self.exit_state()
+            self.game.state_m.exit_state()
 
     def handle_clicks(self, name):
 

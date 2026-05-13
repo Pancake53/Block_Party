@@ -309,76 +309,7 @@ class Game():
         '''
         self.dt = self.clock.tick(60) / 1000
 
-    # HELPERS
 
-    def draw_text(self, surface, text, colour, x, y, size="Title"):
-        '''
-        helper function for drawing text
-
-        surface: game canvas
-        text: written message
-        colour: colour of text
-        x & y: center coordinates of text rect
-        size: Title, Medium or Small
-        '''
-        match size:
-            case "Title":
-                text_surface = self.font_title.render(text,
-                                                True, colour)
-            case "H1":
-                text_surface = self.font_h1.render(text,
-                                                True, colour)
-            case "Medium":
-                text_surface = self.font_medium.render(text,
-                                                True, colour)
-            case "Small":
-                text_surface = self.font_small.render(text,
-                                                True, colour)
-            case _:
-                text_surface = self.font_medium.render(text,
-                                                True, colour)
-                print(f"Draw text input error, size: {size} is not in Title, Medium, Small")
-        text_rect = text_surface.get_rect()
-        text_rect.center = (x, y)
-        surface.blit(text_surface, text_rect)
-
-    def draw_text_topleft(self, surface, text, colour, x, y, size="Title"):
-        '''
-        helper function for drawing text
-
-        surface: game canvas
-        text: written message
-        colour: colour of text
-        x & y: center coordinates of text rect
-        size: Title, Medium or Small
-        '''
-        match size:
-            case "Title":
-                text_surface = self.font_title.render(text,
-                                                True, colour)
-            case "H1":
-                text_surface = self.font_h1.render(text,
-                                                True, colour)
-            case "Medium":
-                text_surface = self.font_medium.render(text,
-                                                True, colour)
-            case "Small":
-                text_surface = self.font_small.render(text,
-                                                True, colour)
-            case _:
-                text_surface = self.font_medium.render(text,
-                                                True, colour)
-                print(f"Draw text input error, size: {size} is not in Title, Medium, Small")
-        text_rect = text_surface.get_rect()
-        text_rect.topleft = (x, y)
-        surface.blit(text_surface, text_rect)
-
-    def add_image(self, image_asset_name, x, y, list):
-
-        rect = self.assets[image_asset_name].get_rect()
-        rect.topleft = (x, y)
-        list.append({'img': self.assets[image_asset_name],
-                            'rect': rect})
         
 
 
@@ -427,6 +358,9 @@ class Game():
         self.assets['mute_img'] = pygame.image.load(os.path.join(self.image_dir, "mute.png")).convert_alpha()
         self.assets['settings_img'] = pygame.image.load(os.path.join(self.image_dir, "settings2.png")).convert_alpha()
         self.assets['continue_img'] = pygame.image.load(os.path.join(self.image_dir, "continue.png")).convert_alpha()
+        self.assets['random_img'] = pygame.image.load(os.path.join(self.image_dir, "random.png")).convert_alpha()
+        self.assets['confirm_img'] = pygame.image.load(os.path.join(self.image_dir, "confirm.png")).convert_alpha()
+        self.assets['delete_img'] = pygame.image.load(os.path.join(self.image_dir, "delete.png")).convert_alpha()
 
         self.load_cursors()
         # cursors
@@ -607,4 +541,78 @@ class Game():
         for action in self.actions:
             if action != "mouse_pos":
                 self.actions[action] = False
+
+    # HELPERS
+
+    def draw_text(self, surface, text, colour, x, y, size="Title"):
+        '''
+        helper function for drawing text
+
+        surface: game canvas
+        text: written message
+        colour: colour of text
+        x & y: center coordinates of text rect
+        size: Title, Medium or Small
+        '''
+        match size:
+            case "Title":
+                text_surface = self.font_title.render(text,
+                                                True, colour)
+            case "H1":
+                text_surface = self.font_h1.render(text,
+                                                True, colour)
+            case "Medium":
+                text_surface = self.font_medium.render(text,
+                                                True, colour)
+            case "Small":
+                text_surface = self.font_small.render(text,
+                                                True, colour)
+            case _:
+                text_surface = self.font_medium.render(text,
+                                                True, colour)
+                print(f"Draw text input error, size: {size} is not in Title, Medium, Small")
+        text_rect = text_surface.get_rect()
+        text_rect.center = (x, y)
+        surface.blit(text_surface, text_rect)
+
+    def draw_text_topleft(self, surface, text, colour, x, y, size="Title"):
+        '''
+        helper function for drawing text
+
+        surface: game canvas
+        text: written message
+        colour: colour of text
+        x & y: center coordinates of text rect
+        size: Title, Medium or Small
+        '''
+        match size:
+            case "Title":
+                text_surface = self.font_title.render(text,
+                                                True, colour)
+            case "H1":
+                text_surface = self.font_h1.render(text,
+                                                True, colour)
+            case "Medium":
+                text_surface = self.font_medium.render(text,
+                                                True, colour)
+            case "Small":
+                text_surface = self.font_small.render(text,
+                                                True, colour)
+            case _:
+                text_surface = self.font_medium.render(text,
+                                                True, colour)
+                print(f"Draw text input error, size: {size} is not in Title, Medium, Small")
+        text_rect = text_surface.get_rect()
+        text_rect.topleft = (x, y)
+        surface.blit(text_surface, text_rect)
+
+    def add_image(self, image_asset_name, x, y, list):
+
+        rect = self.assets[image_asset_name].get_rect()
+        rect.topleft = (x, y)
+        list.append({'img': self.assets[image_asset_name],
+                            'rect': rect})
+        
+
+
 

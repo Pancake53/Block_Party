@@ -10,9 +10,10 @@ class Credits(Overlay):
     pass
 
     def __post_init__(self):
-        return super().__post_init__()
+        self.title = 'credits'
+        super().__post_init__()
     
-    def child_spesific_actions(self, actions):
+    def child_spesific_update(self, dt, actions):
         pass
 
     def child_spesific_render(self, surface):

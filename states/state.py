@@ -13,6 +13,7 @@ class State():
         self.cursor = 'default'
         self.game = game
         self.prev_state = None
+        result = None
         self.images = []
 
     def update(self, delta_time, actions):
@@ -24,18 +25,10 @@ class State():
     def render(self, surface):
         pass
 
-    def enter_state(self):
-        '''
-        appends self to state stack
-        '''
-        if len(self.game.state_stack) > 1:
-            self.prev_state = self.game.state_stack[-1]
-        self.game.state_stack.append(self)
-        self.game.reset_keys()
 
-    def exit_state(self):
+
+    def on_return(self, returned):
         '''
-        removes top state
+        handels overlay passing in information
         '''
-        self.game.state_stack.pop()
-        self.game.reset_keys()
+        print(f'something returned: {returned} to state: {self}')

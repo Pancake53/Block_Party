@@ -40,7 +40,7 @@ class Overlay(State):
         self.child_spesific_update(delta_time, actions)
 
         if self.exit:
-            self.exit_state()
+            self.game.state_m.exit_state()
 
         
 
@@ -60,7 +60,7 @@ class Overlay(State):
             
         self.child_spesific_render(surface)
 
-    def child_spesific_update(self, actions):
+    def child_spesific_update(self, dt, actions):
         pass
 
     def child_spesific_render(self, surface):

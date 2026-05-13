@@ -103,7 +103,7 @@ class Level_Menu(State):
                                           created_chars = self.created_chars)
 
         if actions["esc"]:
-            self.exit_state()
+            self.game.state_m.exit_state()
 
 
         

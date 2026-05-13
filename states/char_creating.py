@@ -1,4 +1,4 @@
-import pygame
+import pygame, json
 
 
 from part import Part
@@ -48,15 +48,8 @@ class Char_Creating(State):
         self.red, self.green, self.blue = self.selected_colour
 
         # button pressed states 
-        self.selected = False
-        self.left_clicked = False
-        self.right_clicked = False
-        self.new_piece = False
-        self.duplicate = False
-        self.reset = False
         self.lock_colour = False
-        self.save = False
-        self.load_from_file = False
+
 
         # changes with regard to which rect has been last clicked
         self.selected_part = None
@@ -95,8 +88,6 @@ class Char_Creating(State):
         self.update_parts(delta_time, actions)
         self.game.cursor = self.cursor
 
-        if self.selected:
-            self.change_state()
 
     def handle_clicks(self, name):
 
@@ -125,10 +116,10 @@ class Char_Creating(State):
                 self.reset_parts()
 
             case 'save':
-                pass
+                self.save()
 
             case 'load':
-                pass
+                self.load_from_save()
 
             case 'done':
                 self.change_state()
@@ -139,7 +130,7 @@ class Char_Creating(State):
         '''
 
         if actions["esc"]:
-            self.exit_state()
+            self.game.state_m.exit_state()
 
         self.mouse_actions(actions)
 
@@ -280,10 +271,7 @@ class Char_Creating(State):
         else:
             # all characters created, go to selecting level
             self.game.state_m.enter_state('level_menu', 
-                                   created_chars = self.created_chars)
-            
-        
-        
+                                   created_chars = self.created_chars)            
 
     def render(self, surface):
         '''
@@ -310,9 +298,7 @@ class Char_Creating(State):
         if self.player_id > 0:
             self.render_created_characters(surface)
 
-        self.render_parts(surface)
-
-        
+        self.render_parts(surface)    
 
     def render_buttons(self, surface):
         '''
@@ -441,6 +427,8 @@ class Char_Creating(State):
         
         self.load_created_characters()
 
+        self.load_saved_chars_data()
+
     def load_ui(self):
         '''
         load needed buttons for the view
@@ -493,7 +481,6 @@ class Char_Creating(State):
         self.add_image(self.trash_closed_img, self.trash_rect)
         # trash_open
         self.trash_open_img = self.game.assets['trash_open_img']
-
 
     def load_buttons(self):
         
@@ -723,9 +710,7 @@ class Char_Creating(State):
                             height = h, 
                             on_change=self.update_colour, colour=(0, 0, 255))
 
-        self.sliders.extend([self.red_slider, self.green_slider, self.blue_slider])
-
-        
+        self.sliders.extend([self.red_slider, self.green_slider, self.blue_slider])    
 
     def load_helpers(self):
         '''
@@ -780,9 +765,7 @@ class Char_Creating(State):
         self.helpers.append({
             'side' : 1, 'colour_id': 2,
             'rgb' : (255, 120, 120),
-            'rect': right_blue})
-
-        
+            'rect': right_blue})      
 
     def load_lines(self):
         # LINES / DIVIDERS
@@ -800,7 +783,6 @@ class Char_Creating(State):
         line_start = (x_left, y)
         line_end = (x_right, y)
         self.lines.append([line_start, line_end])  
-
 
     def load_hitbox(self):
         '''
@@ -970,6 +952,55 @@ class Char_Creating(State):
         else: 
             self.selected_part.colour = self.selected_colour
     
+    # save & load
+
+    def save(self):
+
+        name = 'test4'
+        parts = []
+        for part in self.character_parts:
+            part_data = {
+                'x': part.rect.x,
+                'y': part.rect.y,
+                'w': part.rect.width,
+                'h': part.rect.height,
+                'colour': part.colour,
+                'layer': part.layer,
+                'main': part.main
+            }
+            parts.append(part_data)
+        
+        new_char = {
+            'name': name,
+            'main_colour': self.main_colour,
+            'parts': parts
+        }
+
+        self.saved_chars_data.append(new_char)
+
+        with open('data/saved_characters.json', 'w') as file:
+            json.dump(self.saved_chars_data, file, indent=4)
+
+    def load_saved_chars_data(self):
+        '''
+        loads saved chars data for saving and displaying
+        '''
+        # load data from file
+        try:
+            with open('data/saved_characters.json', 'r') as file:
+                self.saved_chars_data = json.load(file)
+
+        except FileNotFoundError:
+            print('File not found')
+            self.saved_chars_data = []
+
+        except json.JSONDecodeError:
+            print('decoder error')
+            self.saved_chars_data = []
+
+    def load_from_save(self):
+        self.game.state_m.enter_state('load_menu', data = self.saved_chars_data, 
+                                      char_surface_pos = self.bg_char_creating.topleft)
 
     # helpers
 

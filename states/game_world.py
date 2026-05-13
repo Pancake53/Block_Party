@@ -659,11 +659,9 @@ class Game_World(State):
             self.reset_level()
         
         if actions["esc"]:
-            new_state = PauseMenu(self.game)
-            new_state.enter_state()
+            self.game.state_m.enter_state('pause_menu')
         if actions["start"]:
-            new_state = PauseMenu(self.game)
-            new_state.enter_state()
+            self.game.state_m.enter_state('pause_menu')
 
     def reset_level(self):
         # reset characters to their original position and states

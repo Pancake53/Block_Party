@@ -95,7 +95,7 @@ class AudioManager():
         pygame.mixer.init()
         self.audio = {}
         self.SFX = {}
-        # audio
+        # tracks
         self.audio['main_theme'] = os.path.join(self.audio_dir, 'main_music.ogg')
         self.audio['sea_ambiance'] = os.path.join(self.audio_dir, 'sea_ambiance.ogg')
         self.audio['smile'] = os.path.join(self.audio_dir, 'smile.ogg')
