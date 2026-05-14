@@ -41,14 +41,16 @@ class PauseMenu(Overlay):
 
         match name:
             case 'continue':
-                self.exit_state()
+                self.game.state_m.exit_state()
 
             case 'settings':
                 self.game.state_m.enter_state('settings', bg_surface = self.shaded_bg)
 
             case 'level select':
                 if self.level_select_active:
-                    self.game.state_m.enter_state('level_menu', created_chars = self.prev_state.created_chars)
+                    self.game.state_m.exit_state()
+                    self.game.state_m.exit_state()
+
 
             case _:
                 print(f'Invalid case in handle clicks: {name}')

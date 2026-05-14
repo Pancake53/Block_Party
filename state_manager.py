@@ -49,9 +49,10 @@ class StateManager():
             'settings': lambda bg_surface=None: 
             SettingsMenu(self.game, bg_surface=bg_surface),
 
-            'load_menu': lambda data=None, char_surface_pos=None: 
+            'load_menu': lambda data=None, char_surface_pos=None, scalar=None: 
             LoadMenu(self.game, saved_chars_data=data, 
-                    char_surface_pos= char_surface_pos),
+                    char_surface_pos= char_surface_pos,
+                    scalar= scalar),
 
             'credits': lambda: Credits(self.game)
         }
@@ -73,8 +74,9 @@ class StateManager():
         passes on result of top removed state to the now top state
         '''
         self.prev_state = self.game.state_stack.pop()
+        print(f'state exited, result is: {result}')
         
-        if result:
+        if result is not None:
             self.game.state_stack[-1].on_return(result)
 
         self.game.reset_keys()

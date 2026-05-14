@@ -799,6 +799,7 @@ class Char_Creating(State):
         # scale of big view char to the real char in game
         # scalar = 3
         self.scalar = self.bg_char_creating.height / self.game.char_surface_H
+        print(self.scalar)
 
         # starting colour, position and dimensions, hitbox
         height = self.game.CHARACTER_SIZE * 2 * self.scalar
@@ -956,7 +957,7 @@ class Char_Creating(State):
 
     def save(self):
 
-        name = 'test4'
+        name = 'test67'
         parts = []
         for part in self.character_parts:
             part_data = {
@@ -1000,7 +1001,31 @@ class Char_Creating(State):
 
     def load_from_save(self):
         self.game.state_m.enter_state('load_menu', data = self.saved_chars_data, 
-                                      char_surface_pos = self.bg_char_creating.topleft)
+                                      char_surface_pos = self.bg_char_creating.topleft,
+                                      scalar = self.scalar)
+
+    def on_return(self, returned):
+        '''
+        handels returned index out of load overlay
+        '''
+        print(f'handling returned in char creating, returned: {returned}')
+        self.character_parts.clear()
+        print(f'parts list after clear: {self.character_parts}')
+
+        new_char_data = self.saved_chars_data[returned]
+
+        for part in new_char_data['parts']:
+            
+            new_part = Part(part['x'], part['y'], 
+                            part['w'], part['h'], 
+                            part['colour'], part['layer'], 
+                            self, part['main'])
+            
+            self.character_parts.append(new_part)
+        
+        print(f'parts list after adding: {self.character_parts}')
+            
+
 
     # helpers
 
