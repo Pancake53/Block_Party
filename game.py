@@ -40,6 +40,7 @@ class Game():
         self.LIGHT_GREY = (200, 200, 200)
         self.RED = (255, 0, 0)
         # fonts
+        self.TEXT_COL = (181, 67, 0)
         self.FONT_TITLE = 40
         self.FONT_H1 = 32
         self.FONT_MEDIUM = 24
@@ -361,6 +362,9 @@ class Game():
         self.assets['random_img'] = pygame.image.load(os.path.join(self.image_dir, "random.png")).convert_alpha()
         self.assets['confirm_img'] = pygame.image.load(os.path.join(self.image_dir, "confirm.png")).convert_alpha()
         self.assets['delete_img'] = pygame.image.load(os.path.join(self.image_dir, "delete.png")).convert_alpha()
+        self.assets['backspace_img'] = pygame.image.load(os.path.join(self.image_dir, "backspace.png")).convert_alpha()
+        self.assets['enter_img'] = pygame.image.load(os.path.join(self.image_dir, "enter.png")).convert_alpha()
+        self.assets['space_img'] = pygame.image.load(os.path.join(self.image_dir, "space.png")).convert_alpha()
 
         self.load_cursors()
         # cursors
@@ -552,7 +556,7 @@ class Game():
         text: written message
         colour: colour of text
         x & y: center coordinates of text rect
-        size: Title, Medium or Small
+        size: Title, H1, Medium or Small
         '''
         match size:
             case "Title":
@@ -613,6 +617,10 @@ class Game():
         list.append({'img': self.assets[image_asset_name],
                             'rect': rect})
         
-
+    def add_text(self, str, x, y, size, list):
+        list.append({'str': str, 
+                     'x': x,
+                     'y': y,
+                     'size': size})
 
 

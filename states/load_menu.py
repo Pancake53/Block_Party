@@ -1,4 +1,4 @@
-import pygame
+import pygame, random
 
 from states.overlay import Overlay
 
@@ -53,7 +53,7 @@ class LoadMenu(Overlay):
         for button in self.buttons:
             button.update(actions)
 
-        for chars in self.saved_chars:
+        for chars in self.visible_chars:
             chars.update(actions)
 
     def handle_clicks(self, name):
@@ -86,14 +86,16 @@ class LoadMenu(Overlay):
 
 
                 case 'confirm':
-                    self.result = self.selection
-                    self.game.state_m.exit_state(result = self.result)
+                    self.result = ['load', self.selection]
+                    self.game.state_m.exit_state(self.result)
 
                 case 'delete':
-                    print(f'WORK IN PROGRESS: {name}')
+                    self.delete()
+                    
 
                 case 'random':
-                    print(f'WORK IN PROGRESS: {name}')
+                    self.selection = random.randint(0, len(self.saved_chars_data))
+                    print 
 
                 case _:
                     print(f'Invalid case in handle clicks: {name}')
@@ -325,15 +327,34 @@ class LoadMenu(Overlay):
                 x += (self.char_display_surface_W + self.x_padding)
             char.x = x
             char.rect.x = char.x
-            print(x)
+
+            name_lenght = len(char.name)
+            if name_lenght > 5 and '\n' not in char.name:
+                new_name = (char.name[:round(name_lenght/2)] + 
+                            '\n' + char.name[round(name_lenght/2):])
+                
+                
+                char.name = new_name         
 
     def draw_name(self, name, x, surface):
+
         self.game.draw_text(surface, name, 
                             self.game.TILE_COL, 
                             x + self.char_display_surface_W / 2, 
                             self.name_y, size='Small')
     
+    def delete(self):
+        for char in self.saved_chars[self.selection:]:
+            char.i -= 1
 
+        self.saved_chars_data.pop(self.selection)
+        self.saved_chars.pop(self.selection)
+
+        self.update_visible_chars()
+
+        self.result = ['delete']
+
+        
 
 
 

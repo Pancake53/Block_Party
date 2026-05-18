@@ -3,7 +3,6 @@ import pygame, json
 
 from part import Part
 from states.state import State
-from states.level_menu import Level_Menu
 from UI.button_stationary import ButtonStationary
 from UI.slider import Slider
 from helpers import draw_shading_for_rect
@@ -448,7 +447,7 @@ class Char_Creating(State):
 
         self.title_x = self.red_slider.x + self.red_slider.width / 2 - 10
         self.title_y = self.game.GAME_H / 8 - 10
-        self.add_text('create your character', self.title_x, self.title_y, size='H1')
+        self.add_text('create your character', self.title_x, self.title_y, size='Medium')
 
         self.load_helpers()
         self.load_lines()
@@ -956,31 +955,8 @@ class Char_Creating(State):
     # save & load
 
     def save(self):
-
-        name = 'test67'
-        parts = []
-        for part in self.character_parts:
-            part_data = {
-                'x': part.rect.x,
-                'y': part.rect.y,
-                'w': part.rect.width,
-                'h': part.rect.height,
-                'colour': part.colour,
-                'layer': part.layer,
-                'main': part.main
-            }
-            parts.append(part_data)
+        self.game.state_m.enter_state('save_menu')
         
-        new_char = {
-            'name': name,
-            'main_colour': self.main_colour,
-            'parts': parts
-        }
-
-        self.saved_chars_data.append(new_char)
-
-        with open('data/saved_characters.json', 'w') as file:
-            json.dump(self.saved_chars_data, file, indent=4)
 
     def load_saved_chars_data(self):
         '''
@@ -1006,26 +982,75 @@ class Char_Creating(State):
 
     def on_return(self, returned):
         '''
-        handels returned index out of load overlay
+        handels 
+        a) returned index out of load overlay
+        b) returned name string out of save overlay
+
+        returned 
         '''
-        print(f'handling returned in char creating, returned: {returned}')
-        self.character_parts.clear()
-        print(f'parts list after clear: {self.character_parts}')
 
-        new_char_data = self.saved_chars_data[returned]
-
-        for part in new_char_data['parts']:
-            
-            new_part = Part(part['x'], part['y'], 
-                            part['w'], part['h'], 
-                            part['colour'], part['layer'], 
-                            self, part['main'])
-            
-            self.character_parts.append(new_part)
+        action = returned[0]
+        print(returned)
+        match action:
+            case 'load':
+                
+                index = int(returned[1])
         
-        print(f'parts list after adding: {self.character_parts}')
-            
+                #  => loading from save
+                # print(f'handling returned in char creating, returned: {returned}')
+                self.character_parts.clear()
+                # print(f'parts list after clear: {self.character_parts}')
 
+                new_char_data = self.saved_chars_data[index]
+
+                for part in new_char_data['parts']:
+                    
+                    new_part = Part(part['x'], part['y'], 
+                                    part['w'], part['h'], 
+                                    part['colour'], part['layer'], 
+                                    self, part['main'])
+                    
+                    self.character_parts.append(new_part)
+
+                with open('data/saved_characters.json', 'w') as file:
+                    json.dump(self.saved_chars_data, file, indent=4) 
+            
+                # print(f'parts list after adding: {self.character_parts}')
+
+            case 'delete':
+                # only deleting in load menu
+                with open('data/saved_characters.json', 'w') as file:
+                    json.dump(self.saved_chars_data, file, indent=4) 
+
+            case 'save':
+                # => name for saved character
+                name = returned[1]
+                parts = []
+                for part in self.character_parts:
+                    part_data = {
+                        'x': part.rect.x,
+                        'y': part.rect.y,
+                        'w': part.rect.width,
+                        'h': part.rect.height,
+                        'colour': part.colour,
+                        'layer': part.layer,
+                        'main': part.main
+                    }
+                    parts.append(part_data)
+                
+                new_char = {
+                    'name': name,
+                    'main_colour': self.main_colour,
+                    'parts': parts
+                }
+
+                self.saved_chars_data.append(new_char)
+
+                with open('data/saved_characters.json', 'w') as file:
+                    json.dump(self.saved_chars_data, file, indent=4)
+
+            case _:
+                print(f'On return in char creating failed, action: {action}')
 
     # helpers
 

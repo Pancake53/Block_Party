@@ -10,6 +10,7 @@ from states.pause_menu import PauseMenu
 from states.settings_menu import SettingsMenu
 from states.credits import Credits
 from states.load_menu import LoadMenu
+from states.save_menu import SaveMenu
 
 # from states. import
 
@@ -49,6 +50,8 @@ class StateManager():
             'settings': lambda bg_surface=None: 
             SettingsMenu(self.game, bg_surface=bg_surface),
 
+            'save_menu': lambda: SaveMenu(self.game),
+
             'load_menu': lambda data=None, char_surface_pos=None, scalar=None: 
             LoadMenu(self.game, saved_chars_data=data, 
                     char_surface_pos= char_surface_pos,
@@ -74,7 +77,7 @@ class StateManager():
         passes on result of top removed state to the now top state
         '''
         self.prev_state = self.game.state_stack.pop()
-        print(f'state exited, result is: {result}')
+        # print(f'state exited, result is: {result}')
         
         if result is not None:
             self.game.state_stack[-1].on_return(result)

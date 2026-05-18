@@ -23,6 +23,7 @@ class Overlay(State):
         self.cursor = 'default'
         self.prev_state = self.game.state_stack[-1]
         self.exit = False
+        self.result = None
 
         # variables
         self.ALPHA = 100
@@ -40,7 +41,7 @@ class Overlay(State):
         self.child_spesific_update(delta_time, actions)
 
         if self.exit:
-            self.game.state_m.exit_state()
+            self.game.state_m.exit_state(self.result)
 
         
 
