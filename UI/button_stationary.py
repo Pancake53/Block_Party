@@ -22,6 +22,8 @@ class ButtonStationary():
     height: int =0
     image: object =None # asset
     toggled_image: object =None
+    background: bool = True
+    change_col: bool = True
     
 
 
@@ -82,13 +84,15 @@ class ButtonStationary():
 
         Return True when button is clicked
         '''
-
-        if self.clicked:
-            self.draw_button(self.click_colour, surface)
-        elif self.hovered:
-            self.draw_button(self.hover_colour, surface)
+        if self.change_col:
+            if self.clicked:
+                self.draw_button(self.click_colour, surface)
+            elif self.hovered:
+                self.draw_button(self.hover_colour, surface)
+            else:
+                self.draw_button(self.button_colour, surface)
         else:
-            self.draw_button(self.button_colour, surface)
+                self.draw_button(self.button_colour, surface)
         
     
     def draw_button(self, col, surface):
@@ -100,23 +104,27 @@ class ButtonStationary():
         '''
         # draw rec
         if self.toggled_image:
-            if self.toggled:
-                pygame.draw.rect(surface, col, self.rect)
-                surface.blit(self.toggled_image, self.rect)
-            else:
-                pygame.draw.rect(surface, col, self.rect)
+            if self.hovered:
+                if self.background:
+                    pygame.draw.rect(surface, col, self.rect)
                 surface.blit(self.image, self.rect)
+            else:
+                if self.background:
+                    pygame.draw.rect(surface, col, self.rect)
+                surface.blit(self.toggled_image, self.rect)
 
 
         elif self.image:
-            pygame.draw.rect(surface, col, self.rect)
+            if self.background:
+                pygame.draw.rect(surface, col, self.rect)
             surface.blit(self.image, self.rect)
 
 
         else:
             pygame.draw.rect(surface, col, self.rect)
 
-        draw_shading_for_rect(self.WHITE, self.rect,
+        if self.background:
+            draw_shading_for_rect(self.WHITE, self.rect,
                                surface, right_color = self.BLACK)
         
 

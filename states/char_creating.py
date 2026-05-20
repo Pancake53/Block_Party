@@ -90,6 +90,12 @@ class Char_Creating(State):
 
     def handle_clicks(self, name):
 
+        if isinstance(name, tuple):
+           
+            self.selected_colour = name
+            self.handle_colour_change()
+            return
+
         match name:
             case 'left_arrow':
                 self.change_col_left()
@@ -114,6 +120,30 @@ class Char_Creating(State):
             case 'reset':
                 self.reset_parts()
 
+            case 'forward1':
+                if self.selected_part:
+                    self.update_layers(self.selected_part, name)
+                else:
+                    print('no selection!')
+
+            case 'back1':
+                if self.selected_part:
+                    self.update_layers(self.selected_part, name)
+                else:
+                    print('no selection!')
+
+            case 'top':
+                if self.selected_part:
+                    self.update_layers(self.selected_part, name)
+                else:
+                    print('no selection!')
+
+            case 'bottom':
+                if self.selected_part:
+                    self.update_layers(self.selected_part, name)
+                else:
+                    print('no selection!')
+
             case 'save':
                 self.save()
 
@@ -122,6 +152,9 @@ class Char_Creating(State):
 
             case 'done':
                 self.change_state()
+
+            case _:
+                print(f'Char creating handle cliks invalid name: {name}!')
 
     def handle_actions(self, actions):
         '''
@@ -225,6 +258,9 @@ class Char_Creating(State):
         self.handle_colour_change()          
             
     def handle_colour_change(self):
+            if self.selected_part is None:
+                self.selected_part = self.character_parts[0]
+
             self.selected_part.colour = self.selected_colour
             self.red, self.green, self.blue = self.selected_colour
             self.update_sliders()   
@@ -288,7 +324,7 @@ class Char_Creating(State):
             pygame.draw.line(surface, 
                             self.game.LIGHT_GREY, 
                             line[0], line[1], 
-                            width=7)
+                            width=5)
         
         self.render_buttons(surface)
         self.render_slicers(surface)
@@ -326,7 +362,7 @@ class Char_Creating(State):
 
         # to show that is selected
         if self.lock_colour:
-            pygame.draw.rect(surface, self.game.BLACK, self.btn_lock_colour.rect, width=3) 
+            pygame.draw.rect(surface, self.game.TEXT_COL, self.btn_lock_colour.rect, width=5) 
         
     def render_slicers(self, surface):
 
@@ -433,6 +469,15 @@ class Char_Creating(State):
         load needed buttons for the view
         '''
 
+        self.padding = 15
+        self.line_padding = 10
+
+
+        self.left_x = self.game.GAME_W / 2 - 10
+        self.left_arrow_y = self.game.GAME_H / 4
+        self.arrow_W, self.arrow_H = self.game.assets["arrowleft_img"].get_size()
+        self.right_arrow_x = self.game.GAME_W - self.arrow_W - self.padding
+        self.right_arrow_y = self.left_arrow_y
 
 
         self.buttons = []
@@ -441,9 +486,9 @@ class Char_Creating(State):
         
         
         self.load_images()
-
-        self.load_buttons()
         self.load_sliders()
+        self.load_buttons()
+        
 
         self.title_x = self.red_slider.x + self.red_slider.width / 2 - 10
         self.title_y = self.game.GAME_H / 8 - 10
@@ -452,11 +497,11 @@ class Char_Creating(State):
         self.load_helpers()
         self.load_lines()
         
+
+
     def load_images(self):
-        # bucket
-        self.bucket_img = self.game.assets['bucket_img']
-        self.bucket_rect = self.bucket_img.get_rect()
-        self.add_image(self.bucket_img, self.bucket_rect)
+        
+        
         # add
         self.add_img = self.game.assets['add_img']
         self.add_rect = self.add_img.get_rect()
@@ -474,56 +519,113 @@ class Char_Creating(State):
         self.load_img = self.game.assets['load_img']
         self.load_rect = self.load_img.get_rect()
         self.add_image(self.load_img, self.load_rect)
-        # trash_closed
-        self.trash_closed_img = self.game.assets['trash_closed_img']
-        self.trash_rect = self.trash_closed_img.get_rect()
-        self.add_image(self.trash_closed_img, self.trash_rect)
-        # trash_open
-        self.trash_open_img = self.game.assets['trash_open_img']
+        
 
     def load_buttons(self):
         
-        padding = 15
+        # grid
+        
         
         # 1 arrow
         name = 'left_arrow'
-        self.left_arrow_x = self.game.GAME_W / 2 
-        self.left_arrow_y = self.game.GAME_H / 4
-        self.arrow_W, self.arrow_H = self.game.assets["arrowleft_img"].get_size()
 
-        button = ButtonStationary(
-            name,
-            self.left_arrow_x, self.left_arrow_y, 
-            image = self.game.assets["arrowleft_img"],
-            on_click=self.handle_clicks
-        )
-        self.buttons.append(button)
+
+        # button = ButtonStationary(
+        #     name,
+        #     self.left_arrow_x, self.left_arrow_y, 
+        #     image = self.game.assets["arrowleft_img"],
+        #     on_click=self.handle_clicks
+        # )
+        # self.buttons.append(button)
 
         # 2 arrow
         name = 'right_arrow'    
-        self.right_arrow_x = self.game.GAME_W - self.arrow_W - padding
-        self.right_arrow_y = self.left_arrow_y
 
-        button = ButtonStationary(
+
+        # button = ButtonStationary(
+        #     name,
+        #     self.right_arrow_x, self.right_arrow_y, 
+        #     image = self.game.assets["arrowright_img"],
+        #     on_click=self.handle_clicks
+        # )
+        # self.buttons.append(button)
+
+                # lock colour
+        name = 'bucket'
+
+        x = self.left_x
+        y_bucket = self.blue_slider.y + self.blue_slider.height + self.padding
+        bucket_h = self.game.assets['bucket_img'].get_height()
+        bucket_w = self.game.assets['bucket_img'].get_width()
+
+        self.btn_lock_colour = ButtonStationary(
             name,
-            self.right_arrow_x, self.right_arrow_y, 
-            image = self.game.assets["arrowright_img"],
+            x, y_bucket, 
+            button_colour=self.selected_colour,
+            hover_colour=self.selected_colour,
+            image=self.game.assets['bucket_img'],
             on_click=self.handle_clicks
         )
-        self.buttons.append(button)
 
-        
-        
+        self.buttons.append(self.btn_lock_colour)
+
+        # small colour buttons :)
+        w = 35
+        h = 35
+        x_grid = [(x+bucket_w + self.padding) + i * (w + self.line_padding) for i in range(8)]
+        y_grid = [y_bucket, y_bucket + h + self.padding]
+
+        colours = [
+            (0, 0, 0),
+            (115, 115, 115),
+            (255, 255, 255),
+            (235, 117, 117),
+            (224, 25, 25),
+            (222, 105, 22), 
+            (222, 125, 22),
+            (232, 221, 63),
+            (149, 227, 32),
+            (5, 179, 43),
+            (44, 209, 198),
+            (44, 110, 209),
+            (113, 44, 209),
+            (209, 44, 209),
+            (209, 44, 110),
+            (209, 44, 44)
+            # (130, 0, 0)
+        ]
+
+        i = 0
+        for y in y_grid:
+            for x in x_grid:
+                colour = colours[i]
+
+                button = ButtonStationary(
+                    colour,
+                    x, y,
+                    width=w, height=h,
+                    on_click=self.handle_clicks,
+                    hover_colour=colour,
+                    button_colour=colour
+                )
+
+                self.buttons.append(button)
+
+                i += 1
+
+
+        # --- PIECE CONTROL ---
+
         # New piece
         name = 'new_piece'
 
-        w = 200
+        w = 150
         h = 50
 
         # new piece
-        x = (self.game.GAME_W / 2 - 10)
-        y = (self.game.GAME_H * 2 / 3 -
-            h / 2)
+        x = self.left_x
+        new_piece_y = y_bucket + bucket_h + self.line_padding * 2
+        y = new_piece_y
 
         button = ButtonStationary(
             name,
@@ -535,10 +637,10 @@ class Char_Creating(State):
 
         self.buttons.append(button)
 
-        text_x = x + w / 3 + 12
+        text_x = x + w / 3 + 4
         text_y = y + h / 2
 
-        self.add_text('new piece', text_x, text_y)
+        self.add_text('new', text_x, text_y)
 
         self.add_rect.x = x + w - self.add_rect.width - 3
         self.add_rect.y = y + 2
@@ -548,7 +650,7 @@ class Char_Creating(State):
         # duplicate
         name = 'duplicate'
 
-        x += padding + w
+        x += self.padding + w
 
         button = ButtonStationary(
             name,
@@ -560,18 +662,98 @@ class Char_Creating(State):
 
         self.buttons.append(button)
 
-        text_x = x + w / 3 + 12
+        text_x = x + w / 3 + 4
         text_y = y + h / 2
 
-        self.add_text(name, text_x, text_y)
+        self.add_text('copy', text_x, text_y)
 
         self.duplicate_rect.x = x + w - self.duplicate_rect.width - 3
         self.duplicate_rect.y = y + 2
 
+        # trah
+        name = 'trash'
+
+        x += self.padding + w
+
+        button = ButtonStationary(
+            name,
+            x, y,  
+            image=self.game.assets['trash_open_img'],
+            toggled_image=self.game.assets['trash_closed_img'],
+            background = False,
+            change_col = False,
+            on_click=self.handle_clicks
+        )
+
+        self.buttons.append(button)
+
+
+
+
+        # --- FORWARD / BACKWARD / LAYERS CONTROL ---
+
+        
+        name = 'forward1'
+
+        w = 50
+        h = 50
+
+        x = self.left_x
+        y = new_piece_y + h + self.padding
+        
+
+        button = ButtonStationary(
+            name,
+            x, y, 
+            width=w, height=h, 
+            button_colour=self.game.BG_COL,
+            on_click=self.handle_clicks)
+        
+        self.buttons.append(button)
+
+        name = 'back1'
+
+        x += self.padding + w
+
+        button = ButtonStationary(
+            name,
+            x, y, 
+            width=w, height=h, 
+            button_colour=self.game.BG_COL,
+            on_click=self.handle_clicks)
+        
+        self.buttons.append(button)
+
+        name = 'top'
+
+        x += self.padding + w
+
+        button = ButtonStationary(
+            name,
+            x, y, 
+            width=w, height=h, 
+            button_colour=self.game.BG_COL,
+            on_click=self.handle_clicks)
+        
+        self.buttons.append(button)
+
+        name = 'bottom'
+
+        x += self.padding + w
+
+        button = ButtonStationary(
+            name,
+            x, y, 
+            width=w, height=h, 
+            button_colour=self.game.BG_COL,
+            on_click=self.handle_clicks)
+        
+        self.buttons.append(button)
+
         # reset
         name = 'reset'
  
-        x += padding + w 
+        x += self.padding + w 
 
         
         button = ButtonStationary(
@@ -585,82 +767,17 @@ class Char_Creating(State):
         self.buttons.append(button)
 
 
-
-        # lock colour
-        name = 'bucket'
-
-        h = 100
-        w = 70
-
-        x = self.left_arrow_x
-        y = self.left_arrow_y + self.arrow_H + padding
-
-        self.btn_lock_colour = ButtonStationary(
-            name,
-            x, y, 
-            width=w, height=h, 
-            button_colour=self.selected_colour,
-            hover_colour=self.selected_colour,
-            on_click=self.handle_clicks
-        )
-
-        self.buttons.append(self.btn_lock_colour)
-
-        self.bucket_rect.x = x + 12
-        self.bucket_rect.y = y + 12
-
-        # BOTTOM ROW
-
-        # Done
-        name = 'done'
-
-        w = 100
-        h = 50
-
-        x = self.game.GAME_W - w - 10
-        y = self.game.GAME_H - h - 10
-        self.y_bottom = y
-
-        button = ButtonStationary(
-            name,
-            x, y, 
-            width=w, height=h, 
-            button_colour=self.game.BG_COL,
-            on_click=self.handle_clicks)
-        
-        self.buttons.append(button)
-
-        text_x = x + w / 2
-        text_y = y + h / 2
-        self.add_text(name, text_x, text_y)
-        
-        # load
-        name = 'load'
-
-        w = 150
-        x -= w + padding
-        
-        button = ButtonStationary(
-            name,
-            x, y, 
-            width=w, height=h, 
-            button_colour=self.game.BG_COL,
-            on_click=self.handle_clicks
-        )
-
-        self.buttons.append(button)
-
-        text_x = x + w / 3 + 4
-        text_y = y + h / 2
-        self.add_text(name, text_x, text_y)
-
-        self.load_rect.x = x + w - self.load_rect.width - 3
-        self.load_rect.y = y
-
+        # --- BOTTOM ROW ---
         # save
         name = 'save'
 
-        x -= w + padding
+        w = 150
+        h = 50
+
+        x = self.left_x
+        y += h + self.line_padding * 2
+        self.y_bottom = y
+
 
         button = ButtonStationary(
             name,
@@ -679,14 +796,61 @@ class Char_Creating(State):
         self.save_rect.x = x + w - self.save_rect.width - 3
         self.save_rect.y = y
 
+        # load
+        name = 'load'
+
+
+        x += w + self.padding
+        
+        button = ButtonStationary(
+            name,
+            x, y, 
+            width=w, height=h, 
+            button_colour=self.game.BG_COL,
+            on_click=self.handle_clicks
+        )
+
+        self.buttons.append(button)
+
+        text_x = x + w / 3 + 4
+        text_y = y + h / 2
+        self.add_text(name, text_x, text_y)
+
+        self.load_rect.x = x + w - self.load_rect.width - 3
+        self.load_rect.y = y
+
+
+
+        # Done
+        name = 'done'
+
+
+        x += w + self.padding
+        w = 100
+
+
+        button = ButtonStationary(
+            name,
+            x, y, 
+            width=w, height=h, 
+            button_colour=self.game.BG_COL,
+            on_click=self.handle_clicks)
+        
+        self.buttons.append(button)
+
+        text_x = x + w / 2
+        text_y = y + h / 2
+        self.add_text(name, text_x, text_y)
+        
+
     def load_sliders(self):
         '''
         loads slider objects
         '''
         w = 255
         h = 20
-        x = (self.left_arrow_x + self.arrow_W + self.right_arrow_x) / 2 - w / 2
-        y = self.left_arrow_y + self.arrow_H / 2 - h * 2
+        x = (self.left_x + self.arrow_W + self.right_arrow_x) / 2 - w / 2
+        y = self.left_arrow_y + self.arrow_H / 2 - h * 2 - 6
         self.red_slider = Slider("red",
                             x, y, w,
                             0, 255, self.red,
@@ -715,7 +879,7 @@ class Char_Creating(State):
         '''
         loads rects that help w colour choosing
         '''
-        w = 16
+        w = 24
         h = 24
         left_value = 0
         right_value = 255
@@ -771,17 +935,25 @@ class Char_Creating(State):
 
         # title
         y = self.title_y + 40
-        x_left = self.left_arrow_x - 5
+        x_left = self.left_x - self.padding
         line_start = (x_left, y)
 
         x_right = self.game.GAME_W - 5
         line_end = (x_right, y)
         self.lines.append([line_start, line_end])
 
-        y = self.y_bottom - 20
+        y = (self.btn_lock_colour.y 
+             + self.btn_lock_colour.height + self.line_padding)
         line_start = (x_left, y)
         line_end = (x_right, y)
-        self.lines.append([line_start, line_end])  
+        self.lines.append([line_start, line_end]) 
+
+        y = self.y_bottom - 10
+        line_start = (x_left, y)
+        line_end = (x_right, y)
+        self.lines.append([line_start, line_end]) 
+
+
 
     def load_hitbox(self):
         '''
@@ -881,7 +1053,7 @@ class Char_Creating(State):
         creates new Part obj and adds it character parts
         '''
         if x is None:
-            x = self.left_arrow_x
+            x = self.left_x
         
         if y is None:
             y = self.y_bottom - 70
@@ -928,8 +1100,9 @@ class Char_Creating(State):
             slider.update_pos()
 
     def update_buttons(self):
-        self.btn_lock_colour.button_col = self.selected_colour
-        self.btn_lock_colour.hover_col = self.selected_colour
+        # print('button should update')
+        self.btn_lock_colour.button_colour = self.selected_colour
+        self.btn_lock_colour.hover_colour = self.selected_colour
 
     def set_selection(self, part):
         self.selected_part = part
@@ -952,6 +1125,40 @@ class Char_Creating(State):
         else: 
             self.selected_part.colour = self.selected_colour
     
+    # layer
+
+    def update_layers(self, part, action):
+        '''
+        changes parts order in character_parts
+        '''
+
+        match action:
+            case 'forward1':
+
+                index = self.character_parts.index(part)
+                self.character_parts.remove(part)
+                index += 1
+                self.character_parts.insert(index, part)
+
+            case 'back1':
+
+                index = self.character_parts.index(part)
+                self.character_parts.remove(part)
+                index += -1
+                self.character_parts.insert(index, part)
+
+            case 'top':
+                
+                self.character_parts.remove(part)
+            
+                self.character_parts.append(part)
+
+            case 'bottom':
+    
+                self.character_parts.remove(part)
+                index = 0
+                self.character_parts.insert(index, part)
+
     # save & load
 
     def save(self):
@@ -1051,6 +1258,7 @@ class Char_Creating(State):
 
             case _:
                 print(f'On return in char creating failed, action: {action}')
+
 
     # helpers
 

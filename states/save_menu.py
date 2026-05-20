@@ -1,4 +1,4 @@
-import pygame
+import pygame, pygame.time
 
 from states.overlay import Overlay
 
@@ -15,11 +15,15 @@ class SaveMenu(Overlay):
         self.title = 'Enter name'
         self.padding = 20
         self.name_box_col = (245, 225, 174)
-        self.name = 'test'
+        self.name = ''
         self.max_name_len = 10
         self.max_len = False
         self.min_name_len = 2
         self.min_len_rached = False
+
+        
+        self.start_time = pygame.time.get_ticks()
+        self.duration = 500
 
         self.inactive_btn_col = (139, 139, 139)
         self.active_btn_col = (0, 153, 136)
@@ -35,15 +39,30 @@ class SaveMenu(Overlay):
         pygame.draw.rect(surface, self.name_box_col, self.name_box)
         pygame.draw.rect(surface, self.game.BG_COL, self.name_box, width=5)
 
-        self.game.draw_text(surface, self.name, self.game.TEXT_COL, 
-                            self.name_text_x, self.name_text_y, size='Medium')
+        
+        if self.name:
+            self.game.draw_text(surface, self.name, self.game.TEXT_COL, 
+                                self.name_text_x, self.name_text_y, size='Medium')
+        else:
+            self.render_line(surface)
         
         for button in self.buttons:
             button.render(surface)
 
         for text in self.texts:
-            self.game.draw_text(surface, text['str'], self.game.TEXT_COL, 
+            self.game.draw_text(surface, text['str'], text['colour'], 
                             text['x'], text['y'], text['size'])
+
+    def render_line(self, surface):
+        elapsed = pygame.time.get_ticks() - self.start_time
+
+        flash = int(elapsed / self.duration) % 2
+
+        if flash:
+            pygame.draw.line(surface, self.game.TEXT_COL, 
+                             self.line_start, self.line_end, 
+                             self.line_h)
+        
 
     def handle_clicks(self, name):
         '''
@@ -88,7 +107,7 @@ class SaveMenu(Overlay):
 
             if len(self.name) == self.max_name_len:
                 self.max_len = True
-            self.update_button_col('max_len')
+                self.update_button_col('max_len')
 
         else:
             self.max_len = True
@@ -114,6 +133,7 @@ class SaveMenu(Overlay):
         w, h = 30, 32
         self.letter_padding = w / 3
         y_spacing_mlt = 1.7
+        dark_padding = 1
 
         for i, row in enumerate(letters):
             # reset x at the beginning of each row
@@ -129,6 +149,13 @@ class SaveMenu(Overlay):
                                           width=w, height=h)
                 self.buttons.append(button)
 
+
+                self.game.add_text(letter, 
+                                   x + w / 2 + 2 + dark_padding, 
+                                   y + h / 2 + dark_padding, 
+                                   'Small', self.texts,
+                                   colour = self.game.BLACK)
+
                 self.game.add_text(letter, 
                                    x + w / 2 + 2, 
                                    y + h / 2, 
@@ -142,9 +169,16 @@ class SaveMenu(Overlay):
         button = ButtonStationary(name,
                                   x, y,
                                   on_click=self.handle_clicks,
-                                  image=self.game.assets['backspace_img'])
+                                  image=self.game.assets['backspace_img'], 
+                                  button_colour = self.inactive_btn_col)
         
         self.buttons.append(button)
+
+        x_text = x + self.game.assets['backspace_img'].get_width() * 2 / 3
+        y_text = y + self.game.assets['backspace_img'].get_height() / 2
+
+        self.game.add_text('del', x_text + dark_padding, y_text + dark_padding, 'Small', self.texts, colour=self.game.BLACK)
+        self.game.add_text('del', x_text, y_text, 'Small', self.texts)
 
         # space
         name = 'space'     
@@ -157,6 +191,13 @@ class SaveMenu(Overlay):
         
         self.buttons.append(button)
 
+        x_text = x + self.game.assets['space_img'].get_width() / 2
+        y_text = y + self.game.assets['space_img'].get_height() * 0.4
+
+        self.game.add_text('space', x_text + dark_padding, y_text + dark_padding, 'Small', self.texts, colour=self.game.BLACK)
+        self.game.add_text('space', x_text, y_text, 'Small', self.texts)
+
+
         # enter
         name = 'enter'
         x -= w + self.letter_padding  
@@ -165,16 +206,25 @@ class SaveMenu(Overlay):
         button = ButtonStationary(name,
                                   x, y,
                                   on_click=self.handle_clicks,
-                                  image=self.game.assets['enter_img'])
+                                  image=self.game.assets['enter_img'],
+                                  button_colour = self.inactive_btn_col)
         
         self.buttons.append(button)
+
+        x_text = x + self.game.assets['enter_img'].get_width() * 0.4
+        y_text = y + self.game.assets['enter_img'].get_height() * 0.4
+
+        self.game.add_text('save', x_text + dark_padding, y_text + dark_padding, 'Small', self.texts, colour=self.game.BLACK)
+        self.game.add_text('save', x_text, y_text, 'Small', self.texts)
 
 
 
 
     def load_else(self):
         '''
-        loads the rect for name 
+        loads 
+        - the rect for name 
+        - line that flashes
         '''
 
         w = self.width - self.padding * 2
@@ -189,6 +239,16 @@ class SaveMenu(Overlay):
 
         self.name_text_x = self.title_x
         self.name_text_y = y + h / 2 - 2
+
+        line_w = 100 
+        self.line_h = 6
+
+        x = self.name_text_x - line_w / 2
+        y = self.name_text_y + h / 4
+        self.line_start = (x, y)
+
+        x += line_w
+        self.line_end = (x, y)
         
     def update_button_col(self, action):
         '''
@@ -200,9 +260,13 @@ class SaveMenu(Overlay):
                 for button in self.buttons[:-3]:
                     button.button_colour = self.inactive_btn_col
 
+                self.buttons[-2].button_colour = self.inactive_btn_col
+
             case 'not_max':
                 for button in self.buttons[:-3]:
                     button.button_colour = self.active_btn_col
+
+                self.buttons[-2].button_colour = self.active_btn_col
 
             case 'empty':
                 self.buttons[-3].button_colour = self.inactive_btn_col

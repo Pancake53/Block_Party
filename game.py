@@ -362,8 +362,8 @@ class Game():
         self.assets['random_img'] = pygame.image.load(os.path.join(self.image_dir, "random.png")).convert_alpha()
         self.assets['confirm_img'] = pygame.image.load(os.path.join(self.image_dir, "confirm.png")).convert_alpha()
         self.assets['delete_img'] = pygame.image.load(os.path.join(self.image_dir, "delete.png")).convert_alpha()
-        self.assets['backspace_img'] = pygame.image.load(os.path.join(self.image_dir, "backspace.png")).convert_alpha()
-        self.assets['enter_img'] = pygame.image.load(os.path.join(self.image_dir, "enter.png")).convert_alpha()
+        self.assets['backspace_img'] = pygame.image.load(os.path.join(self.image_dir, "backspace2.png")).convert_alpha()
+        self.assets['enter_img'] = pygame.image.load(os.path.join(self.image_dir, "enter2.png")).convert_alpha()
         self.assets['space_img'] = pygame.image.load(os.path.join(self.image_dir, "space.png")).convert_alpha()
 
         self.load_cursors()
@@ -617,10 +617,13 @@ class Game():
         list.append({'img': self.assets[image_asset_name],
                             'rect': rect})
         
-    def add_text(self, str, x, y, size, list):
+    def add_text(self, str, x, y, size, list, colour = None):
+        if colour is None:
+            colour = self.TEXT_COL
         list.append({'str': str, 
                      'x': x,
                      'y': y,
-                     'size': size})
+                     'size': size,
+                     'colour': colour})
 
 
