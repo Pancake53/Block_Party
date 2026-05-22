@@ -21,6 +21,7 @@ class ButtonStationary():
     width: int =0
     height: int =0
     image: object =None # asset
+    hovered_image: object =None
     toggled_image: object =None
     background: bool = True
     change_col: bool = True
@@ -103,7 +104,7 @@ class ButtonStationary():
         surface: surface for rendering
         '''
         # draw rec
-        if self.toggled_image:
+        if self.hovered_image:
             if self.hovered:
                 if self.background:
                     pygame.draw.rect(surface, col, self.rect)
@@ -111,7 +112,18 @@ class ButtonStationary():
             else:
                 if self.background:
                     pygame.draw.rect(surface, col, self.rect)
+                surface.blit(self.hovered_image, self.rect)
+
+        elif self.toggled_image:
+            if self.toggled:
+                if self.background:
+                    pygame.draw.rect(surface, col, self.rect)
                 surface.blit(self.toggled_image, self.rect)
+            else:
+                if self.background:
+                    pygame.draw.rect(surface, col, self.rect)
+                surface.blit(self.image, self.rect)
+
 
 
         elif self.image:

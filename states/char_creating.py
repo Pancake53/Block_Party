@@ -106,7 +106,7 @@ class Char_Creating(State):
                 self.lock_colour = not self.lock_colour
 
             case 'new_piece':
-                self.spawn_part()
+                self.spawn_part(selected=True)
 
             case 'duplicate':
                 if self.selected_part:
@@ -119,6 +119,12 @@ class Char_Creating(State):
 
             case 'reset':
                 self.reset_parts()
+
+            case 'trash':
+                if self.selected_part:
+                    if self.selected_part.main == False:
+                        self.character_parts.remove(self.selected_part)
+                        self.selected_part = None
 
             case 'forward1':
                 if self.selected_part:
@@ -317,6 +323,17 @@ class Char_Creating(State):
         surface.fill((self.game.UI_BG_COL))
 
         pygame.draw.rect(surface, self.game.BG_COL, self.bg_char_creating)
+
+        for line in self.grid_lines:
+            pygame.draw.line(surface, self.game.TEXT_COL, 
+                             line['start'], line['end'], width=1)
+
+        pygame.draw.rect(surface, self.game.TILE_COL, self.hitbox, width=3, border_radius=5)
+        self.game.draw_text(surface, 'hitbox', 
+                            self.game.TEXT_COL, 
+                            self.hitbox_text_x, self.hitbox_text_y, 
+                            'Small')
+        
         draw_shading_for_rect(self.game.TILE_COL,
             self.bg_char_creating, surface, shading_W=5)
         
@@ -458,7 +475,7 @@ class Char_Creating(State):
 
         self.load_ui()
         
-        self.load_hitbox()
+        self.load_editbox()
         
         self.load_created_characters()
 
@@ -679,7 +696,7 @@ class Char_Creating(State):
             name,
             x, y,  
             image=self.game.assets['trash_open_img'],
-            toggled_image=self.game.assets['trash_closed_img'],
+            hovered_image=self.game.assets['trash_closed_img'],
             background = False,
             change_col = False,
             on_click=self.handle_clicks
@@ -687,7 +704,7 @@ class Char_Creating(State):
 
         self.buttons.append(button)
 
-
+        
 
 
         # --- FORWARD / BACKWARD / LAYERS CONTROL ---
@@ -707,6 +724,7 @@ class Char_Creating(State):
             x, y, 
             width=w, height=h, 
             button_colour=self.game.BG_COL,
+            image=self.game.assets['forward1_img'],
             on_click=self.handle_clicks)
         
         self.buttons.append(button)
@@ -720,6 +738,7 @@ class Char_Creating(State):
             x, y, 
             width=w, height=h, 
             button_colour=self.game.BG_COL,
+            image=self.game.assets['back1_img'],
             on_click=self.handle_clicks)
         
         self.buttons.append(button)
@@ -733,6 +752,7 @@ class Char_Creating(State):
             x, y, 
             width=w, height=h, 
             button_colour=self.game.BG_COL,
+            image=self.game.assets['top_img'],
             on_click=self.handle_clicks)
         
         self.buttons.append(button)
@@ -746,6 +766,7 @@ class Char_Creating(State):
             x, y, 
             width=w, height=h, 
             button_colour=self.game.BG_COL,
+            image=self.game.assets['bottom_img'],
             on_click=self.handle_clicks)
         
         self.buttons.append(button)
@@ -753,7 +774,7 @@ class Char_Creating(State):
         # reset
         name = 'reset'
  
-        x += self.padding + w 
+        x += self.padding + w  + 5
 
         
         button = ButtonStationary(
@@ -951,11 +972,14 @@ class Char_Creating(State):
         y = self.y_bottom - 10
         line_start = (x_left, y)
         line_end = (x_right, y)
-        self.lines.append([line_start, line_end]) 
+        self.lines.append([line_start, line_end])
+
+        
+        
 
 
 
-    def load_hitbox(self):
+    def load_editbox(self):
         '''
         loads initial box into view
         '''
@@ -968,22 +992,37 @@ class Char_Creating(State):
         self.bg_char_creating = pygame.Rect(x, y, W, H) 
 
         # scale of big view char to the real char in game
-        # scalar = 3
+        # scalar = 6
         self.scalar = self.bg_char_creating.height / self.game.char_surface_H
-        print(self.scalar)
+        # print(self.scalar)
+
+        # load grid
+        self.grid_lines = []
+        for y_temp in range(int(y), int(y + H), int(self.scalar * 4)):
+            self.grid_lines.append({'start': (x, y_temp), 'end': (x + W, y_temp)})
+        for x_temp in range(int(x), int(x + W), int(self.scalar * 4)):
+            self.grid_lines.append({'start': (x_temp, y), 'end': (x_temp, y + H)})
+
+        
 
         # starting colour, position and dimensions, hitbox
         height = self.game.CHARACTER_SIZE * 2 * self.scalar
         width = height / 2
-        print(f'Scalar: {self.scalar}, width: {width}')
+        # print(f'Scalar: {self.scalar}, width: {width}')
 
         x = self.bg_char_creating.x + self.bg_char_creating.width / 2 - width / 2
         y = self.bg_char_creating.y + self.bg_char_creating.height - height
+        self.hitbox = pygame.Rect(x, y, width, height)
+        self.hitbox_text_x = x + width / 2
+        self.hitbox_text_y = y + 25
 
         self.spawn_part(x, y, width, height, self.main_colour, main= True)
 
         # second rect for testing !!!
         self.default_outfit(x, y, width, height)
+
+
+
         
     def default_outfit(self, x, y, width, height):
         # hat :D
@@ -1080,7 +1119,7 @@ class Char_Creating(State):
         resets back to default
         '''
         self.character_parts.clear()
-        self.load_hitbox()
+        self.load_editbox()
 
     def update_colour(self, colour, value):
         setattr(self, colour, value)
@@ -1134,18 +1173,21 @@ class Char_Creating(State):
 
         match action:
             case 'forward1':
-
+                
                 index = self.character_parts.index(part)
-                self.character_parts.remove(part)
-                index += 1
-                self.character_parts.insert(index, part)
+
+                if index < len(self.character_parts) - 1:
+                    self.character_parts.remove(part)
+                    index += 1
+                    self.character_parts.insert(index, part)
 
             case 'back1':
-
+                
                 index = self.character_parts.index(part)
-                self.character_parts.remove(part)
-                index += -1
-                self.character_parts.insert(index, part)
+                if index > 0:
+                    self.character_parts.remove(part)
+                    index += -1
+                    self.character_parts.insert(index, part)
 
             case 'top':
                 

@@ -7,10 +7,12 @@ class Part():
         '''
         pass in atributes
         '''
-        self.x = x
-        self.y = y
-        self.W = width
-        self.H = height
+        self.char_creating = char_creating
+
+        self.x = self.round_to_scalar(x)
+        self.y = self.round_to_scalar(y)
+        self.W = self.round_to_scalar(width)
+        self.H = self.round_to_scalar(height)
         self.colour = colour
 
 
@@ -22,7 +24,7 @@ class Part():
         # for checking if object is on top 
         # and for knowing how many total parts 
         # there are for bringing objects to the top 
-        self.char_creating = char_creating
+        
 
         # if main = True, then part
         # determines characters main colour
@@ -45,11 +47,15 @@ class Part():
         self.move_buffer = self.char_creating.scalar
 
         # determines what is considered an edge and what is center
-        # larger value => less space for center/moving, more for resizing 
-        self.min_size = 12
+        # larger value => less space for center/moving, more for resizing
+        self.scalar = char_creating.scalar 
+        self.min_size = self.scalar * 2
         self.min_edge = self.min_size / 4
         self.edge_buffer_W = max(self.min_edge, self.W / 12)
         self.edge_buffer_H = max(self.min_edge, self.H / 12)
+
+        # for smooth movement on left and top
+        self.old_values = {'x': self.x, 'y': self.y, 'w': self.W, 'h': self.H}
 
 
 
@@ -199,8 +205,8 @@ class Part():
         self.x += x_movement
         self.y += y_movement
 
-        self.rect.x = self.x
-        self.rect.y = self.y
+        self.rect.x = self.round_to_scalar(self.x)
+        self.rect.y = self.round_to_scalar(self.y)
 
         # store current value into old value
         self.old_mouse_pos = actions['mouse_pos']
@@ -228,11 +234,17 @@ class Part():
         
         self.W += width_change
         self.W = max(self.min_size, self.W)
-        self.rect.width = self.W
+        self.rect.width = self.round_to_scalar(self.W)
 
-        if self.W > self.min_size:
-            self.x -= width_change
-            self.rect.x = self.x
+
+        if self.rect.width != self.old_values['w']:
+            difference = self.rect.width - self.old_values['w']
+            self.old_values['w'] = self.rect.width
+            self.x -= difference
+            self.rect.x = self.round_to_scalar(self.x)
+            self.x = self.rect.x
+        
+            
 
         # store current value into old value
         self.old_mouse_pos = actions['mouse_pos']
@@ -258,7 +270,7 @@ class Part():
         
         self.W += width_change
         self.W = max(self.min_size, self.W)
-        self.rect.width = self.W
+        self.rect.width = self.round_to_scalar(self.W)
 
         # store current value into old value
         self.old_mouse_pos = actions['mouse_pos']
@@ -285,11 +297,15 @@ class Part():
         
         self.H += height_change
         self.H = max(self.min_size, self.H)
-        self.rect.height = self.H
+        self.rect.height = self.round_to_scalar(self.H)
 
-        if self.H > self.min_size:
-            self.y -= height_change
-            self.rect.y = self.y
+        if self.rect.height != self.old_values['h']:
+            difference = self.rect.height - self.old_values['h']
+            self.old_values['h'] = self.rect.height
+            self.y -= difference
+            self.rect.y = self.round_to_scalar(self.y)
+            self.y = self.rect.y
+        
 
         # store current value into old value
         self.old_mouse_pos = actions['mouse_pos']
@@ -316,7 +332,7 @@ class Part():
         
         self.H += height_change
         self.H = max(self.min_size, self.H)
-        self.rect.height = self.H
+        self.rect.height = self.round_to_scalar(self.H)
 
 
         # store current value into old value
@@ -334,6 +350,11 @@ class Part():
     def reset_state(self):
         for key in self.state.keys():
             self.state[key] = False
+
+    # snapping
+
+    def round_to_scalar(self, value):
+        return round(value / self.char_creating.scalar) * self.char_creating.scalar
 
     
 

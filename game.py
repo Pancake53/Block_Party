@@ -219,10 +219,7 @@ class Game():
             self.update_mouse_pos(self.dt) 
         self.actions["mouse_pos"] = (self.cursor_pos[0] * self.scale_multiplier_x,
                                       self.cursor_pos[1] * self.scale_multiplier_y)
-
-
-        
-        
+    
         
     def check_controller_events(self, event):
         '''
@@ -262,7 +259,6 @@ class Game():
         if event.type == pygame.JOYAXISMOTION:
             self.last_input = 'controller'
             self.analog_keys[event.axis] = event.value
-
 
 
     def update(self):
@@ -311,9 +307,6 @@ class Game():
         self.dt = self.clock.tick(60) / 1000
 
 
-        
-
-
     def load_assets(self):
         '''
         loads games assets
@@ -352,8 +345,8 @@ class Game():
         self.assets['copy_img'] = pygame.image.load(os.path.join(self.image_dir, "copy.png")).convert_alpha()
         self.assets['save_img'] = pygame.image.load(os.path.join(self.image_dir, "save.png")).convert_alpha()
         self.assets['load_img'] = pygame.image.load(os.path.join(self.image_dir, "load.png")).convert_alpha()
-        self.assets['trash_open_img'] = pygame.image.load(os.path.join(self.image_dir, "trash_open.png")).convert_alpha()
-        self.assets['trash_closed_img'] = pygame.image.load(os.path.join(self.image_dir, "trash_closed.png")).convert_alpha()
+        self.assets['trash_open_img'] = pygame.image.load(os.path.join(self.image_dir, "trash_opened2.png")).convert_alpha()
+        self.assets['trash_closed_img'] = pygame.image.load(os.path.join(self.image_dir, "trash_closed2.png")).convert_alpha()
         self.assets['pause_img'] = pygame.image.load(os.path.join(self.image_dir, "pause.png")).convert_alpha()
         self.assets['sound_img'] = pygame.image.load(os.path.join(self.image_dir, "sound.png")).convert_alpha()
         self.assets['mute_img'] = pygame.image.load(os.path.join(self.image_dir, "mute.png")).convert_alpha()
@@ -365,14 +358,13 @@ class Game():
         self.assets['backspace_img'] = pygame.image.load(os.path.join(self.image_dir, "backspace2.png")).convert_alpha()
         self.assets['enter_img'] = pygame.image.load(os.path.join(self.image_dir, "enter2.png")).convert_alpha()
         self.assets['space_img'] = pygame.image.load(os.path.join(self.image_dir, "space.png")).convert_alpha()
+        self.assets['forward1_img'] = pygame.image.load(os.path.join(self.image_dir, "forward1.png")).convert_alpha()
+        self.assets['back1_img'] = pygame.image.load(os.path.join(self.image_dir, "back1.png")).convert_alpha()
+        self.assets['top_img'] = pygame.image.load(os.path.join(self.image_dir, "top.png")).convert_alpha()
+        self.assets['bottom_img'] = pygame.image.load(os.path.join(self.image_dir, "bottom.png")).convert_alpha()
 
         self.load_cursors()
         # cursors
-
-
-        
-    
-
 
 
     def load_cursors(self):
