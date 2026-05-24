@@ -8,12 +8,12 @@ class Camera():
         
     
         # 1x speed
-        self.edge_buffer_1x = 25 # px
+        self.edge_buffer_1x = 40 # px
         self.right_edge_1x = self.game_world.game.GAME_W - self.edge_buffer_1x
         self.bottom_edge_1x = self.game_world.game.GAME_H - self.edge_buffer_1x
 
         # 2x speed
-        self.edge_buffer_2x = 5 # px # double speed if closer to edge
+        self.edge_buffer_2x = 15 # px # double speed if closer to edge
         self.right_edge_2x = self.game_world.game.GAME_W - self.edge_buffer_2x
         self.bottom_edge_2x = self.game_world.game.GAME_H - self.edge_buffer_2x
         self.total_offset_x = 0
@@ -224,9 +224,11 @@ class Camera():
         self.game_world.camera_moved = True
         # collision tiles
         # self.game_world.temp_tiles = self.game_world.tiles.copy()
-        for tile in self.game_world.tiles:
-            tile.update(x_offset, y_offset)
-        self.game_world.tiles = self.game_world.temp_tiles.copy()
+        for tile_type in self.game_world.tiles:
+            for tile in tile_type:
+                tile.update(x_offset, y_offset)
+
+        self.game_world.update_tiles()
         # characters
         for team in self.game_world.teams_not_eliminated.values():
             for char in team:

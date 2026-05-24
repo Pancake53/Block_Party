@@ -45,6 +45,7 @@ class Game():
         self.FONT_H1 = 32
         self.FONT_MEDIUM = 24
         self.FONT_SMALL = 16
+        self.FONT_TINY = 8
 
         # surface / character size
         self.CHARACTER_SIZE = 24                
@@ -103,6 +104,8 @@ class Game():
         # state management
         self.state_stack = []
         self.load_states()
+
+        print('\n\n ---- NEW GAME ---- \n\n')
 
 
 
@@ -328,8 +331,11 @@ class Game():
         self.font_h1 = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_H1)
         self.font_medium = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_MEDIUM)
         self.font_small = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_SMALL)
-        # assets
+        self.font_tiny = pygame.font.Font(os.path.join(self.font_dir, '8-BIT WONDER.TTF'), self.FONT_TINY)
+        # in game graphics
         self.assets["explosion_img"] = pygame.image.load(os.path.join(self.image_dir, "explosion.png")).convert_alpha()
+        self.assets["wave_img"] = pygame.image.load(os.path.join(self.image_dir, "wave.png")).convert_alpha()
+        self.assets["wave_small_img"] = pygame.image.load(os.path.join(self.image_dir, "wave_small.png")).convert_alpha()
         # level ui
         self.assets["bomb_img"] = pygame.image.load(os.path.join(self.image_dir, "bomb.png")).convert_alpha()
         self.assets["jump_img"] = pygame.image.load(os.path.join(self.image_dir, "jump.png")).convert_alpha()
@@ -563,6 +569,10 @@ class Game():
             case "Small":
                 text_surface = self.font_small.render(text,
                                                 True, colour)
+            case "xs":
+                text_surface = self.font_tiny.render(text,
+                                                True, colour)
+            
             case _:
                 text_surface = self.font_medium.render(text,
                                                 True, colour)
@@ -593,6 +603,9 @@ class Game():
                                                 True, colour)
             case "Small":
                 text_surface = self.font_small.render(text,
+                                                True, colour)
+            case "xs":
+                text_surface = self.font_tiny.render(text,
                                                 True, colour)
             case _:
                 text_surface = self.font_medium.render(text,

@@ -1,61 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="15" height="18" tilewidth="64" tileheight="30" infinite="0" nextlayerid="3" nextobjectid="40">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="15" height="36" tilewidth="64" tileheight="15" infinite="0" nextlayerid="6" nextobjectid="99">
  <editorsettings>
-  <export format="json"/>
+  <export target="../levels/ship.tmj" format="json"/>
  </editorsettings>
- <layer id="1" name="Tile Layer 1" width="15" height="18">
-  <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-</data>
- </layer>
  <objectgroup id="2" name="collisionTiles">
-  <object id="1" type="collision_tile" x="256" y="450" width="448" height="30"/>
+  <object id="1" type="collision_tile" x="192" y="450" width="576" height="30"/>
   <object id="5" type="collision_tile" x="128" y="420" width="192" height="30"/>
   <object id="6" type="collision_tile" x="640" y="420" width="192" height="30"/>
   <object id="11" type="collision_tile" x="384" y="300" width="192" height="30"/>
   <object id="12" type="collision_tile" x="128" y="240" width="194.667" height="30"/>
   <object id="13" type="collision_tile" x="640" y="240" width="192" height="30"/>
   <object id="14" type="collision_tile" x="384" y="150" width="192" height="30"/>
-  <object id="15" name="1" type="character" x="191.314" y="185.181" width="24" height="48"/>
-  <object id="17" name="1" type="character" x="649.012" y="180.803" width="24" height="48"/>
-  <object id="18" name="1" type="character" x="402.512" y="94.9576" width="24" height="48"/>
-  <object id="19" name="1" type="character" x="423.36" y="232.311" width="24" height="48"/>
-  <object id="20" name="1" type="character" x="787.592" y="362.306" width="24" height="48"/>
-  <object id="21" name="4" type="character" x="554.581" y="385.607" width="24" height="48"/>
-  <object id="22" name="1" type="character" x="233.273" y="363.532" width="24" height="48"/>
-  <object id="23" name="3" type="character" x="144.975" y="184.483" width="24" height="48"/>
-  <object id="24" name="2" type="character" x="182.992" y="363.532" width="24" height="48"/>
-  <object id="25" name="2" type="character" x="517.79" y="233.537" width="24" height="48"/>
-  <object id="26" name="2" type="character" x="788.818" y="179.576" width="24" height="48"/>
-  <object id="27" name="2" type="character" x="531.281" y="94.9576" width="24" height="48"/>
-  <object id="28" name="3" type="character" x="387.795" y="389.286" width="24" height="48"/>
-  <object id="29" name="2" type="character" x="286.007" y="185.709" width="24" height="48"/>
-  <object id="30" name="3" type="character" x="693.161" y="180.803" width="24" height="48"/>
-  <object id="31" name="3" type="character" x="748.347" y="361.079" width="24" height="48"/>
-  <object id="32" name="2" type="character" x="705.425" y="362.306" width="24" height="48"/>
-  <object id="33" name="3" type="character" x="278.649" y="364.758" width="24" height="48"/>
-  <object id="34" name="4" type="character" x="142.522" y="362.306" width="24" height="48"/>
-  <object id="35" name="4" type="character" x="239.405" y="183.256" width="24" height="48"/>
-  <object id="36" name="4" type="character" x="446.661" y="92.5049" width="24" height="48"/>
-  <object id="37" name="3" type="character" x="490.81" y="92.5049" width="24" height="48"/>
-  <object id="38" name="4" type="character" x="662.502" y="362.306" width="24" height="48"/>
-  <object id="39" name="4" type="character" x="739.763" y="180.803" width="24" height="48"/>
+  <object id="64" type="collision_tile" x="256" y="480.571" width="448" height="30"/>
+  <object id="65" type="collision_tile" x="288.591" y="510" width="383.777" height="30"/>
+ </objectgroup>
+ <objectgroup id="4" name="background1">
+  <object id="69" type="water" x="-400" y="510" width="720" height="282">
+   <properties>
+    <property name="colour" type="color" value="#ff004882"/>
+   </properties>
+  </object>
+  <object id="88" type="water" x="640" y="510" width="779" height="292">
+   <properties>
+    <property name="colour" type="color" value="#ff004882"/>
+   </properties>
+  </object>
+  <object id="89" type="water" x="320" y="525" width="320" height="269">
+   <properties>
+    <property name="colour" type="color" value="#ff004882"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="5" name="moving1">
+  <object id="74" type="bird" x="1013.33" y="46.6667">
+   <point/>
+  </object>
+  <object id="75" type="bird" x="1342.67" y="174.667">
+   <point/>
+  </object>
+  <object id="76" type="bird" x="1150.33" y="419.333">
+   <point/>
+  </object>
+  <object id="77" type="wave" x="128" y="465">
+   <point/>
+  </object>
+  <object id="81" type="wave_small" x="704" y="465">
+   <point/>
+  </object>
+  <object id="83" type="wave_small" x="512" y="465">
+   <point/>
+  </object>
+  <object id="84" type="bird" x="1066.67" y="104">
+   <point/>
+  </object>
+  <object id="85" type="bird" x="1117.33" y="61.3333">
+   <point/>
+  </object>
+  <object id="93" type="wave_small" x="768" y="465">
+   <point/>
+  </object>
+  <object id="94" type="wave_small" x="1024" y="465">
+   <point/>
+  </object>
+  <object id="95" type="wave_small" x="1088" y="465">
+   <point/>
+  </object>
+  <object id="96" type="wave_small" x="1152" y="465">
+   <point/>
+  </object>
+  <object id="97" type="wave_small" x="256" y="465">
+   <point/>
+  </object>
+  <object id="98" type="wave_small" x="192" y="465">
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="3" name="characters">
+  <object id="41" name="1" type="character" x="172.545" y="178.763" width="24" height="48"/>
+  <object id="43" name="1" type="character" x="405.076" y="96.5395" width="24" height="48"/>
+  <object id="44" name="1" type="character" x="425.924" y="233.893" width="24" height="48"/>
+  <object id="45" name="1" type="character" x="756.823" y="358.555" width="24" height="48"/>
+  <object id="46" name="4" type="character" x="557.145" y="387.189" width="24" height="48"/>
+  <object id="49" name="2" type="character" x="520.354" y="235.119" width="24" height="48"/>
+  <object id="51" name="2" type="character" x="533.845" y="96.5395" width="24" height="48"/>
+  <object id="52" name="3" type="character" x="390.359" y="390.868" width="24" height="48"/>
+  <object id="53" name="2" type="character" x="245.905" y="176.624" width="24" height="48"/>
+  <object id="54" name="3" type="character" x="757.059" y="179.718" width="24" height="48"/>
+  <object id="56" name="2" type="character" x="694.656" y="358.555" width="24" height="48"/>
+  <object id="57" name="3" type="character" x="250.547" y="357.007" width="24" height="48"/>
+  <object id="58" name="4" type="character" x="189.086" y="359.888" width="24" height="48"/>
+  <object id="60" name="4" type="character" x="449.225" y="94.0868" width="24" height="48"/>
+  <object id="61" name="3" type="character" x="493.374" y="94.0868" width="24" height="48"/>
+  <object id="63" name="4" type="character" x="692.994" y="179.718" width="24" height="48"/>
  </objectgroup>
 </map>

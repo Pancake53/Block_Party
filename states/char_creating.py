@@ -1,4 +1,4 @@
-import pygame, json
+import pygame, json, pygame.time, pytweening, random
 
 
 from part import Part
@@ -8,7 +8,7 @@ from UI.slider import Slider
 from helpers import draw_shading_for_rect
 
 class Char_Creating(State):
-    def __init__(self, game, players_left=1, created_chars=None):
+    def __init__(self, game, players_left=1, created_chars=None, saved_chars_data=None):
         super().__init__(game)
         # how many players havent created their characters yet
         self.players_left = players_left - 1
@@ -19,10 +19,9 @@ class Char_Creating(State):
         # value is dict, which 
         # contain keys main_colour and char_surface
         print(created_chars)
-
+        self.created_characters_for_render = []
         # selecting players id
         if created_chars:
-            self.created_characters_for_render = []
             self.created_chars = created_chars
             self.player_id = len(self.created_chars)
             self.taken_colours = [char['main_colour']
@@ -62,6 +61,18 @@ class Char_Creating(State):
         self.sliders = []
         self.lines = []
 
+        self.saved_chars_data = saved_chars_data
+
+        # animation of characters on the left
+        self.max_angle = 20
+        self.animation_speed = 50
+        self.start_angle = -self.max_angle
+        self.end_angle = self.max_angle
+
+        self.start_time = pygame.time.get_ticks()
+        self.duration = 1000
+        self.random_duration = 400
+
         self.load() # Buttons / UI elements / coordinates
 
     def update(self, delta_time, actions):
@@ -85,6 +96,8 @@ class Char_Creating(State):
         self.update_helpers()
 
         self.update_parts(delta_time, actions)
+
+        self.update_animations(delta_time)
         self.game.cursor = self.cursor
 
 
@@ -193,13 +206,8 @@ class Char_Creating(State):
             # mouse over part
             if part.hovered:
                 # if first part
-                if not self.top_part:
-                    self.top_part = part
-                    self.top_part_layer = part.layer
-                # part is on top of another
-                elif part.layer > self.top_part_layer:
-                    self.top_part = part
-                    self.top_part_layer = part.layer
+                self.top_part = part
+                
 
         for part in self.character_parts:
             if part == self.top_part:
@@ -347,8 +355,8 @@ class Char_Creating(State):
         self.render_slicers(surface)
         self.render_helpers(surface)
         
-        if self.player_id > 0:
-            self.render_created_characters(surface)
+        
+        self.render_created_characters(surface)
 
         self.render_parts(surface)    
 
@@ -409,11 +417,17 @@ class Char_Creating(State):
         # contain keys char_surface, x, y
         for char_dict in self.created_characters_for_render:
             
-            surface.blit(char_dict['char_surface'],
-                (char_dict['x'], char_dict['y']))
+            rotated = pygame.transform.rotate(
+                char_dict['char_surface'], char_dict['angle'])
 
-            draw_shading_for_rect(self.game.TILE_COL,
-                char_dict['rect'], surface)
+            surface.blit(rotated,
+                (char_dict['x'], char_dict['y']))
+            
+            # rect = rotated.get_rect()
+            # rect.topleft = (char_dict['x'], char_dict['y'])
+
+            # draw_shading_for_rect(self.game.TILE_COL,
+            #     rect, surface)
 
 
     def create_surface_from_created_char(self):
@@ -449,8 +463,18 @@ class Char_Creating(State):
         '''
         rescales a single part and draws it on surface
         '''
-        colour = part.colour
-        rect = part.rect
+        if isinstance(part, Part):
+            colour = part.colour
+            rect = part.rect
+        else:
+            colour = part['colour']
+            rect = pygame.Rect(
+                part['x'],
+                part['y'],
+                part['w'],
+                part['h']
+            )
+                
 
         # coordinates
         
@@ -473,13 +497,15 @@ class Char_Creating(State):
         calls other load functions
         '''
 
+        self.load_editbox()
+
         self.load_ui()
         
-        self.load_editbox()
-        
-        self.load_created_characters()
+        if self.saved_chars_data is None:
+            self.load_saved_chars_data()
 
-        self.load_saved_chars_data()
+        self.load_created_characters()
+        
 
     def load_ui(self):
         '''
@@ -491,7 +517,7 @@ class Char_Creating(State):
 
 
         self.left_x = self.game.GAME_W / 2 - 10
-        self.left_arrow_y = self.game.GAME_H / 4
+        self.left_arrow_y = self.game.GAME_H / 4 - 30
         self.arrow_W, self.arrow_H = self.game.assets["arrowleft_img"].get_size()
         self.right_arrow_x = self.game.GAME_W - self.arrow_W - self.padding
         self.right_arrow_y = self.left_arrow_y
@@ -507,12 +533,14 @@ class Char_Creating(State):
         self.load_buttons()
         
 
-        self.title_x = self.red_slider.x + self.red_slider.width / 2 - 10
-        self.title_y = self.game.GAME_H / 8 - 10
+        self.title_x = self.red_slider.x + self.red_slider.width / 2
+        self.title_y = 40
         self.add_text('create your character', self.title_x, self.title_y, size='Medium')
 
         self.load_helpers()
         self.load_lines()
+
+        self.load_left_side()
         
 
 
@@ -641,7 +669,7 @@ class Char_Creating(State):
 
         # new piece
         x = self.left_x
-        new_piece_y = y_bucket + bucket_h + self.line_padding * 2
+        new_piece_y = y_bucket + bucket_h + self.line_padding + self.padding
         y = new_piece_y
 
         button = ButtonStationary(
@@ -796,7 +824,7 @@ class Char_Creating(State):
         h = 50
 
         x = self.left_x
-        y += h + self.line_padding * 2
+        y += h + self.line_padding + self.padding
         self.y_bottom = y
 
 
@@ -954,12 +982,22 @@ class Char_Creating(State):
     def load_lines(self):
         # LINES / DIVIDERS
 
+        # inspiraton
+        y = self.title_y + 25  
+        x_left = 8
+        line_start = (x_left, y)
+
+        x_right = self.bg_char_creating.x - 8
+        line_end = (x_right, y)
+        self.lines.append([line_start, line_end]) 
+
+
         # title
-        y = self.title_y + 40
+        
         x_left = self.left_x - self.padding
         line_start = (x_left, y)
 
-        x_right = self.game.GAME_W - 5
+        x_right = self.game.GAME_W - 8
         line_end = (x_right, y)
         self.lines.append([line_start, line_end])
 
@@ -969,12 +1007,20 @@ class Char_Creating(State):
         line_end = (x_right, y)
         self.lines.append([line_start, line_end]) 
 
-        y = self.y_bottom - 10
+        y = self.y_bottom - 15
         line_start = (x_left, y)
         line_end = (x_right, y)
         self.lines.append([line_start, line_end])
 
-        
+    def load_left_side(self):
+        '''
+        loads all that is on the left side of the character creation box
+        '''    
+
+        y = self.bg_char_creating.y + 16
+        x_center = self.bg_char_creating.x / 2
+
+        self.game.add_text('inspiration', x_center, y, 'Small', self.texts)
         
 
 
@@ -1072,35 +1118,89 @@ class Char_Creating(State):
         # value is dict, which 
         # contain keys main_colour and char_surface
 
-        if self.created_chars:
-            x = self.game.char_surface_W
+        character_size_mlt = 1.5
+        h = self.game.char_surface_H * character_size_mlt
+        w = self.game.char_surface_W * character_size_mlt
+        x_center = self.bg_char_creating.x / 2 - w / 2
+        x_1 = self.bg_char_creating.x / 4 - w / 2 + 5
+        x_2 = x_1 + self.bg_char_creating.x / 2 - 15
+        start_y = 70
+        left = True
 
-            for id, dict in self.created_chars.items():
-                y = self.game.char_surface_H * 1.5 * (1 + id)
+        y_padding = (self.game.char_surface_H * character_size_mlt) * 0.55
+
+        if self.created_chars:
+            for i, dict in enumerate(reversed(self.created_chars.values())):
+                y = y_padding * i + start_y
+
+                x = x_1 if left else x_2
+                left = not left
+
                 self.created_characters_for_render.append(
-                    {'x': x,
+                    {'base_x' : x,
+                    'x': x,
                     'y': y,
-                    'char_surface' : dict['char_surface'],
-                    'rect': pygame.Rect(x, y, 
-                    dict['char_surface'].width,
-                    dict['char_surface'].height)
-                    }
-                )     
-                        
+                    'char_surface' : pygame.transform.scale(dict['char_surface'], (w, h)),
+                    'rect': pygame.Rect(x, y, w, h),
+                    't': 0,
+                    'start_angle': -self.max_angle,
+                    'end_angle': self.max_angle,
+                    'angle' : -self.max_angle,
+                    'duration': self.duration + random.randint(0, self.random_duration),
+                    'direction': 1}
+                )
+
+        else:
+            y = start_y - y_padding
+
+        print(self.created_characters_for_render)
+        print(len(self.created_characters_for_render) < 3)
+        # add saved chars for inspiration
+        i = 0
+        while (len(self.created_characters_for_render) < 6 
+               and
+               i < len(self.saved_chars_data)):
+            data = self.saved_chars_data[i]
+            y += y_padding
+
+            x = x_1 if left else x_2
+            left = not left
+
+            char_surface = pygame.surface.Surface((self.game.char_surface_W, self.game.char_surface_H), pygame.SRCALPHA)
+
+            for part in data['parts']:
+                self.scale_part(part, char_surface)
+
+            self.created_characters_for_render.append(
+                {'base_x' : x,
+                'x': x,
+                'y': y,
+                'char_surface' : pygame.transform.scale(char_surface, (w, h)),
+                'rect': pygame.Rect(x, y, w, h),
+                't': 0,
+                'start_angle': -self.max_angle,
+                'end_angle': self.max_angle,
+                'angle' : -self.max_angle,
+                'duration': self.duration + random.randint(0, self.random_duration),
+                'direction': 1}
+            )
+
+            i += 1
+                            
     def spawn_part(self, x = None, y = None, W = None, H = None, colour = None, main = False, selected = False):
         '''
         creates new Part obj and adds it character parts
         '''
         if x is None:
-            x = self.left_x
+            x = self.bg_char_creating.x + self.scalar * 4
         
         if y is None:
-            y = self.y_bottom - 70
+            y = self.bg_char_creating.y + self.scalar * 4
 
         if W is None:   
-            W = 50
+            W = self.scalar * 4
         if H is None:
-            H = 50
+            H = self.scalar * 4
 
         if colour is None:
             colour = self.selected_colour
@@ -1180,6 +1280,7 @@ class Char_Creating(State):
                     self.character_parts.remove(part)
                     index += 1
                     self.character_parts.insert(index, part)
+                    part.layer = index
 
             case 'back1':
                 
@@ -1188,18 +1289,22 @@ class Char_Creating(State):
                     self.character_parts.remove(part)
                     index += -1
                     self.character_parts.insert(index, part)
+                    part.layer = index
 
             case 'top':
                 
                 self.character_parts.remove(part)
             
                 self.character_parts.append(part)
+                part.layer = len(self.character_parts) - 1
 
             case 'bottom':
     
                 self.character_parts.remove(part)
                 index = 0
                 self.character_parts.insert(index, part)
+                part.layer = index
+
 
     # save & load
 
@@ -1301,6 +1406,64 @@ class Char_Creating(State):
             case _:
                 print(f'On return in char creating failed, action: {action}')
 
+    # animations
+
+    def update_animations(self, dt):
+
+        now = pygame.time.get_ticks()
+        time_elapsed = now - self.start_time
+
+        for char_dict in self.created_characters_for_render:
+            curr_angle = char_dict['angle']
+
+            # if curr_angle > char_dict['end_angle']:
+            #     char_dict['direction'] = -1
+
+            # elif curr_angle < char_dict['start_angle']:
+            #     char_dict['direction'] = 1
+
+        
+            full_cycle = char_dict['duration'] * 2
+            progress = time_elapsed % full_cycle / char_dict['duration'] 
+            
+            if progress <= 1:
+                t = progress
+            else:
+                t = 2 - progress
+
+            eased = pytweening.easeInOutQuad(t)
+            
+            new_angle = (char_dict['start_angle']
+                        + (char_dict['end_angle'] - char_dict['start_angle'])
+                        * eased
+                        # * char_dict['direction']
+            )
+
+            change = curr_angle - new_angle
+            if change > 10:
+                    print(f"elapsed: {time_elapsed:6.0f} | progress: {progress:.4f} | "
+                        f"t: {t:.4f} | eased: {eased:.4f} | "
+                        f"curr: {char_dict['angle']:.2f} → new: {new_angle:.2f}")
+
+            if curr_angle > 0:
+                char_dict['x'] = char_dict['base_x'] - new_angle * 1.5
+
+            char_dict['angle'] = new_angle
+
+        # for char_dict in self.created_characters_for_render:
+        #     curr_angle = char_dict['angle']
+
+        #     if abs(curr_angle) > self.max_angle:
+        #         char_dict['direction'] *= -1
+
+        #     change = char_dict['direction'] * dt
+        #     new_angle = curr_angle + change
+
+        #     if curr_angle > 0:
+        #         char_dict['x'] -= change * 1.5
+
+        #     char_dict['angle'] = new_angle
+        
 
     # helpers
 

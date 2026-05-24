@@ -209,6 +209,8 @@ class Part():
         self.rect.y = self.round_to_scalar(self.y)
 
         # store current value into old value
+        self.old_values['x'] = self.rect.x
+        self.old_values['y'] = self.rect.y
         self.old_mouse_pos = actions['mouse_pos']
 
         
@@ -273,6 +275,7 @@ class Part():
         self.rect.width = self.round_to_scalar(self.W)
 
         # store current value into old value
+        self.old_values['w'] = self.rect.width
         self.old_mouse_pos = actions['mouse_pos']
 
         # update edge buffer
@@ -334,8 +337,8 @@ class Part():
         self.H = max(self.min_size, self.H)
         self.rect.height = self.round_to_scalar(self.H)
 
-
         # store current value into old value
+        self.old_values['h'] = self.rect.height
         self.old_mouse_pos = actions['mouse_pos']
 
         # update edge buffer

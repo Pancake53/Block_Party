@@ -1,4 +1,4 @@
-import pygame, json, os, random
+import pygame, json, os, random, copy
 from pygame.math import Vector2
 
 from states.state import State
@@ -7,6 +7,7 @@ from game_objects.character import Character
 from game_objects.bomb import Bomb
 from game_objects.explosion import Explosion
 from game_objects.tile import Tile
+from game_objects.background import Background
 
 from UI.button_stationary import ButtonStationary
 from UI.camera import Camera
@@ -25,8 +26,8 @@ class Game_World(State):
         
         self.BG_COL = (0, 153, 136) # (56, 175, 218) light blue
         self.TILE_COL = (181, 67, 0)
-        self.tiles = []
-        self.temp_tiles = []
+        self.collision = []
+        self.collision_temp = []
         
         # About created_chars
         # all characters created by players so far
@@ -96,6 +97,9 @@ class Game_World(State):
 
         # music     
         self.game.audio.play_music(level_name)
+
+        # level stuff
+        self.WATER_COL = (0, 72, 130)
         
 
 
@@ -119,9 +123,11 @@ class Game_World(State):
         # update tiles
         self.camera.update(delta_time, actions)
 
+        self.update_bg(delta_time)
+
         self.update_characters(delta_time, actions)
             
-        self.bomb.update(delta_time, actions, self.tiles)
+        self.bomb.update(delta_time, actions, self.collision)
         
         self.explosion.update()
         self.handle_actions(actions)
@@ -131,12 +137,15 @@ class Game_World(State):
 
         for button in self.buttons:
             button.update(actions)
-        
 
         if self.state['game_over']:
             self.update_winning()
 
         self.game.cursor = self.cursor    
+
+    def update_bg(self, dt):
+        for moving_obj in self.moving1:
+            moving_obj.move(dt)
 
     def update_characters(self, delta_time, actions):
         '''
@@ -159,7 +168,7 @@ class Game_World(State):
                 else: 
                     char.state['locked'] = turn_lock
                         
-                char.update(delta_time, actions, self.tiles)
+                char.update(delta_time, actions, self.collision)
 
                 if char.state["choosing"]:
                     self.choosing_char = char
@@ -255,6 +264,8 @@ class Game_World(State):
         tile: tile that need wrapping
         side: side of the tile that went over on x-axis ('left'/'right')
         '''
+
+
         match side:
             case 'left':
                 # dublicate to right side of the sceen
@@ -265,9 +276,15 @@ class Game_World(State):
             case _:
                 print("error in tile dublicating")
 
-        new_tile = Tile(x, tile.rect.y, tile.rect.width,
-                         tile.rect.height, self.TILE_COL, self)
-        self.temp_tiles.append(new_tile)
+
+        
+        new_tile = Tile(x, tile.rect.y, 
+                        tile.rect.width, tile.rect.height,
+                        tile.colour, tile.index,
+                        self)
+        self.tiles_temp[tile.index].append(new_tile)
+      
+            
 
     def delete_tile(self, tile):
         '''
@@ -275,7 +292,17 @@ class Game_World(State):
 
         tile: tile to be deleted
         '''
-        self.temp_tiles.remove(tile)
+
+        self.tiles_temp[tile.index].remove(tile)
+
+    def update_tiles(self):
+        '''
+        sets temp to real
+        '''
+        self.tiles = [tile_type.copy() for tile_type in self.tiles_temp]
+        self.collision = self.tiles[0]
+        self.background1 = self.tiles[1]
+        self.moving1 = self.tiles[2]
 
     # render functions
 
@@ -295,8 +322,10 @@ class Game_World(State):
                                self.game.GAME_H / 8)
         
         # collision tiles
-        for tile in self.tiles:
-            tile.render(surface)
+        for tile_type in self.tiles:
+            for tile in tile_type:
+                # print(tile)
+                tile.render(surface)
 
         
         
@@ -439,7 +468,10 @@ class Game_World(State):
 
         level_name: filename with level data
         '''
-
+        self.tiles = []
+        self.collision = []
+        self.background1 = []
+        self.moving1 = []
 
         # level data
         path = os.path.join(self.game.level_dir, level_name)
@@ -448,20 +480,66 @@ class Game_World(State):
             level_data = json.load(f)
 
         for layer in level_data["layers"]:
-            if layer["type"] == "objectgroup":
+            
+            type = 'collision'
+            index = 0
+            # tiles
+            if layer["name"] == "collisionTiles":
                 for obj in layer["objects"]:
+                    self.collision.append(
+                        Tile(obj["x"], obj["y"],
+                            obj["width"], obj["height"], 
+                            self.TILE_COL,
+                            index, self)
+                    )
 
-                    # tiles
-                    if obj['type'] == "collision_tile":
-                        self.tiles.append(
-                            Tile(obj["x"], obj["y"],
-                                obj["width"], obj["height"], 
-                                self.TILE_COL, self)
-                        )
-                        
-                    # playable characters
-                    if obj['type'] == "character":
-                        self.load_character(obj)
+            # playable characters
+            if layer["name"] == "characters":
+                for obj in layer["objects"]:   
+                    self.load_character(obj)
+
+            type = 'background1'
+            index += 1
+
+            if layer["name"] == type:
+                for obj in layer["objects"]:
+                    self.background1.append(
+                        Background(obj['x'],
+                                   obj['y'],
+                                   index,
+                                   self,
+                                   width=obj['width'],
+                                   height=obj['height'],
+                                   colour=obj['properties'][0]['value'])
+
+                    )
+
+            type = 'moving1'
+            index += 1
+
+            moving_objs = {
+                'wave': -50,
+                'wave_small': -50
+            }
+
+            if layer["name"] == type:
+                for obj in layer["objects"]:
+                    if obj['type'] in moving_objs.keys():
+                        image = self.game.assets[obj['type'] + '_img']
+                        speed = moving_objs[obj['type']]
+
+                        getattr(self, type).append(
+                            Background(obj['x'],
+                                   obj['y'],
+                                   index,
+                                   self,
+                                   image = image,
+                                   speed = speed
+                                   )
+                            )
+                    else:
+                        print(f'\nAdd {obj['type']} to moving_objs dictionary!!!\n Is composes of: \n {moving_objs}')
+                    
 
         self.teams_not_eliminated = {team_id: characters[:]
                                     for team_id, characters in 
@@ -470,11 +548,14 @@ class Game_World(State):
         self.temp_teams_not_eliminated = {team_id: characters[:]
                                     for team_id, characters in 
                                     self.teams_not_eliminated.items()}
+        
+        self.tiles.extend([self.collision, self.background1, self.moving1])
 
-        self.temp_tiles = self.tiles.copy()
+        self.tiles_temp = [tile_type.copy() for tile_type in self.tiles]
+        print(self.tiles)
 
         self.choosing_char = None
-
+        print('Level data loaded!')
         
         # print(f'Level Loaded \nLevel Data:\n{self.teams}')
 
@@ -562,7 +643,7 @@ class Game_World(State):
         self.bomb.y_screen = self.bomb.rect.y 
 
         # check if bomb has spawned already colliding with a wall
-        collisions = self.bomb.collision_test(self.tiles)
+        collisions = self.bomb.collision_test(self.collision)
         if collisions:
             # print(f"Bomb collides w wall on spawn, fixing, collisions: {collisions}")
             self.bomb.fix_spawn(collisions)
@@ -671,8 +752,9 @@ class Game_World(State):
                 char.reset_state()
 
         # reset tiles
-        for tile in self.tiles:
-            tile.reset()
+        for tile_type in self.tiles:
+            for tile in tile_type:
+                tile.reset()    
 
         # game state
         self.state['turn'] = 0
