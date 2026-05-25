@@ -324,6 +324,7 @@ class Game():
         self.sound_fx_dir = os.path.join(self.audio_dir, "sound_fx")
         self.level_dir = os.path.join("levels")
         self.cursor_dir = os.path.join(self.image_dir, "cursors")
+        self.bg_dir = os.path.join(self.image_dir, "backgrounds")
         # self.tilemap_dir = os.path.join("tilemap") NOT IN USE
         # Assets themselves
         # fonts
@@ -336,6 +337,11 @@ class Game():
         self.assets["explosion_img"] = pygame.image.load(os.path.join(self.image_dir, "explosion.png")).convert_alpha()
         self.assets["wave_img"] = pygame.image.load(os.path.join(self.image_dir, "wave.png")).convert_alpha()
         self.assets["wave_small_img"] = pygame.image.load(os.path.join(self.image_dir, "wave_small.png")).convert_alpha()
+        self.assets["bird_img"] = pygame.image.load(os.path.join(self.image_dir, "bird2.png")).convert_alpha()
+        # backgrounds
+        self.assets["ship_bg1_img"] = pygame.image.load(os.path.join(self.bg_dir, "ship_bg1.png")).convert_alpha()
+        self.assets["ship_bg2_img"] = pygame.image.load(os.path.join(self.bg_dir, "ship_bg2.png")).convert_alpha()
+        self.assets["ship_bg3_img"] = pygame.image.load(os.path.join(self.bg_dir, "ship_bg3.png")).convert_alpha()
         # level ui
         self.assets["bomb_img"] = pygame.image.load(os.path.join(self.image_dir, "bomb.png")).convert_alpha()
         self.assets["jump_img"] = pygame.image.load(os.path.join(self.image_dir, "jump.png")).convert_alpha()

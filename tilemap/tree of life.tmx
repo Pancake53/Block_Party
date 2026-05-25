@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="60" height="36" tilewidth="16" tileheight="15" infinite="0" nextlayerid="3" nextobjectid="150">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="60" height="36" tilewidth="16" tileheight="15" infinite="0" nextlayerid="4" nextobjectid="162">
  <editorsettings>
   <export target="../levels/tree of life.tmj" format="json"/>
  </editorsettings>
@@ -43,9 +43,21 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
+ <objectgroup id="3" name="characters">
+  <object id="150" name="4" type="character" x="399.16" y="185.093" width="24" height="48"/>
+  <object id="151" name="3" type="character" x="869.81" y="186.885" width="24" height="48"/>
+  <object id="152" name="1" type="character" x="465.935" y="8.23069" width="24" height="48"/>
+  <object id="153" name="1" type="character" x="875.097" y="308.423" width="24" height="48"/>
+  <object id="154" name="1" type="character" x="130.097" y="332.656" width="24" height="48"/>
+  <object id="155" name="2" type="character" x="51.0966" y="334.656" width="24" height="48"/>
+  <object id="156" name="2" type="character" x="527.097" y="201.423" width="24" height="48"/>
+  <object id="157" name="2" type="character" x="883.097" y="69.4231" width="24" height="48"/>
+  <object id="158" name="3" type="character" x="49.0966" y="97.6561" width="24" height="48"/>
+  <object id="159" name="3" type="character" x="609.097" y="331.423" width="24" height="48"/>
+  <object id="160" name="4" type="character" x="531.097" y="333.423" width="24" height="48"/>
+  <object id="161" name="4" type="character" x="52.0966" y="204.656" width="24" height="48"/>
+ </objectgroup>
  <objectgroup id="2" name="collisionTiles">
-  <object id="36" name="4" type="character" x="401.063" y="174.67" width="24" height="48"/>
-  <object id="37" name="3" type="character" x="871.713" y="176.462" width="24" height="48"/>
   <object id="67" type="collision_tile" x="512" y="255" width="97" height="30"/>
   <object id="81" type="collision_tile" x="448" y="90" width="64" height="550">
    <properties>
@@ -54,7 +66,6 @@
   </object>
   <object id="88" type="collision_tile" x="512" y="390" width="160" height="30"/>
   <object id="93" type="collision_tile" x="512" y="150" width="64" height="15"/>
-  <object id="98" name="1" type="character" x="467.838" y="-2.19242" width="24" height="48"/>
   <object id="99" type="collision_tile" x="320" y="240" width="128" height="30"/>
   <object id="100" type="collision_tile" x="288" y="360" width="160" height="30"/>
   <object id="101" type="collision_tile" x="32" y="255" width="97" height="30"/>
@@ -75,15 +86,6 @@
   <object id="111" type="collision_tile" x="32" y="150" width="64" height="15"/>
   <object id="112" type="collision_tile" x="384" y="120" width="64" height="15"/>
   <object id="113" type="collision_tile" x="864" y="118.316" width="64" height="16.684"/>
-  <object id="115" name="1" type="character" x="877" y="298" width="24" height="48"/>
-  <object id="116" name="1" type="character" x="132" y="322.233" width="24" height="48"/>
-  <object id="117" name="2" type="character" x="53" y="324.233" width="24" height="48"/>
-  <object id="118" name="2" type="character" x="529" y="191" width="24" height="48"/>
-  <object id="119" name="2" type="character" x="885" y="59" width="24" height="48"/>
-  <object id="120" name="3" type="character" x="51" y="87.233" width="24" height="48"/>
-  <object id="121" name="3" type="character" x="611" y="321" width="24" height="48"/>
-  <object id="122" name="4" type="character" x="533" y="323" width="24" height="48"/>
-  <object id="123" name="4" type="character" x="54" y="194.233" width="24" height="48"/>
   <object id="125" type="collision_tile" x="0" y="60" width="16" height="30"/>
   <object id="126" type="collision_tile" x="944" y="60" width="16" height="30"/>
   <object id="127" type="collision_tile" x="240" y="540" width="208" height="30"/>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="15" height="36" tilewidth="64" tileheight="15" infinite="0" nextlayerid="6" nextobjectid="99">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="60" height="36" tilewidth="64" tileheight="15" infinite="0" nextlayerid="8" nextobjectid="105">
  <editorsettings>
   <export target="../levels/ship.tmj" format="json"/>
  </editorsettings>
@@ -14,7 +14,7 @@
   <object id="64" type="collision_tile" x="256" y="480.571" width="448" height="30"/>
   <object id="65" type="collision_tile" x="288.591" y="510" width="383.777" height="30"/>
  </objectgroup>
- <objectgroup id="4" name="background1">
+ <objectgroup id="4" name="stationary">
   <object id="69" type="water" x="-400" y="510" width="720" height="282">
    <properties>
     <property name="colour" type="color" value="#ff004882"/>
@@ -31,47 +31,56 @@
    </properties>
   </object>
  </objectgroup>
- <objectgroup id="5" name="moving1">
-  <object id="74" type="bird" x="1013.33" y="46.6667">
+ <objectgroup id="5" name="moving">
+  <object id="74" type="bird" x="2304" y="30">
    <point/>
   </object>
-  <object id="75" type="bird" x="1342.67" y="174.667">
+  <object id="75" type="bird" x="2432" y="0">
    <point/>
   </object>
-  <object id="76" type="bird" x="1150.33" y="419.333">
+  <object id="76" type="bird" x="2432" y="135">
    <point/>
   </object>
-  <object id="77" type="wave" x="128" y="465">
+  <object id="77" type="wave" x="1088" y="480">
    <point/>
   </object>
-  <object id="81" type="wave_small" x="704" y="465">
+  <object id="81" type="wave_small" x="1664" y="480">
    <point/>
   </object>
-  <object id="83" type="wave_small" x="512" y="465">
+  <object id="84" type="bird" x="2368" y="90">
    <point/>
   </object>
-  <object id="84" type="bird" x="1066.67" y="104">
+  <object id="85" type="bird" x="2368" y="15">
    <point/>
   </object>
-  <object id="85" type="bird" x="1117.33" y="61.3333">
+  <object id="93" type="wave_small" x="1728" y="480">
    <point/>
   </object>
-  <object id="93" type="wave_small" x="768" y="465">
+  <object id="96" type="wave_small" x="2112" y="480">
    <point/>
   </object>
-  <object id="94" type="wave_small" x="1024" y="465">
+  <object id="97" type="wave_small" x="1216" y="480">
    <point/>
   </object>
-  <object id="95" type="wave_small" x="1088" y="465">
+  <object id="98" type="wave_small" x="1152" y="480">
    <point/>
   </object>
-  <object id="96" type="wave_small" x="1152" y="465">
+  <object id="99" type="bird" x="2414" y="46">
    <point/>
   </object>
-  <object id="97" type="wave_small" x="256" y="465">
+  <object id="100" type="wave" x="3072" y="480">
    <point/>
   </object>
-  <object id="98" type="wave_small" x="192" y="465">
+  <object id="101" type="wave" x="3200" y="480">
+   <point/>
+  </object>
+  <object id="102" type="bird" x="3520" y="360">
+   <point/>
+  </object>
+  <object id="103" type="bird" x="3456" y="315">
+   <point/>
+  </object>
+  <object id="104" type="bird" x="3551" y="269.833">
    <point/>
   </object>
  </objectgroup>

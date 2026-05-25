@@ -51,31 +51,152 @@
         }, 
         {
          "draworder":"topdown",
-         "id":2,
-         "name":"collisionTiles",
+         "id":3,
+         "name":"characters",
          "objects":[
                 {
                  "height":48,
-                 "id":36,
+                 "id":150,
                  "name":"4",
                  "rotation":0,
                  "type":"character",
                  "visible":true,
                  "width":24,
-                 "x":401.063,
-                 "y":174.67
+                 "x":399.159611391492,
+                 "y":185.093113028118
                 }, 
                 {
                  "height":48,
-                 "id":37,
+                 "id":151,
                  "name":"3",
                  "rotation":0,
                  "type":"character",
                  "visible":true,
                  "width":24,
-                 "x":871.713,
-                 "y":176.462
+                 "x":869.809611391492,
+                 "y":186.885113028118
                 }, 
+                {
+                 "height":48,
+                 "id":152,
+                 "name":"1",
+                 "rotation":0,
+                 "type":"character",
+                 "visible":true,
+                 "width":24,
+                 "x":465.934611391492,
+                 "y":8.23069302811825
+                }, 
+                {
+                 "height":48,
+                 "id":153,
+                 "name":"1",
+                 "rotation":0,
+                 "type":"character",
+                 "visible":true,
+                 "width":24,
+                 "x":875.096611391493,
+                 "y":308.423113028118
+                }, 
+                {
+                 "height":48,
+                 "id":154,
+                 "name":"1",
+                 "rotation":0,
+                 "type":"character",
+                 "visible":true,
+                 "width":24,
+                 "x":130.096611391492,
+                 "y":332.656113028118
+                }, 
+                {
+                 "height":48,
+                 "id":155,
+                 "name":"2",
+                 "rotation":0,
+                 "type":"character",
+                 "visible":true,
+                 "width":24,
+                 "x":51.0966113914924,
+                 "y":334.656113028118
+                }, 
+                {
+                 "height":48,
+                 "id":156,
+                 "name":"2",
+                 "rotation":0,
+                 "type":"character",
+                 "visible":true,
+                 "width":24,
+                 "x":527.096611391492,
+                 "y":201.423113028118
+                }, 
+                {
+                 "height":48,
+                 "id":157,
+                 "name":"2",
+                 "rotation":0,
+                 "type":"character",
+                 "visible":true,
+                 "width":24,
+                 "x":883.096611391493,
+                 "y":69.4231130281183
+                }, 
+                {
+                 "height":48,
+                 "id":158,
+                 "name":"3",
+                 "rotation":0,
+                 "type":"character",
+                 "visible":true,
+                 "width":24,
+                 "x":49.0966113914924,
+                 "y":97.6561130281183
+                }, 
+                {
+                 "height":48,
+                 "id":159,
+                 "name":"3",
+                 "rotation":0,
+                 "type":"character",
+                 "visible":true,
+                 "width":24,
+                 "x":609.096611391493,
+                 "y":331.423113028118
+                }, 
+                {
+                 "height":48,
+                 "id":160,
+                 "name":"4",
+                 "rotation":0,
+                 "type":"character",
+                 "visible":true,
+                 "width":24,
+                 "x":531.096611391492,
+                 "y":333.423113028118
+                }, 
+                {
+                 "height":48,
+                 "id":161,
+                 "name":"4",
+                 "rotation":0,
+                 "type":"character",
+                 "visible":true,
+                 "width":24,
+                 "x":52.0966113914924,
+                 "y":204.656113028118
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":2,
+         "name":"collisionTiles",
+         "objects":[
                 {
                  "height":30,
                  "id":67,
@@ -125,17 +246,6 @@
                  "width":64,
                  "x":512,
                  "y":150
-                }, 
-                {
-                 "height":48,
-                 "id":98,
-                 "name":"1",
-                 "rotation":0,
-                 "type":"character",
-                 "visible":true,
-                 "width":24,
-                 "x":467.838,
-                 "y":-2.19242
                 }, 
                 {
                  "height":30,
@@ -280,105 +390,6 @@
                  "width":64,
                  "x":864,
                  "y":118.316
-                }, 
-                {
-                 "height":48,
-                 "id":115,
-                 "name":"1",
-                 "rotation":0,
-                 "type":"character",
-                 "visible":true,
-                 "width":24,
-                 "x":877,
-                 "y":298
-                }, 
-                {
-                 "height":48,
-                 "id":116,
-                 "name":"1",
-                 "rotation":0,
-                 "type":"character",
-                 "visible":true,
-                 "width":24,
-                 "x":132,
-                 "y":322.233
-                }, 
-                {
-                 "height":48,
-                 "id":117,
-                 "name":"2",
-                 "rotation":0,
-                 "type":"character",
-                 "visible":true,
-                 "width":24,
-                 "x":53,
-                 "y":324.233
-                }, 
-                {
-                 "height":48,
-                 "id":118,
-                 "name":"2",
-                 "rotation":0,
-                 "type":"character",
-                 "visible":true,
-                 "width":24,
-                 "x":529,
-                 "y":191
-                }, 
-                {
-                 "height":48,
-                 "id":119,
-                 "name":"2",
-                 "rotation":0,
-                 "type":"character",
-                 "visible":true,
-                 "width":24,
-                 "x":885,
-                 "y":59
-                }, 
-                {
-                 "height":48,
-                 "id":120,
-                 "name":"3",
-                 "rotation":0,
-                 "type":"character",
-                 "visible":true,
-                 "width":24,
-                 "x":51,
-                 "y":87.233
-                }, 
-                {
-                 "height":48,
-                 "id":121,
-                 "name":"3",
-                 "rotation":0,
-                 "type":"character",
-                 "visible":true,
-                 "width":24,
-                 "x":611,
-                 "y":321
-                }, 
-                {
-                 "height":48,
-                 "id":122,
-                 "name":"4",
-                 "rotation":0,
-                 "type":"character",
-                 "visible":true,
-                 "width":24,
-                 "x":533,
-                 "y":323
-                }, 
-                {
-                 "height":48,
-                 "id":123,
-                 "name":"4",
-                 "rotation":0,
-                 "type":"character",
-                 "visible":true,
-                 "width":24,
-                 "x":54,
-                 "y":194.233
                 }, 
                 {
                  "height":30,
@@ -606,8 +617,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":3,
- "nextobjectid":150,
+ "nextlayerid":4,
+ "nextobjectid":162,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

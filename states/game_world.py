@@ -123,7 +123,7 @@ class Game_World(State):
         # update tiles
         self.camera.update(delta_time, actions)
 
-        self.update_bg(delta_time)
+        self.update_moving(delta_time)
 
         self.update_characters(delta_time, actions)
             
@@ -143,8 +143,8 @@ class Game_World(State):
 
         self.game.cursor = self.cursor    
 
-    def update_bg(self, dt):
-        for moving_obj in self.moving1:
+    def update_moving(self, dt):
+        for moving_obj in self.moving:
             moving_obj.move(dt)
 
     def update_characters(self, delta_time, actions):
@@ -264,7 +264,7 @@ class Game_World(State):
         tile: tile that need wrapping
         side: side of the tile that went over on x-axis ('left'/'right')
         '''
-
+        print(f'wrapping tile: {tile}')
 
         match side:
             case 'left':
@@ -300,10 +300,8 @@ class Game_World(State):
         sets temp to real
         '''
         self.tiles = [tile_type.copy() for tile_type in self.tiles_temp]
-        self.collision = self.tiles[0]
-        self.background1 = self.tiles[1]
-        self.moving1 = self.tiles[2]
-
+        for tile_type, index in self.tile_type_dict.items():
+            setattr(self, tile_type, self.tiles[index])
     # render functions
 
     def render(self, surface):
@@ -317,17 +315,12 @@ class Game_World(State):
         # background
         surface.fill((self.BG_COL))
 
-        self.game.draw_text(surface, "Gameplay",
-                             self.game.BLACK, self.game.GAME_W / 2,
-                               self.game.GAME_H / 8)
-        
+      
         # collision tiles
         for tile_type in self.tiles:
             for tile in tile_type:
                 # print(tile)
                 tile.render(surface)
-
-        
         
         # characters
         self.render_characters(surface)
@@ -469,10 +462,30 @@ class Game_World(State):
         level_name: filename with level data
         '''
         self.tiles = []
-        self.collision = []
-        self.background1 = []
-        self.moving1 = []
 
+        self.backgrounds = []
+        self.collision = []
+        self.stationary = []
+        self.moving = []
+        
+
+        self.tile_type_dict = {'backgrounds': 0, 
+                               'collision' : 1,
+                               'stationary' : 2, 
+                               'moving' : 3
+        }
+
+        moving_objs = {
+                'wave': -50,
+                'wave_small': -60,
+                'bird': -80
+
+            }
+        
+        index = 0
+        
+        self.load_bg(level_name, index)
+        
         # level data
         path = os.path.join(self.game.level_dir, level_name)
 
@@ -482,9 +495,10 @@ class Game_World(State):
         for layer in level_data["layers"]:
             
             type = 'collision'
-            index = 0
+            
             # tiles
             if layer["name"] == "collisionTiles":
+                index = 1
                 for obj in layer["objects"]:
                     self.collision.append(
                         Tile(obj["x"], obj["y"],
@@ -498,12 +512,13 @@ class Game_World(State):
                 for obj in layer["objects"]:   
                     self.load_character(obj)
 
-            type = 'background1'
-            index += 1
+            type = 'stationary'
+            
 
             if layer["name"] == type:
+                index = 2
                 for obj in layer["objects"]:
-                    self.background1.append(
+                    self.stationary.append(
                         Background(obj['x'],
                                    obj['y'],
                                    index,
@@ -514,15 +529,11 @@ class Game_World(State):
 
                     )
 
-            type = 'moving1'
-            index += 1
-
-            moving_objs = {
-                'wave': -50,
-                'wave_small': -50
-            }
+            type = 'moving'
+            
 
             if layer["name"] == type:
+                index = 3
                 for obj in layer["objects"]:
                     if obj['type'] in moving_objs.keys():
                         image = self.game.assets[obj['type'] + '_img']
@@ -539,7 +550,9 @@ class Game_World(State):
                             )
                     else:
                         print(f'\nAdd {obj['type']} to moving_objs dictionary!!!\n Is composes of: \n {moving_objs}')
-                    
+        
+        
+
 
         self.teams_not_eliminated = {team_id: characters[:]
                                     for team_id, characters in 
@@ -549,15 +562,48 @@ class Game_World(State):
                                     for team_id, characters in 
                                     self.teams_not_eliminated.items()}
         
-        self.tiles.extend([self.collision, self.background1, self.moving1])
+        for tile_type in self.tile_type_dict.keys():
+
+            self.tiles.extend([getattr(self, tile_type)])
 
         self.tiles_temp = [tile_type.copy() for tile_type in self.tiles]
-        print(self.tiles)
-
+        # print(self.tiles)
+        
         self.choosing_char = None
         print('Level data loaded!')
         
         # print(f'Level Loaded \nLevel Data:\n{self.teams}')
+
+
+    def load_bg(self, level_name, index):
+
+         # Load backgrounds availability
+        levels_background_data = {}
+
+        for level in ['ship', 'shipwreck', 'smily', 'swords', 'tree of life']:
+            bg_list = []
+
+            for i in range(1, 5):
+                key = f'{level}_bg{i}_img'
+
+                if key in self.game.assets:
+                    bg_list.append(self.game.assets[key])
+
+            levels_background_data[level] = bg_list
+
+        # Load backgrounds
+        for i, bg_asset in enumerate(levels_background_data[level_name[:-4]]):
+            x = 0
+            y = 0
+            if i > 0:
+                x = -100
+                y = -100
+            
+            speed = [0, 1/8, 1/4][i]
+            # print(bg_asset)
+
+            bg = Background(x, y, index, self, camera_speed=speed, image=bg_asset)
+            self.backgrounds.append(bg)
 
     def load_character(self, obj):
         '''

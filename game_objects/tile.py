@@ -25,25 +25,22 @@ class Tile:
         self.update(x_offset, y_offset)
 
     def update_normal(self, x_offset, y_offset):
-        self.x += x_offset
-        self.y += y_offset
-
-        self.rect.x = self.x
-        self.rect.y = self.y
+        self.camera_move(x_offset, y_offset)
 
     def update_wrap_around(self, x_offset, y_offset):
 
-
-        self.x += x_offset
-        self.y += y_offset
-
-        self.rect.x = self.x
-        self.rect.y = self.y
+        self.camera_move(x_offset, y_offset)
+        
 
         self.duplicating()
         self.deleting()
 
-        
+    def camera_move(self, x_offset, y_offset):
+        self.x += x_offset
+        self.y += y_offset
+
+        self.rect.x = self.x
+        self.rect.y = self.y
 
     def duplicating(self):
         # if hasn't created a dublicate on the other side

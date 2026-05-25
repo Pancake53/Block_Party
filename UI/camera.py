@@ -4,7 +4,7 @@ class Camera():
         self.game_world = game_world
 
         # Camera
-        self.camera_speed = 60
+        self.camera_speed = 120
         
     
         # 1x speed

@@ -115,7 +115,7 @@
         {
          "draworder":"topdown",
          "id":4,
-         "name":"background1",
+         "name":"stationary",
          "objects":[
                 {
                  "height":282,
@@ -177,7 +177,7 @@
         {
          "draworder":"topdown",
          "id":5,
-         "name":"moving1",
+         "name":"moving",
          "objects":[
                 {
                  "height":0,
@@ -188,8 +188,8 @@
                  "type":"bird",
                  "visible":true,
                  "width":0,
-                 "x":1013.33,
-                 "y":46.6667
+                 "x":2304,
+                 "y":30
                 }, 
                 {
                  "height":0,
@@ -200,8 +200,8 @@
                  "type":"bird",
                  "visible":true,
                  "width":0,
-                 "x":1342.67,
-                 "y":174.667
+                 "x":2432,
+                 "y":0
                 }, 
                 {
                  "height":0,
@@ -212,8 +212,8 @@
                  "type":"bird",
                  "visible":true,
                  "width":0,
-                 "x":1150.33,
-                 "y":419.333
+                 "x":2432,
+                 "y":135
                 }, 
                 {
                  "height":0,
@@ -224,8 +224,8 @@
                  "type":"wave",
                  "visible":true,
                  "width":0,
-                 "x":128,
-                 "y":465
+                 "x":1088,
+                 "y":480
                 }, 
                 {
                  "height":0,
@@ -236,20 +236,8 @@
                  "type":"wave_small",
                  "visible":true,
                  "width":0,
-                 "x":704,
-                 "y":465
-                }, 
-                {
-                 "height":0,
-                 "id":83,
-                 "name":"",
-                 "point":true,
-                 "rotation":0,
-                 "type":"wave_small",
-                 "visible":true,
-                 "width":0,
-                 "x":512,
-                 "y":465
+                 "x":1664,
+                 "y":480
                 }, 
                 {
                  "height":0,
@@ -260,8 +248,8 @@
                  "type":"bird",
                  "visible":true,
                  "width":0,
-                 "x":1066.67,
-                 "y":104
+                 "x":2368,
+                 "y":90
                 }, 
                 {
                  "height":0,
@@ -272,8 +260,8 @@
                  "type":"bird",
                  "visible":true,
                  "width":0,
-                 "x":1117.33,
-                 "y":61.3333
+                 "x":2368,
+                 "y":15
                 }, 
                 {
                  "height":0,
@@ -284,32 +272,8 @@
                  "type":"wave_small",
                  "visible":true,
                  "width":0,
-                 "x":768,
-                 "y":465
-                }, 
-                {
-                 "height":0,
-                 "id":94,
-                 "name":"",
-                 "point":true,
-                 "rotation":0,
-                 "type":"wave_small",
-                 "visible":true,
-                 "width":0,
-                 "x":1024,
-                 "y":465
-                }, 
-                {
-                 "height":0,
-                 "id":95,
-                 "name":"",
-                 "point":true,
-                 "rotation":0,
-                 "type":"wave_small",
-                 "visible":true,
-                 "width":0,
-                 "x":1088,
-                 "y":465
+                 "x":1728,
+                 "y":480
                 }, 
                 {
                  "height":0,
@@ -320,8 +284,8 @@
                  "type":"wave_small",
                  "visible":true,
                  "width":0,
-                 "x":1152,
-                 "y":465
+                 "x":2112,
+                 "y":480
                 }, 
                 {
                  "height":0,
@@ -332,8 +296,8 @@
                  "type":"wave_small",
                  "visible":true,
                  "width":0,
-                 "x":256,
-                 "y":465
+                 "x":1216,
+                 "y":480
                 }, 
                 {
                  "height":0,
@@ -344,8 +308,80 @@
                  "type":"wave_small",
                  "visible":true,
                  "width":0,
-                 "x":192,
-                 "y":465
+                 "x":1152,
+                 "y":480
+                }, 
+                {
+                 "height":0,
+                 "id":99,
+                 "name":"",
+                 "point":true,
+                 "rotation":0,
+                 "type":"bird",
+                 "visible":true,
+                 "width":0,
+                 "x":2414,
+                 "y":46
+                }, 
+                {
+                 "height":0,
+                 "id":100,
+                 "name":"",
+                 "point":true,
+                 "rotation":0,
+                 "type":"wave",
+                 "visible":true,
+                 "width":0,
+                 "x":3072,
+                 "y":480
+                }, 
+                {
+                 "height":0,
+                 "id":101,
+                 "name":"",
+                 "point":true,
+                 "rotation":0,
+                 "type":"wave",
+                 "visible":true,
+                 "width":0,
+                 "x":3200,
+                 "y":480
+                }, 
+                {
+                 "height":0,
+                 "id":102,
+                 "name":"",
+                 "point":true,
+                 "rotation":0,
+                 "type":"bird",
+                 "visible":true,
+                 "width":0,
+                 "x":3520,
+                 "y":360
+                }, 
+                {
+                 "height":0,
+                 "id":103,
+                 "name":"",
+                 "point":true,
+                 "rotation":0,
+                 "type":"bird",
+                 "visible":true,
+                 "width":0,
+                 "x":3456,
+                 "y":315
+                }, 
+                {
+                 "height":0,
+                 "id":104,
+                 "name":"",
+                 "point":true,
+                 "rotation":0,
+                 "type":"bird",
+                 "visible":true,
+                 "width":0,
+                 "x":3551,
+                 "y":269.833333333333
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -522,8 +558,7 @@
                  "width":24,
                  "x":493.374,
                  "y":94.0868
-                },
-            
+                }, 
                 {
                  "height":48,
                  "id":63,
@@ -541,8 +576,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":6,
- "nextobjectid":99,
+ "nextlayerid":8,
+ "nextobjectid":105,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -551,5 +586,5 @@
  "tilewidth":64,
  "type":"map",
  "version":"1.10",
- "width":15
+ "width":60
 }

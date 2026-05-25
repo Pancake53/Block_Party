@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="18" tilewidth="32" tileheight="30" infinite="0" nextlayerid="3" nextobjectid="69">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="18" tilewidth="32" tileheight="30" infinite="0" nextlayerid="4" nextobjectid="81">
  <editorsettings>
   <export format="json"/>
  </editorsettings>
@@ -27,18 +27,6 @@
  </layer>
  <objectgroup id="2" name="collisionTiles">
   <object id="12" type="collision_tile" x="224" y="300" width="640" height="30"/>
-  <object id="15" name="1" type="character" x="245.274" y="440.266" width="24" height="48"/>
-  <object id="17" name="1" type="character" x="132.712" y="170.992" width="24" height="48"/>
-  <object id="18" name="1" type="character" x="625.711" y="239.669" width="24" height="48"/>
-  <object id="23" name="3" type="character" x="499.395" y="443.246" width="24" height="48"/>
-  <object id="26" name="2" type="character" x="119.222" y="27.5069" width="24" height="48"/>
-  <object id="27" name="2" type="character" x="559.487" y="237.216" width="24" height="48"/>
-  <object id="29" name="2" type="character" x="120.448" y="443.246" width="24" height="48"/>
-  <object id="30" name="3" type="character" x="803.534" y="243.348" width="24" height="48"/>
-  <object id="35" name="4" type="character" x="354.684" y="356.174" width="24" height="48"/>
-  <object id="36" name="4" type="character" x="274.97" y="234.763" width="24" height="48"/>
-  <object id="37" name="3" type="character" x="355.91" y="61.8457" width="24" height="48"/>
-  <object id="39" name="4" type="character" x="731.178" y="239.669" width="24" height="48"/>
   <object id="48" type="collision_tile" x="0" y="210" width="32" height="210"/>
   <object id="50" type="collision_tile" x="32" y="150" width="32" height="90"/>
   <object id="51" type="collision_tile" x="352" y="420" width="30" height="90"/>
@@ -56,5 +44,19 @@
   <object id="65" type="collision_tile" x="736" y="510" width="160" height="30"/>
   <object id="67" type="collision_tile" x="32" y="390" width="32" height="90"/>
   <object id="68" type="collision_tile" x="64" y="450" width="32" height="90"/>
+ </objectgroup>
+ <objectgroup id="3" name="characters">
+  <object id="69" name="1" type="character" x="244.896" y="447.89" width="24" height="48"/>
+  <object id="70" name="1" type="character" x="132.334" y="178.616" width="24" height="48"/>
+  <object id="71" name="1" type="character" x="625.333" y="247.293" width="24" height="48"/>
+  <object id="72" name="3" type="character" x="499.017" y="450.87" width="24" height="48"/>
+  <object id="73" name="2" type="character" x="118.844" y="35.1305" width="24" height="48"/>
+  <object id="74" name="2" type="character" x="802.109" y="243.84" width="24" height="48"/>
+  <object id="75" name="2" type="character" x="119.07" y="455.87" width="24" height="48"/>
+  <object id="76" name="3" type="character" x="560.156" y="238.972" width="24" height="48"/>
+  <object id="77" name="4" type="character" x="354.306" y="363.798" width="24" height="48"/>
+  <object id="78" name="4" type="character" x="274.592" y="245.387" width="24" height="48"/>
+  <object id="79" name="3" type="character" x="355.532" y="69.4693" width="24" height="48"/>
+  <object id="80" name="4" type="character" x="730.8" y="247.293" width="24" height="48"/>
  </objectgroup>
 </map>

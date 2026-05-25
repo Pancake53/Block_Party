@@ -11,6 +11,8 @@ class Background(Tile):
     index: str
     game_world: object
 
+    camera_speed: int =1
+
     image: object =None
     width: int=None
     height: int=None
@@ -22,6 +24,12 @@ class Background(Tile):
         
         self.x_origin = self.x
         self.y_origin = self.y
+
+        self.camera_speed_x = self.camera_speed
+        if self.camera_speed != 1:
+            self.camera_speed_y = self.camera_speed / 2
+        else:
+            self.camera_speed_y = self.camera_speed
         
         if self.colour:
             print(f'{self.colour}')
@@ -50,7 +58,7 @@ class Background(Tile):
         else:
             self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-        self.max_offset = 200
+        self.max_offset = self.game_world.game.GAME_W
 
     def render_image(self, surface):
         surface.blit(self.image, self.rect)
@@ -62,6 +70,17 @@ class Background(Tile):
         if self.x <= - self.max_offset:
             self.x = self.game_world.game.GAME_W + self.max_offset
         self.rect.x = self.x
+
+    def camera_move(self, x_offset, y_offset):
+        '''
+        override the tile class
+        '''
+
+        self.x += x_offset * self.camera_speed_x
+        self.y += y_offset * self.camera_speed_y
+
+        self.rect.x = self.x
+        self.rect.y = self.y
 
 
             

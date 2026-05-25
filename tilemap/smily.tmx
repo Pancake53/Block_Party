@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="18" tilewidth="32" tileheight="30" infinite="0" nextlayerid="3" nextobjectid="99">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="18" tilewidth="32" tileheight="30" infinite="0" nextlayerid="4" nextobjectid="115">
  <editorsettings>
   <export target="../levels/smily.tmj" format="json"/>
  </editorsettings>
@@ -25,18 +25,25 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
+ <objectgroup id="3" name="characters">
+  <object id="99" name="1" type="character" x="184.119" y="456.085" width="24" height="48"/>
+  <object id="100" name="1" type="character" x="795.221" y="65.9253" width="24" height="48"/>
+  <object id="101" name="1" type="character" x="548.777" y="309.725" width="24" height="48"/>
+  <object id="102" name="2" type="character" x="865.845" y="66.4402" width="24" height="48"/>
+  <object id="103" name="2" type="character" x="88.7743" y="456.928" width="24" height="48"/>
+  <object id="104" name="2" type="character" x="412.842" y="306.515" width="24" height="48"/>
+  <object id="105" name="3" type="character" x="870.936" y="456.503" width="24" height="48"/>
+  <object id="106" name="4" type="character" x="789.971" y="457.329" width="24" height="48"/>
+  <object id="107" name="4" type="character" x="61.2573" y="65.2537" width="24" height="48"/>
+  <object id="108" name="3" type="character" x="133.197" y="64.3364" width="24" height="48"/>
+  <object id="109" name="4" type="character" x="327.465" y="154.594" width="24" height="48"/>
+  <object id="110" name="3" type="character" x="610.509" y="156.933" width="24" height="48"/>
+  <object id="111" name="3" type="character" x="127.287" y="331.368" width="24" height="48"/>
+  <object id="112" name="4" type="character" x="67.2873" y="161.368" width="24" height="48"/>
+  <object id="113" name="2" type="character" x="866.287" y="159.368" width="24" height="48"/>
+  <object id="114" name="1" type="character" x="808.951" y="337.155" width="24" height="48"/>
+ </objectgroup>
  <objectgroup id="2" name="collisionTiles">
-  <object id="15" name="1" type="character" x="183.274" y="448.266" width="24" height="48"/>
-  <object id="17" name="1" type="character" x="796.712" y="54.992" width="24" height="48"/>
-  <object id="18" name="1" type="character" x="548.711" y="288.669" width="24" height="48"/>
-  <object id="26" name="2" type="character" x="864.222" y="55.5069" width="24" height="48"/>
-  <object id="27" name="2" type="character" x="89.487" y="445.216" width="24" height="48"/>
-  <object id="29" name="2" type="character" x="417.448" y="293.246" width="24" height="48"/>
-  <object id="30" name="3" type="character" x="868.534" y="446.348" width="24" height="48"/>
-  <object id="35" name="4" type="character" x="790.684" y="447.174" width="24" height="48"/>
-  <object id="36" name="4" type="character" x="61.97" y="52.763" width="24" height="48"/>
-  <object id="37" name="3" type="character" x="133.91" y="51.8457" width="24" height="48"/>
-  <object id="39" name="4" type="character" x="328.178" y="150.669" width="24" height="48"/>
   <object id="48" type="collision_tile" x="0" y="0" width="960" height="30"/>
   <object id="50" type="collision_tile" x="32" y="120" width="224" height="30"/>
   <object id="52" type="collision_tile" x="320" y="210" width="32" height="60"/>
@@ -62,10 +69,5 @@
   <object id="91" type="collision_tile" x="864" y="210" width="64" height="30"/>
   <object id="92" type="collision_tile" x="864" y="240" width="32" height="60"/>
   <object id="93" type="collision_tile" x="864" y="300" width="64" height="28"/>
-  <object id="94" name="3" type="character" x="612" y="146" width="24" height="48"/>
-  <object id="95" name="3" type="character" x="128" y="329" width="24" height="48"/>
-  <object id="96" name="4" type="character" x="68" y="159" width="24" height="48"/>
-  <object id="97" name="2" type="character" x="867" y="157" width="24" height="48"/>
-  <object id="98" name="1" type="character" x="812" y="327" width="24" height="48"/>
  </objectgroup>
 </map>
